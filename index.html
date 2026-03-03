@@ -1,0 +1,1316 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SOLSTORMEN — CLASSIFIED</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Share+Tech+Mono&family=Crimson+Pro:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:#050709; --surface:#0b0f13; --red:#ff2020; --orange:#ff6600;
+  --amber:#ffbe00; --cyan:#00e5ff; --text:#ccc8c0; --dim:#4a4540;
+  --glow-red:0 0 18px rgba(255,32,32,.65),0 0 55px rgba(255,32,32,.2);
+  --glow-amber:0 0 16px rgba(255,190,0,.55);
+  --glow-cyan:0 0 14px rgba(0,229,255,.5);
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+
+/* ── CUSTOM CURSOR ── */
+body{background:var(--bg);color:var(--text);font-family:'Crimson Pro',Georgia,serif;min-height:100vh;overflow-x:hidden;cursor:none;}
+#cursor{position:fixed;width:20px;height:20px;pointer-events:none;z-index:99999;transform:translate(-50%,-50%);}
+#cursor svg{width:100%;height:100%;}
+
+/* ── LAYERS ── */
+#solar-canvas{position:fixed;inset:0;z-index:0;pointer-events:none;}
+#particle-canvas{position:fixed;inset:0;z-index:1;pointer-events:none;}
+
+/* ── CRT OVERLAY ── */
+#crt{position:fixed;inset:0;z-index:9990;pointer-events:none;}
+#crt::before{content:'';position:absolute;inset:0;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,.13) 2px,rgba(0,0,0,.13) 4px);animation:scanroll 6s linear infinite;}
+#crt::after{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 50% 50%,transparent 35%,rgba(0,0,0,.8) 100%);}
+@keyframes scanroll{0%{background-position:0 0}100%{background-position:0 80px}}
+
+/* ── FLASH / GLITCH OVERLAYS ── */
+#flash{position:fixed;inset:0;opacity:0;pointer-events:none;z-index:9985;mix-blend-mode:screen;}
+#glitch-r,#glitch-b{position:fixed;inset:0;pointer-events:none;z-index:9984;opacity:0;mix-blend-mode:screen;}
+#glitch-r{background:rgba(255,0,0,.07);}
+#glitch-b{background:rgba(0,200,255,.07);}
+
+/* ── BOOT SCREEN ── */
+#boot{position:fixed;inset:0;background:#000;z-index:99998;display:flex;flex-direction:column;justify-content:center;padding:3rem;font-family:'Share Tech Mono',monospace;font-size:.85rem;color:#ff2020;line-height:1.9;overflow:hidden;}
+#boot-text{white-space:pre-wrap;word-break:break-all;}
+#boot-cursor{display:inline-block;width:9px;height:1.1em;background:#ff2020;animation:bootblink .5s step-end infinite;vertical-align:middle;margin-left:2px;}
+@keyframes bootblink{0%,100%{opacity:1}50%{opacity:0}}
+#boot.hidden{display:none;}
+#boot-skip{position:absolute;bottom:1.5rem;right:2rem;font-size:.7rem;color:var(--dim);letter-spacing:2px;cursor:pointer;border:none;background:none;font-family:'Share Tech Mono',monospace;}
+#boot-skip:hover{color:var(--red);}
+
+/* ── MAIN WRAP ── */
+#game-wrap{position:relative;z-index:10;max-width:760px;margin:0 auto;padding:1.5rem 1.5rem 5rem;}
+
+/* ── TOP HUD ── */
+#hud{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;border-bottom:1px solid rgba(255,32,32,.2);padding-bottom:.8rem;margin-bottom:1rem;gap:.5rem;}
+#hud-left{font-family:'Bebas Neue',sans-serif;font-size:1.3rem;letter-spacing:8px;color:var(--dim);}
+#hud-center{}
+#hud-right{display:flex;gap:.6rem;justify-content:flex-end;align-items:center;}
+
+/* radiation meter */
+#rad-wrap{display:flex;align-items:center;gap:.5rem;}
+#rad-label{font-family:'Share Tech Mono',monospace;font-size:.65rem;color:var(--red);letter-spacing:2px;}
+#rad-bar-outer{width:80px;height:6px;background:rgba(255,32,32,.15);border-radius:2px;overflow:hidden;}
+#rad-bar{height:100%;background:linear-gradient(90deg,#ff6600,#ff2020);width:0%;transition:width 1.5s ease;box-shadow:0 0 8px rgba(255,32,32,.5);}
+
+/* alert dot */
+#alert-dot{width:8px;height:8px;border-radius:50%;background:var(--red);box-shadow:var(--glow-red);animation:blink-dot 1s step-end infinite;}
+@keyframes blink-dot{0%,100%{opacity:1}50%{opacity:0}}
+
+/* ── COUNTDOWN ── */
+#countdown-wrap{text-align:center;margin-bottom:1rem;position:relative;}
+#cd-label{font-family:'Share Tech Mono',monospace;font-size:.65rem;letter-spacing:5px;color:var(--dim);margin-bottom:.2rem;}
+#cd{font-family:'Bebas Neue',sans-serif;font-size:clamp(3rem,9vw,5.5rem);letter-spacing:10px;color:var(--red);text-shadow:var(--glow-red);line-height:1;transition:color .4s,text-shadow .4s;}
+#cd.amber{color:var(--amber);text-shadow:var(--glow-amber);}
+#cd.critical{animation:cdpulse .4s ease-in-out infinite;}
+@keyframes cdpulse{0%,100%{transform:scale(1)}50%{transform:scale(1.03)}}
+
+/* ── STATS BAR ── */
+#stats-bar{display:flex;gap:1rem;margin-bottom:1rem;padding:.7rem 1rem;border:1px solid rgba(255,32,32,.12);background:rgba(11,15,19,.7);border-radius:3px;flex-wrap:wrap;}
+.stat{display:flex;flex-direction:column;gap:3px;flex:1;min-width:80px;}
+.stat-label{font-family:'Share Tech Mono',monospace;font-size:.6rem;letter-spacing:3px;color:var(--dim);}
+.stat-bar-outer{height:4px;background:rgba(255,255,255,.07);border-radius:2px;overflow:hidden;}
+.stat-bar{height:100%;border-radius:2px;transition:width .8s ease;}
+.stat-bar.frykt{background:linear-gradient(90deg,#ff4444,#ff0000);}
+.stat-bar.mot{background:linear-gradient(90deg,#00cc88,#00ffaa);}
+.stat-bar.kunnskap{background:linear-gradient(90deg,#00aaff,#00e5ff);}
+.stat-val{font-family:'Share Tech Mono',monospace;font-size:.65rem;color:var(--text);}
+
+/* ── INVENTORY ── */
+#inv-bar{display:flex;gap:.5rem;margin-bottom:.9rem;min-height:28px;flex-wrap:wrap;}
+.inv-item{font-family:'Share Tech Mono',monospace;font-size:.68rem;padding:.25rem .55rem;border:1px solid rgba(0,229,255,.35);color:var(--cyan);border-radius:2px;background:rgba(0,229,255,.05);text-shadow:var(--glow-cyan);animation:itemPop .3s ease-out both;}
+@keyframes itemPop{from{transform:scale(0) rotate(-5deg);opacity:0}to{transform:scale(1) rotate(0);opacity:1}}
+
+/* ── TICKER ── */
+#ticker-wrap{overflow:hidden;border-top:1px solid rgba(255,32,32,.18);border-bottom:1px solid rgba(255,32,32,.18);padding:.3rem 0;margin-bottom:1.2rem;position:relative;}
+#ticker-wrap::before{content:'KRISE';position:absolute;left:0;top:0;bottom:0;background:var(--red);color:#fff;font-family:'Bebas Neue',sans-serif;font-size:.8rem;letter-spacing:3px;padding:.3rem .6rem;z-index:2;display:flex;align-items:center;}
+#ticker-text{font-family:'Share Tech Mono',monospace;font-size:.72rem;color:var(--red);white-space:nowrap;padding-left:80px;animation:tickerScroll 30s linear infinite;}
+@keyframes tickerScroll{0%{transform:translateX(110vw)}100%{transform:translateX(-100%)}}
+
+/* ── SCENE IMAGE ── */
+.img-wrap{position:relative;width:100%;height:210px;margin-bottom:1.5rem;border-radius:3px;overflow:hidden;}
+.img-wrap::before{content:'';position:absolute;inset:0;background:linear-gradient(to bottom,transparent 30%,var(--bg) 100%);z-index:2;}
+.img-wrap::after{content:'';position:absolute;inset:0;background:rgba(255,32,32,.06);z-index:3;mix-blend-mode:screen;}
+.img-wrap img{width:100%;height:100%;object-fit:cover;filter:saturate(.45) contrast(1.2);transition:filter 1s;}
+.img-wrap .img-glitch{position:absolute;inset:0;z-index:4;pointer-events:none;animation:imgTear 7s step-end infinite;}
+@keyframes imgTear{
+  0%,92%,100%{clip-path:none;transform:none;background:transparent;}
+  93%{clip-path:inset(25% 0 60% 0);transform:translate(-10px);background:rgba(255,0,0,.04);}
+  94%{clip-path:inset(55% 0 15% 0);transform:translate(8px);background:rgba(0,255,255,.04);}
+  95%{clip-path:none;}
+  96%{clip-path:inset(10% 0 80% 0);transform:translate(-5px);}
+  97%{clip-path:none;transform:none;}
+}
+/* scan line on image */
+.img-wrap .scan-line{position:absolute;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,rgba(255,32,32,.4),transparent);z-index:5;animation:scanDown 3s linear infinite;}
+@keyframes scanDown{0%{top:-5px}100%{top:110%}}
+
+/* ── SCENE TITLE ── */
+#scene-title{font-family:'Bebas Neue',sans-serif;font-size:clamp(1.8rem,7vw,3.5rem);letter-spacing:6px;line-height:1;color:#fff;margin-bottom:1.2rem;position:relative;display:inline-block;}
+#scene-title::before,#scene-title::after{content:attr(data-text);position:absolute;top:0;left:0;width:100%;pointer-events:none;}
+#scene-title::before{color:var(--red);animation:gtA 5s step-end infinite;}
+#scene-title::after{color:var(--cyan);animation:gtB 5s step-end infinite;}
+@keyframes gtA{0%,88%,100%{opacity:0}89%{opacity:.9;clip-path:inset(15% 0 70% 0);transform:translate(5px,0)}90%{clip-path:inset(60% 0 15% 0);transform:translate(-5px,0)}91%{opacity:0}}
+@keyframes gtB{0%,90%,100%{opacity:0}91%{opacity:.6;clip-path:inset(35% 0 45% 0);transform:translate(-3px,0)}92%{clip-path:inset(75% 0 5% 0);transform:translate(4px,0)}93%{opacity:0}}
+
+/* ── STORY TEXT ── */
+#story-text{font-size:1.12rem;line-height:1.9;color:var(--text);margin-bottom:1.5rem;}
+#story-text p{margin-bottom:.85rem;}
+#story-text em{display:block;color:#b8b2aa;border-left:2px solid var(--red);padding:.6rem .9rem;margin:.7rem 0;background:rgba(255,32,32,.05);font-style:italic;font-size:1.05rem;border-radius:0 3px 3px 0;}
+#story-text strong{color:#fff;}
+.corrupt-char{color:var(--red);opacity:.7;animation:charFlicker .1s step-end 3;}
+@keyframes charFlicker{0%,100%{opacity:.7}50%{opacity:0}}
+
+/* ── CHOICE AREA ── */
+#choices{display:flex;flex-direction:column;gap:.8rem;}
+.choice-btn{background:transparent;border:1px solid rgba(255,32,32,.2);color:var(--text);padding:.9rem 1.1rem .9rem 1.4rem;text-align:left;font-family:'Crimson Pro',serif;font-size:1.1rem;cursor:none;position:relative;overflow:hidden;transition:border-color .18s,color .18s;border-radius:2px;line-height:1.45;}
+.choice-btn::before{content:'▶';position:absolute;left:-1.8rem;top:50%;transform:translateY(-50%);color:var(--red);font-size:.65rem;transition:left .2s;}
+.choice-btn::after{content:'';position:absolute;inset:0;background:linear-gradient(90deg,rgba(255,32,32,.1) 0%,transparent 55%);transform:translateX(-100%);transition:transform .25s ease;}
+.choice-btn:hover{border-color:var(--red);color:#fff;}
+.choice-btn:hover::before{left:.9rem;}
+.choice-btn:hover::after{transform:translateX(0);}
+.choice-btn span{position:relative;z-index:1;}
+.choice-btn:active{transform:scale(.99);}
+.choice-btn.locked{border-color:rgba(255,190,0,.3);color:var(--dim);cursor:not-allowed;}
+.choice-btn.locked::before{content:'🔒';font-size:.75rem;}
+.choice-btn.requires{border-color:rgba(0,229,255,.3);}
+.choice-btn .req-badge{font-family:'Share Tech Mono',monospace;font-size:.65rem;color:var(--cyan);display:block;margin-top:.25rem;opacity:.7;}
+
+/* ── RESTART ── */
+.restart-btn{background:transparent;border:1px dashed rgba(255,32,32,.4);color:var(--red);width:100%;padding:.85rem;font-family:'Share Tech Mono',monospace;font-size:.85rem;letter-spacing:4px;cursor:none;margin-top:.5rem;transition:all .2s;}
+.restart-btn:hover{background:rgba(255,32,32,.08);letter-spacing:7px;}
+
+/* ── PATH TRACKER ── */
+#path-wrap{margin-top:2rem;padding-top:1rem;border-top:1px solid rgba(255,32,32,.12);}
+#path-label{font-family:'Share Tech Mono',monospace;font-size:.6rem;color:var(--dim);letter-spacing:4px;margin-bottom:.5rem;}
+#path-nodes{display:flex;gap:0;flex-wrap:wrap;align-items:center;}
+.path-node{font-family:'Share Tech Mono',monospace;font-size:.62rem;color:var(--dim);white-space:nowrap;}
+.path-node.current{color:var(--red);font-weight:bold;}
+.path-arrow{color:rgba(255,32,32,.3);margin:0 3px;font-size:.6rem;}
+
+/* ── ENDING SCREENS ── */
+.ending-wrap{text-align:center;padding:1.5rem 0;}
+.ending-title{font-family:'Bebas Neue',sans-serif;font-size:clamp(2rem,8vw,4rem);letter-spacing:8px;margin:1rem 0 .5rem;position:relative;display:inline-block;}
+.ending-title.bad{color:var(--red);text-shadow:var(--glow-red);animation:endingBad 1.5s ease-in-out infinite;}
+.ending-title.good{color:var(--amber);text-shadow:var(--glow-amber);animation:endingGood 2s ease-in-out infinite;}
+.ending-title.solo{color:#778899;}
+.ending-title.secret{color:var(--cyan);text-shadow:var(--glow-cyan);animation:endingSecret 1s step-end infinite;}
+@keyframes endingBad{0%,100%{transform:scale(1) skew(0)}50%{transform:scale(1.02) skew(-.5deg)}}
+@keyframes endingGood{0%,100%{opacity:1;text-shadow:0 0 20px rgba(255,190,0,.5),0 0 60px rgba(255,190,0,.2)}50%{text-shadow:0 0 40px rgba(255,190,0,.9),0 0 100px rgba(255,190,0,.4)}}
+@keyframes endingSecret{0%,100%{opacity:1;letter-spacing:8px}50%{opacity:.7;letter-spacing:14px}}
+.ending-sub{font-family:'Share Tech Mono',monospace;font-size:.75rem;letter-spacing:4px;color:var(--dim);margin-bottom:2rem;}
+
+/* ── NOTIFICATION TOAST ── */
+#toast{position:fixed;bottom:2rem;right:2rem;z-index:9995;display:flex;flex-direction:column;gap:.5rem;pointer-events:none;}
+.toast-item{font-family:'Share Tech Mono',monospace;font-size:.75rem;padding:.6rem 1rem;border-radius:3px;animation:toastIn .3s ease-out both;max-width:280px;line-height:1.4;}
+.toast-item.item{background:rgba(0,229,255,.12);border:1px solid rgba(0,229,255,.4);color:var(--cyan);}
+.toast-item.stat{background:rgba(255,32,32,.1);border:1px solid rgba(255,32,32,.3);color:var(--red);}
+.toast-item.warn{background:rgba(255,190,0,.1);border:1px solid rgba(255,190,0,.3);color:var(--amber);}
+.toast-item.info{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);color:var(--text);}
+@keyframes toastIn{from{transform:translateX(120%);opacity:0}to{transform:translateX(0);opacity:1}}
+
+/* ── DANGER BAR ── */
+#danger-bar-outer{height:2px;background:rgba(255,32,32,.08);margin-bottom:1rem;}
+#danger-bar{height:100%;background:linear-gradient(90deg,var(--orange),var(--red));transition:width 1.5s ease;box-shadow:0 0 6px rgba(255,32,32,.5);}
+
+/* ── FADE ANIM ── */
+@keyframes fadeSlide{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+.fade-in{animation:fadeSlide .45s ease-out both;}
+
+/* ── SHAKE ── */
+@keyframes shake{0%,100%{transform:translate(0)}10%{transform:translate(-7px,-3px) rotate(-.4deg)}20%{transform:translate(7px,3px) rotate(.4deg)}30%{transform:translate(-5px,4px)}40%{transform:translate(5px,-4px)}50%{transform:translate(-3px,2px)}60%{transform:translate(3px,-2px)}80%{transform:translate(2px,-2px)}90%{transform:translate(-2px,1px)}}
+.shake{animation:shake .5s ease-in-out;}
+
+/* ── HEARTBEAT BORDER ── */
+#game-wrap.heartbeat-slow{box-shadow:0 0 0 1px rgba(255,32,32,.1);}
+#game-wrap.heartbeat-fast{animation:heartbeatBorder .6s ease-in-out infinite;}
+@keyframes heartbeatBorder{0%,100%{box-shadow:0 0 0 0 rgba(255,32,32,0)}50%{box-shadow:0 0 30px 3px rgba(255,32,32,.2)}}
+</style>
+</head>
+<body>
+
+<!-- Custom cursor -->
+<div id="cursor">
+  <svg viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <line x1="10" y1="0" x2="10" y2="8" stroke="#ff2020" stroke-width="1.5"/>
+    <line x1="10" y1="12" x2="10" y2="20" stroke="#ff2020" stroke-width="1.5"/>
+    <line x1="0" y1="10" x2="8" y2="10" stroke="#ff2020" stroke-width="1.5"/>
+    <line x1="12" y1="10" x2="20" y2="10" stroke="#ff2020" stroke-width="1.5"/>
+    <circle cx="10" cy="10" r="2.5" stroke="#ff2020" stroke-width="1.2"/>
+  </svg>
+</div>
+
+<!-- Canvas layers -->
+<canvas id="solar-canvas"></canvas>
+<canvas id="particle-canvas"></canvas>
+
+<!-- CRT, overlays -->
+<div id="crt"></div>
+<div id="flash" style="background:#ff2020;"></div>
+<div id="glitch-r"></div>
+<div id="glitch-b"></div>
+
+<!-- Toast notifications -->
+<div id="toast"></div>
+
+<!-- ── BOOT SCREEN ── -->
+<div id="boot">
+  <div id="boot-text"></div><span id="boot-cursor"></span>
+  <button id="boot-skip" onclick="skipBoot()">[ HOPP OVER ]</button>
+</div>
+
+<!-- ── MAIN GAME ── -->
+<div id="game-wrap" class="heartbeat-slow">
+
+  <div id="hud">
+    <div id="hud-left">SOLSTORMEN</div>
+    <div id="hud-center">
+      <div id="rad-wrap">
+        <div id="rad-label">RAD</div>
+        <div id="rad-bar-outer"><div id="rad-bar"></div></div>
+      </div>
+    </div>
+    <div id="hud-right">
+      <div id="alert-dot"></div>
+      <span style="font-family:'Share Tech Mono',monospace;font-size:.65rem;color:var(--red);">NØDVARSEL</span>
+    </div>
+  </div>
+
+  <div id="danger-bar-outer"><div id="danger-bar" style="width:0%"></div></div>
+
+  <div id="ticker-wrap">
+    <div id="ticker-text">SOLSTORM X99 BEKREFTET ◈ 100% DØDELIG STRÅLING ◈ FJELLBUNKER ÅPEN: 50 000 PLASSER ◈ EVAKUER UMIDDELBART ◈ MYNDIGHETENE OPPFORDRER ROLIG EVAKUERING ◈ MOBILNETT FALLER INNEN 18 TIMER ◈ HOLD DEG UNNA VINDUER OG METALLOBJEKTER ◈ PROSJEKT SOLNEDGANG — ER DU INFORMERT? ◈ SOLSTORM X99 ◈</div>
+  </div>
+
+  <div id="countdown-wrap">
+    <div id="cd-label">TID TIL NEDSLAG</div>
+    <div id="cd">00:00:00</div>
+  </div>
+
+  <div id="stats-bar">
+    <div class="stat">
+      <div class="stat-label">FRYKT</div>
+      <div class="stat-bar-outer"><div class="stat-bar frykt" id="bar-frykt" style="width:20%"></div></div>
+      <div class="stat-val" id="val-frykt">20</div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">MOT</div>
+      <div class="stat-bar-outer"><div class="stat-bar mot" id="bar-mot" style="width:50%"></div></div>
+      <div class="stat-val" id="val-mot">50</div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">KUNNSKAP</div>
+      <div class="stat-bar-outer"><div class="stat-bar kunnskap" id="bar-kunnskap" style="width:10%"></div></div>
+      <div class="stat-val" id="val-kunnskap">10</div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">STRÅLING</div>
+      <div class="stat-bar-outer"><div id="rad-stat-outer" class="stat-bar-outer"><div class="stat-bar" id="bar-rad" style="width:0%;background:linear-gradient(90deg,#ff6600,#ff0000)"></div></div></div>
+      <div class="stat-val" id="val-rad">0</div>
+    </div>
+  </div>
+
+  <div id="inv-bar"></div>
+
+  <div id="scene-container" class="fade-in"></div>
+
+  <div id="path-wrap">
+    <div id="path-label">◈ DIN RUTE</div>
+    <div id="path-nodes"></div>
+  </div>
+
+</div>
+
+<script>
+// ═══════════════════════════════════════════
+//  AUDIO ENGINE — Web Audio API
+// ═══════════════════════════════════════════
+let audioCtx = null;
+let masterGain, droneNode, alarmNode, heartbeatNode;
+let heartbeatInterval = null;
+let audioEnabled = false;
+
+function initAudio() {
+  if (audioCtx) return;
+  try {
+    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    masterGain = audioCtx.createGain();
+    masterGain.gain.setValueAtTime(0.35, audioCtx.currentTime);
+    masterGain.connect(audioCtx.destination);
+    startDrone();
+    audioEnabled = true;
+  } catch(e) {}
+}
+
+function startDrone() {
+  if (!audioCtx) return;
+  // Low ominous drone
+  const o1 = audioCtx.createOscillator();
+  const o2 = audioCtx.createOscillator();
+  const o3 = audioCtx.createOscillator();
+  const g = audioCtx.createGain();
+  g.gain.setValueAtTime(0, audioCtx.currentTime);
+  g.gain.linearRampToValueAtTime(0.09, audioCtx.currentTime + 3);
+  o1.type = 'sawtooth'; o1.frequency.value = 40;
+  o2.type = 'sine'; o2.frequency.value = 55;
+  o3.type = 'triangle'; o3.frequency.value = 80;
+  const filter = audioCtx.createBiquadFilter();
+  filter.type = 'lowpass'; filter.frequency.value = 200;
+  o1.connect(g); o2.connect(g); o3.connect(g);
+  g.connect(filter); filter.connect(masterGain);
+  o1.start(); o2.start(); o3.start();
+  // Slow LFO on frequency
+  const lfo = audioCtx.createOscillator();
+  const lfoGain = audioCtx.createGain();
+  lfo.frequency.value = 0.08;
+  lfoGain.gain.value = 8;
+  lfo.connect(lfoGain); lfoGain.connect(o1.frequency);
+  lfo.start();
+  droneNode = {osc:[o1,o2,o3], gain:g};
+}
+
+function playClick() {
+  if (!audioCtx) return;
+  const o = audioCtx.createOscillator();
+  const g = audioCtx.createGain();
+  o.type = 'square'; o.frequency.value = 800;
+  g.gain.setValueAtTime(0.12, audioCtx.currentTime);
+  g.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.08);
+  o.connect(g); g.connect(masterGain);
+  o.start(); o.stop(audioCtx.currentTime + 0.08);
+}
+
+function playAlarm() {
+  if (!audioCtx) return;
+  [880, 1100, 880].forEach((f, i) => {
+    const o = audioCtx.createOscillator();
+    const g = audioCtx.createGain();
+    o.type = 'square'; o.frequency.value = f;
+    const t = audioCtx.currentTime + i * 0.18;
+    g.gain.setValueAtTime(0, t);
+    g.gain.linearRampToValueAtTime(0.15, t + 0.02);
+    g.gain.exponentialRampToValueAtTime(0.001, t + 0.15);
+    o.connect(g); g.connect(masterGain);
+    o.start(t); o.stop(t + 0.15);
+  });
+}
+
+function playHeartbeat(bpm) {
+  if (!audioCtx) return;
+  if (heartbeatInterval) clearInterval(heartbeatInterval);
+  const beat = () => {
+    if (!audioCtx) return;
+    const o = audioCtx.createOscillator();
+    const g = audioCtx.createGain();
+    o.type = 'sine'; o.frequency.value = 60;
+    g.gain.setValueAtTime(0.18, audioCtx.currentTime);
+    g.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.1);
+    o.connect(g); g.connect(masterGain);
+    o.start(); o.stop(audioCtx.currentTime + 0.1);
+    // double-beat
+    setTimeout(() => {
+      if (!audioCtx) return;
+      const o2 = audioCtx.createOscillator();
+      const g2 = audioCtx.createGain();
+      o2.type = 'sine'; o2.frequency.value = 55;
+      g2.gain.setValueAtTime(0.12, audioCtx.currentTime);
+      g2.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.08);
+      o2.connect(g2); g2.connect(masterGain);
+      o2.start(); o2.stop(audioCtx.currentTime + 0.08);
+    }, 150);
+  };
+  beat();
+  heartbeatInterval = setInterval(beat, 60000 / bpm);
+}
+
+function playGlitchSound() {
+  if (!audioCtx) return;
+  const bufSize = audioCtx.sampleRate * 0.06;
+  const buf = audioCtx.createBuffer(1, bufSize, audioCtx.sampleRate);
+  const data = buf.getChannelData(0);
+  for(let i=0;i<bufSize;i++) data[i] = (Math.random()*2-1)*0.3;
+  const src = audioCtx.createBufferSource();
+  const g = audioCtx.createGain();
+  const filter = audioCtx.createBiquadFilter();
+  filter.type = 'bandpass'; filter.frequency.value = 3000; filter.Q.value = 5;
+  src.buffer = buf; g.gain.value = 0.2;
+  src.connect(filter); filter.connect(g); g.connect(masterGain);
+  src.start();
+}
+
+function playEndingSound(type) {
+  if (!audioCtx) return;
+  if (type === 'bad') {
+    [220, 196, 174, 146].forEach((f,i) => {
+      const o = audioCtx.createOscillator();
+      const g = audioCtx.createGain();
+      o.type = 'sawtooth'; o.frequency.value = f;
+      const t = audioCtx.currentTime + i * 0.5;
+      g.gain.setValueAtTime(0.15, t);
+      g.gain.exponentialRampToValueAtTime(0.001, t + 0.45);
+      o.connect(g); g.connect(masterGain);
+      o.start(t); o.stop(t+0.5);
+    });
+  } else if (type === 'good') {
+    [440, 550, 660, 880].forEach((f,i) => {
+      const o = audioCtx.createOscillator();
+      const g = audioCtx.createGain();
+      o.type = 'triangle'; o.frequency.value = f;
+      const t = audioCtx.currentTime + i * 0.3;
+      g.gain.setValueAtTime(0, t);
+      g.gain.linearRampToValueAtTime(0.2, t + 0.15);
+      g.gain.exponentialRampToValueAtTime(0.001, t + 0.8);
+      o.connect(g); g.connect(masterGain);
+      o.start(t); o.stop(t+0.9);
+    });
+  } else if (type === 'secret') {
+    for(let i=0;i<8;i++){
+      const freqs=[262,330,392,523,659,784,1047,1319];
+      const o=audioCtx.createOscillator(); const g=audioCtx.createGain();
+      o.type='sine'; o.frequency.value=freqs[i];
+      const t=audioCtx.currentTime+i*0.18;
+      g.gain.setValueAtTime(0,t); g.gain.linearRampToValueAtTime(0.15,t+0.1);
+      g.gain.exponentialRampToValueAtTime(0.001,t+0.5);
+      o.connect(g); g.connect(masterGain);
+      o.start(t); o.stop(t+0.55);
+    }
+  }
+}
+
+// ═══════════════════════════════════════════
+//  CANVAS — Solar Corona (background)
+// ═══════════════════════════════════════════
+const sc = document.getElementById('solar-canvas');
+const sctx = sc.getContext('2d');
+let SW=0, SH=0;
+function resizeSolar(){SW=sc.width=window.innerWidth; SH=sc.height=window.innerHeight;}
+resizeSolar(); window.addEventListener('resize',resizeSolar);
+
+let coronaTime=0;
+function drawCorona(){
+  sctx.clearRect(0,0,SW,SH);
+  coronaTime += 0.004;
+  // pulsing corona from top-right corner
+  const cx=SW*0.88, cy=-SH*0.1;
+  const pulseR=(Math.sin(coronaTime*1.3)+1)*0.5;
+  const r1=Math.min(SW,SH)*0.5+pulseR*60;
+  // outer glow
+  const grad=sctx.createRadialGradient(cx,cy,0,cx,cy,r1*1.4);
+  grad.addColorStop(0,'rgba(255,100,0,0.035)');
+  grad.addColorStop(0.3,'rgba(255,40,0,0.018)');
+  grad.addColorStop(0.7,'rgba(255,0,0,0.008)');
+  grad.addColorStop(1,'transparent');
+  sctx.fillStyle=grad;
+  sctx.fillRect(0,0,SW,SH);
+  // corona rays
+  for(let i=0;i<12;i++){
+    const angle=(i/12)*Math.PI*2+coronaTime*0.2;
+    const len=r1*(0.6+Math.sin(coronaTime*2.1+i)*0.3);
+    const wid=0.06+Math.sin(coronaTime+i*1.4)*0.03;
+    sctx.save();
+    sctx.translate(cx,cy);
+    sctx.rotate(angle);
+    const rgrad=sctx.createLinearGradient(0,0,len,0);
+    rgrad.addColorStop(0,'rgba(255,80,0,0.04)');
+    rgrad.addColorStop(1,'transparent');
+    sctx.beginPath();
+    sctx.moveTo(0,0);
+    const spread=len*wid;
+    sctx.lineTo(len,spread);
+    sctx.lineTo(len,-spread);
+    sctx.closePath();
+    sctx.fillStyle=rgrad;
+    sctx.fill();
+    sctx.restore();
+  }
+  requestAnimationFrame(drawCorona);
+}
+drawCorona();
+
+// ═══════════════════════════════════════════
+//  CANVAS — Particles
+// ═══════════════════════════════════════════
+const pc = document.getElementById('particle-canvas');
+const pctx = pc.getContext('2d');
+let PW=0,PH=0,particles=[];
+function resizePc(){PW=pc.width=window.innerWidth; PH=pc.height=window.innerHeight;}
+resizePc(); window.addEventListener('resize',resizePc);
+
+function mkP(){
+  const types=['solar','ash','spark'];
+  const type=types[Math.floor(Math.random()*types.length)];
+  return {
+    type, x:Math.random()*PW, y:Math.random()*PH,
+    vx:(Math.random()-.4)*(type==='spark'?2:.8),
+    vy:-(Math.random()*(type==='solar'?.8:1.4)+.1),
+    r:type==='spark'?Math.random()*1.2+.2:Math.random()*2.5+.4,
+    a:Math.random()*.8+.1, life:Math.random()*250+60, age:0,
+    hue:type==='solar'?(Math.random()<.5?0:30):type==='ash'?0:60,
+    sat:type==='ash'?0:100, lit:type==='ash'?40:60,
+  };
+}
+for(let i=0;i<180;i++) particles.push(mkP());
+
+function drawParticles(){
+  pctx.clearRect(0,0,PW,PH);
+  particles.forEach((p,i)=>{
+    p.x+=p.vx; p.y+=p.vy; p.age++;
+    if(p.type==='spark'){p.vx*=.97; p.vy+=.05;}
+    const ratio=p.age/p.life;
+    const alpha=p.a*(1-ratio)*(ratio<.1?ratio*10:1);
+    pctx.beginPath();
+    pctx.arc(p.x,p.y,p.r,0,Math.PI*2);
+    pctx.fillStyle=`hsla(${p.hue},${p.sat}%,${p.lit}%,${alpha})`;
+    pctx.fill();
+    if(p.age>=p.life) particles[i]=mkP();
+  });
+  requestAnimationFrame(drawParticles);
+}
+drawParticles();
+
+// ═══════════════════════════════════════════
+//  CUSTOM CURSOR
+// ═══════════════════════════════════════════
+const cursorEl = document.getElementById('cursor');
+document.addEventListener('mousemove', e => {
+  cursorEl.style.left = e.clientX + 'px';
+  cursorEl.style.top = e.clientY + 'px';
+});
+document.addEventListener('mousedown', () => cursorEl.style.transform='translate(-50%,-50%) scale(0.7)');
+document.addEventListener('mouseup', () => cursorEl.style.transform='translate(-50%,-50%) scale(1)');
+
+// ═══════════════════════════════════════════
+//  GAME STATE
+// ═══════════════════════════════════════════
+let state = {
+  frykt:20, mot:50, kunnskap:10, rad:0,
+  inventory:[],
+  path:[],
+  visited:new Set()
+};
+
+function resetState(){
+  state = {frykt:20, mot:50, kunnskap:10, rad:0, inventory:[], path:[], visited:new Set()};
+}
+
+// ═══════════════════════════════════════════
+//  COUNTDOWN
+// ═══════════════════════════════════════════
+let cdSecs=0, cdIv=null;
+const cdEl=document.getElementById('cd');
+const dangerBar=document.getElementById('danger-bar');
+const radBar=document.getElementById('rad-bar');
+
+function setCountdown(t){
+  const [h,m,s]=t.split(':').map(Number);
+  cdSecs=h*3600+m*60+s;
+  if(cdIv) clearInterval(cdIv);
+  updateCD();
+  if(cdSecs>0) cdIv=setInterval(()=>{if(cdSecs>0){cdSecs--;updateCD();}else clearInterval(cdIv);},1000);
+}
+function updateCD(){
+  const h=Math.floor(cdSecs/3600), m=Math.floor((cdSecs%3600)/60), s=cdSecs%60;
+  cdEl.textContent=`${p2(h)}:${p2(m)}:${p2(s)}`;
+  const pct=Math.min(1,(86400-cdSecs)/86400);
+  dangerBar.style.width=(pct*100)+'%';
+  cdEl.classList.remove('amber','critical');
+  if(cdSecs===0) cdEl.classList.add('critical');
+  else if(cdSecs<7200) cdEl.classList.add('critical');
+  else if(cdSecs<36000) cdEl.classList.add('amber');
+  // heartbeat
+  const wrap=document.getElementById('game-wrap');
+  wrap.classList.remove('heartbeat-slow','heartbeat-fast');
+  if(cdSecs<7200) {wrap.classList.add('heartbeat-fast'); playHeartbeat(120);}
+  else if(cdSecs<36000) {wrap.classList.add('heartbeat-slow'); playHeartbeat(80);}
+}
+function p2(n){return String(n).padStart(2,'0');}
+
+// ═══════════════════════════════════════════
+//  STATS
+// ═══════════════════════════════════════════
+function applyStat(key, delta, label){
+  if(!(key in state)) return;
+  state[key] = Math.max(0, Math.min(100, state[key]+delta));
+  const bar = document.getElementById('bar-'+key);
+  const val = document.getElementById('val-'+key);
+  if(bar) bar.style.width = state[key]+'%';
+  if(val) val.textContent = state[key];
+  if(key==='rad'){
+    radBar.style.width = state.rad+'%';
+    document.getElementById('bar-rad').style.width=state.rad+'%';
+  }
+  if(label) showToast(`${delta>0?'+':''}${delta} ${label}`, delta>0&&key!=='frykt'&&key!=='rad'?'info':'stat');
+}
+
+function applyStatDeltas(deltas){
+  if(!deltas) return;
+  Object.entries(deltas).forEach(([k,{delta,label}])=>applyStat(k,delta,label));
+}
+
+// ═══════════════════════════════════════════
+//  INVENTORY
+// ═══════════════════════════════════════════
+function addItem(id, label){
+  if(state.inventory.includes(id)) return;
+  state.inventory.push(id);
+  updateInvUI();
+  showToast('📦 Fant: '+label,'item');
+  playAlarm();
+}
+
+function hasItem(id){ return state.inventory.includes(id); }
+
+function updateInvUI(){
+  const bar=document.getElementById('inv-bar');
+  bar.innerHTML = state.inventory.length
+    ? state.inventory.map(id=>{
+        const item=itemDefs[id];
+        return `<div class="inv-item">${item?item.label:id}</div>`;
+      }).join('')
+    : '';
+}
+
+const itemDefs = {
+  minnepenn:     {label:'💾 MINNEPENN'},
+  adgangskort:   {label:'🪪 VIP-KORT'},
+  gasmaske:      {label:'😷 GASMASKE'},
+  radiokode:     {label:'📡 RADIOKODE'},
+  bunkerkart:    {label:'🗺 BUNKERKART'},
+  serum:         {label:'💉 MOTGIFT'},
+};
+
+// ═══════════════════════════════════════════
+//  TOAST
+// ═══════════════════════════════════════════
+function showToast(msg, type='info'){
+  const t=document.getElementById('toast');
+  const el=document.createElement('div');
+  el.className=`toast-item ${type}`;
+  el.textContent=msg;
+  t.appendChild(el);
+  setTimeout(()=>{el.style.transition='opacity .5s';el.style.opacity='0';setTimeout(()=>el.remove(),500);},3000);
+}
+
+// ═══════════════════════════════════════════
+//  PATH TRACKER
+// ═══════════════════════════════════════════
+function updatePath(id){
+  state.path.push(id);
+  const wrap=document.getElementById('path-nodes');
+  wrap.innerHTML = state.path.map((p,i)=>{
+    const label=story[p]?.shortName||p;
+    const isCurrent = i===state.path.length-1;
+    return `${i>0?'<span class="path-arrow">→</span>':''}<span class="path-node${isCurrent?' current':''}">${label}</span>`;
+  }).join('');
+}
+
+// ═══════════════════════════════════════════
+//  SCREEN FX
+// ═══════════════════════════════════════════
+function shake(){
+  const w=document.getElementById('game-wrap');
+  w.classList.remove('shake'); void w.offsetWidth; w.classList.add('shake');
+  setTimeout(()=>w.classList.remove('shake'),550);
+}
+function flash(color='#ff2020'){
+  const f=document.getElementById('flash');
+  f.style.background=color; f.style.opacity='.4';
+  setTimeout(()=>{f.style.transition='opacity .35s';f.style.opacity='0';setTimeout(()=>f.style.transition='',400);},40);
+}
+function glitchScreen(){
+  const gr=document.getElementById('glitch-r'), gb=document.getElementById('glitch-b');
+  gr.style.opacity='.6'; gb.style.opacity='.5';
+  playGlitchSound();
+  setTimeout(()=>{
+    gr.style.clipPath=`inset(${Math.random()*60}% 0 ${Math.random()*30}% 0)`;
+    gb.style.clipPath=`inset(${Math.random()*40}% 0 ${Math.random()*50}% 0)`;
+    gr.style.transform=`translate(${(Math.random()-.5)*12}px)`;
+    gb.style.transform=`translate(${(Math.random()-.5)*10}px)`;
+  },0);
+  setTimeout(()=>{gr.style.opacity='0';gb.style.opacity='0';gr.style.clipPath='';gb.style.clipPath='';},120);
+}
+
+// Random glitch events
+setInterval(()=>{
+  if(Math.random()<0.4) glitchScreen();
+}, 8000+Math.random()*10000);
+
+// Corrupt text in body randomly
+function corruptChar(el){
+  if(!el) return;
+  const chars='!@#$%^&*◈▓░▒█▌▐◆◇◉';
+  const walker=document.createTreeWalker(el,NodeFilter.SHOW_TEXT,null,false);
+  const nodes=[];
+  let n;
+  while(n=walker.nextNode()){if(n.textContent.trim()) nodes.push(n);}
+  if(!nodes.length) return;
+  const node=nodes[Math.floor(Math.random()*nodes.length)];
+  const orig=node.textContent;
+  const idx=Math.floor(Math.random()*(orig.length-1));
+  const corrupt=orig.substring(0,idx)+chars[Math.floor(Math.random()*chars.length)]+orig.substring(idx+1);
+  node.textContent=corrupt;
+  setTimeout(()=>node.textContent=orig, 80);
+}
+setInterval(()=>{
+  const st=document.getElementById('story-text');
+  if(st) corruptChar(st);
+},4000);
+
+// ═══════════════════════════════════════════
+//  IMAGE HELPER
+// ═══════════════════════════════════════════
+function img(url,alt=''){
+  return `<img src="${url}" alt="${alt}" onerror="this.src='https://placehold.co/760x210/0b0f13/ff2020?text=◈'">`;
+}
+
+// ═══════════════════════════════════════════
+//  STORY DATA
+// ═══════════════════════════════════════════
+const story = {
+  start:{
+    shortName:'START',
+    img:img('https://images.unsplash.com/photo-1501139083538-0139583c060f?auto=format&fit=crop&w=760&q=80'),
+    time:'23:59:59', radDelta:0,
+    title:'SOLSTORMEN',
+    isTitle:true,
+    text:`<p>Du rykkes ut av søvnen av en skingrende uling. Det nasjonale nødvarselet fyller skjermen:</p>
+<em>«KRISEVARSEL: Solstorm kategori X99 treffer om 24 timer. 100% dødelig stråling. Fjellbunkeren åpen. Kapasitet: 50 000. Førstemann til mølla.»</em>
+<p>Hjertet hamrer. Lyskastere feier gjennom vinduet. Naboen skriker. Et valg må tas. <strong>Nå.</strong></p>`,
+    stats:{frykt:{delta:+20,label:'FRYKT'},mot:{delta:0}},
+    choices:[
+      {text:'Kast deg i bilen — kjør mot fjellbunkeren.', target:'trafikkorken'},
+      {text:'Lås døren. Hack Dark Web. Verifiser varselet.', target:'sannheten'},
+      {text:'Glem fjellet. Løp ned i byens forlatte T-bane.', target:'t_banen'},
+    ]
+  },
+
+  trafikkorken:{
+    shortName:'MOTORVEI',
+    img:img('https://images.unsplash.com/photo-1508003666014-41d327d7fb72?auto=format&fit=crop&w=760&q=80'),
+    time:'20:00:00', radDelta:5,
+    title:'TRAFIKKORKEN',
+    text:`<p>Motorveien er en kirkegård av biler. Tre timer. Null fremgang.</p>
+<em>Radio: «Hold dere i kjøretøyene. Militæret rydder veien snart.»</em>
+<p>Solen er fenoménalt oransje. Eller er det allerede stråling som brenner atmosfæren? Du merker at huden begynner å svie svakt.</p>`,
+    stats:{frykt:{delta:+15,label:'FRYKT'}, rad:{delta:+8,label:'STRÅLING'}},
+    choices:[
+      {text:'Forlat bilen. Ta beina fatt inn i skogen.', target:'bensinstasjon'},
+      {text:'Stol på militæret. Lås dørene og vent.', target:'militaer_felle'},
+    ]
+  },
+
+  militaer_felle:{
+    shortName:'MILITÆR',
+    img:img('https://images.unsplash.com/photo-1537151608828-ea2b11777ee8?auto=format&fit=crop&w=760&q=80'),
+    time:'18:00:00', radDelta:8,
+    title:'DEN SORTE VAN',
+    text:`<p>To timer. En svart, ubetalt van stopper bak deg. Uniformerte menn uten ID-numre banker på ruten din.</p>
+<em>«Vi er her for å hjelpe. Det er plass til deg i bunkeren. Følg med oss.»</em>
+<p>Tre menn med tomme øyne. En av dem filmer deg med et kamera merket: <strong>PROSJEKT SOLNEDGANG — SUBJEKT REGISTRERING.</strong></p>`,
+    stats:{frykt:{delta:+25,label:'FRYKT'}, kunnskap:{delta:+15,label:'KUNNSKAP'}},
+    choices:[
+      {text:'Noe er fundamentalt galt her. Løp!', target:'bensinstasjon'},
+      {text:'Stol på dem. Gå med de uniformerte mennene.', target:'slutt1'},
+    ]
+  },
+
+  sannheten:{
+    shortName:'HACKING',
+    img:img('https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?auto=format&fit=crop&w=760&q=80'),
+    time:'21:00:00', radDelta:0,
+    title:'PROSJEKT SOLNEDGANG',
+    text:`<p>Gjennom krypterte forum bryter du deg inn på en statlig server.</p>
+<em>Mappe: PROSJEKT SOLNEDGANG — KLASSIFISERT — KLARERING NIVÅ 7</em>
+<p>Iskald gysning. Solstormen er en <strong>bløff</strong>. Fjellbunkeren er et gigantisk fengsel. 50 000 mennesker løper frivillig inn i fellen. Og noen vet at du vet.</p>`,
+    stats:{kunnskap:{delta:+30,label:'KUNNSKAP'}, mot:{delta:+10,label:'MOT'}},
+    items:['minnepenn'],
+    choices:[
+      {text:'Avtal et møte med hackeren som lekket filene.', target:'mote_informanten'},
+      {text:'For stort. Slett alt. Flykt ut av byen.', target:'trafikkorken'},
+      {text:'Du har minnepenn og kunnskap nok — gå rett til nyhetskanalen.', target:'nyhetshuset', requires:{item:'minnepenn', statMin:{kunnskap:30}}},
+    ]
+  },
+
+  t_banen:{
+    shortName:'T-BANE',
+    img:img('https://images.unsplash.com/photo-1603525547466-932b1a13b567?auto=format&fit=crop&w=760&q=80'),
+    time:'22:00:00', radDelta:2,
+    title:'UNDER BAKKEN',
+    text:`<p>Det fuktige mørket gir en merkelig ro midt i apokalypsen. Du er alene — i noen sekunder.</p>
+<em>Systematiske lykter. Tunge støvler. De leter etter de som ikke dro til bunkeren.</em>
+<p>Langs veggen: en forlatt medisinsk koffert merket <strong>NØDHJELP — SERUM TYPE B</strong>. Strålingsvern? Du vet ikke.</p>`,
+    stats:{frykt:{delta:+10,label:'FRYKT'}, mot:{delta:+5,label:'MOT'}},
+    items:['serum'],
+    choices:[
+      {text:'Søk kontakt med mennene med lyktene.', target:'opproret'},
+      {text:'Gjøm deg i kloakksjaktene.', target:'kloakken'},
+      {text:'Ta med serumet og finn nødutgangen mot skogen.', target:'skog_inngang', requires:{item:'serum'}},
+    ]
+  },
+
+  mote_informanten:{
+    shortName:'INFORMANT',
+    img:img('https://images.unsplash.com/photo-1509114397022-ed747cca3f65?auto=format&fit=crop&w=760&q=80'),
+    time:'17:00:00', radDelta:3,
+    title:'SMUGET',
+    text:`<p>Informanten presser en minnepenn inn i hånden din. <em>«Hele operasjonen. Navn, datoer, kontoer.»</em></p>
+<p>Blendende lys. Laserprikker. Menn uten ID. Han skriker: <strong>«LØØØP!»</strong></p>
+<p>Du løper.</p>`,
+    stats:{frykt:{delta:+20,label:'FRYKT'}, mot:{delta:+15,label:'MOT'}, kunnskap:{delta:+20,label:'KUNNSKAP'}},
+    items:['minnepenn'],
+    choices:[
+      {text:'Spurt mot TV-stasjonen. Vis verden bevisene!', target:'nyhetshuset'},
+      {text:'Stup ned i et kumlokk.', target:'kloakken'},
+      {text:'Du kjenner radiomasten i skogen — gå dit direkte.', target:'skogen', requires:{statMin:{kunnskap:50}}},
+    ]
+  },
+
+  bensinstasjon:{
+    shortName:'BENSINSTASJON',
+    img:img('https://images.unsplash.com/photo-1542282811-943ef1a977c3?auto=format&fit=crop&w=760&q=80'),
+    time:'16:00:00', radDelta:5,
+    title:'FORLATT STASJON',
+    text:`<p>En forlatt bensinstasjon. En bil med motoren i gang. Eieren flyktet uten å ta nøklene.</p>
+<em>På setet: et VIP-adgangskort til nyhetskanalen — og en oppslått bunkerplan med røde sirkler rundt nødutganger.</em>
+<p>Du hører helikoptere i det fjerne.</p>`,
+    stats:{mot:{delta:+10,label:'MOT'}},
+    items:['adgangskort','bunkerkart'],
+    choices:[
+      {text:'Ignorer bilen. Fortsett inn i skogen.', target:'skogen'},
+      {text:'Stjel bilen. Kjør til nyhetskanalen!', target:'nyhetshuset'},
+    ]
+  },
+
+  kloakken:{
+    shortName:'KLOAKK',
+    img:img('https://images.unsplash.com/photo-1518144591331-17a5dd71c477?auto=format&fit=crop&w=760&q=80'),
+    time:'15:00:00', radDelta:10,
+    title:'KLOAKKLABYRINTEN',
+    text:`<p>Kloakkvann til knærne. Kvalmende lukt. Pusten din lager spøkelser i mørket.</p>
+<em>Spraymalt på veggen: piler dypere inn — og et massivt avløpsrør ut mot villmarken.</em>
+<p>Strålingen penetrerer ikke beton. Ennå.</p>`,
+    stats:{rad:{delta:+12,label:'STRÅLING'}, frykt:{delta:+10,label:'FRYKT'}},
+    choices:[
+      {text:'Følg pilene. Finn undergrunnsgruppa.', target:'opproret'},
+      {text:'Redd deg selv. Krabb ut gjennom avløpsrøret.', target:'slutt3'},
+      {text:'Du har bunkerkart — finn hemmelig nødutgang.', target:'bunker_utgang', requires:{item:'bunkerkart'}},
+    ]
+  },
+
+  skogen:{
+    shortName:'SKOG',
+    img:img('https://images.unsplash.com/photo-1448375240586-882707db8855?auto=format&fit=crop&w=760&q=80'),
+    time:'08:00:00', radDelta:6,
+    title:'RADIOMASTEN',
+    text:`<p>Dypt i skogen: en inngjerdet radiomast. Soldater ler og drikker kaffe. Ingen gasmasker. Ingen verneutstyr.</p>
+<em>De er ikke redd for noen solstorm. Det bekrefter alt.</em>
+<p>En av soldatene har mistet et laminert kort i gresset. Det blinker svakt i skogslyset: <strong>RADIOKODE — NASJONAL NØDFREKVENS</strong>.</p>`,
+    stats:{kunnskap:{delta:+20,label:'KUNNSKAP'}, mot:{delta:+15,label:'MOT'}},
+    choices:[
+      {text:'Snik inn og hack masten. Send sannheten til alle!', target:'radiomasten'},
+      {text:'Snik inn, stjel radiokortet, fortsett skogstien.', target:'skog_kode'},
+      {text:'For farlig. Løp videre inn i villmarken.', target:'slutt3'},
+    ]
+  },
+
+  skog_inngang:{
+    shortName:'SKOGSSTI',
+    img:img('https://images.unsplash.com/photo-1448375240586-882707db8855?auto=format&fit=crop&w=760&q=80'),
+    time:'10:00:00', radDelta:4,
+    title:'SKOGSTIEN',
+    text:`<p>Du injiserer serumet i låret. Det svir, men strålingsindikatoren på telefonen din stopper sin skremmende stigning.</p>
+<em>Serum Type B blokkerer de biologisk aktive strålingsdosene. Du har kjøpt tid.</em>
+<p>Gjennom trærne: lyset fra en militær radiomast. Og en forlatt skogshytte med en amateur-radio inni.</p>`,
+    stats:{rad:{delta:-15,label:'STRÅLING REDUSERT'}, mot:{delta:+20,label:'MOT'}},
+    choices:[
+      {text:'Gå til radiomasten. Avslør bløffen derfra.', target:'radiomasten'},
+      {text:'Bruk hyttens radio for å sende signal.', target:'hytte_radio'},
+    ]
+  },
+
+  skog_kode:{
+    shortName:'RADIOKODE',
+    img:img('https://images.unsplash.com/photo-1584984180436-b51f0f09b552?auto=format&fit=crop&w=760&q=80'),
+    time:'07:00:00', radDelta:3,
+    title:'KODEBRIKKEN',
+    text:`<p>Du snek deg inn og grep radiokortet. Soldaten snudde seg — men du var allerede borte i mørket.</p>
+<em>NØDFREKVENS 103.7 MHz — OVERRIDE KODE: 7-7-ALPHA-4-9</em>
+<p>Med denne koden kan du kringkaste på den nasjonale nødkanalen fra hvilken som helst sender. Du trenger bare en sender.</p>`,
+    stats:{kunnskap:{delta:+25,label:'KUNNSKAP'}, mot:{delta:+10,label:'MOT'}},
+    items:['radiokode'],
+    choices:[
+      {text:'Finn hytta med amateur-radioen i skogen.', target:'hytte_radio'},
+      {text:'Gå rett til nyhetskanalen — de har den sterkeste senderen.', target:'nyhetshuset'},
+    ]
+  },
+
+  hytte_radio:{
+    shortName:'HYTTARADIO',
+    img:img('https://images.unsplash.com/photo-1503803548695-c2a7b4a5b875?auto=format&fit=crop&w=760&q=80'),
+    time:'05:00:00', radDelta:2,
+    title:'SKOGSHYTTEN',
+    text:`<p>En gammel hytte. En støvete Kenwood-radio fra 80-tallet. En kaffekopp som fortsatt er varm.</p>
+<em>Noen var her for ikke lenge siden.</em>
+<p>Radioen kan sende — men rekkevidde er begrenset. Du trenger enten radiokode for nødfrekvensen, eller du kan prøve lykken på vanlig FM.</p>`,
+    stats:{mot:{delta:+10,label:'MOT'}},
+    choices:[
+      {text:'Bruk radiokoden for å kringkaste på nødfrekvensen!', target:'slutt2', requires:{item:'radiokode',statMin:{kunnskap:50}}},
+      {text:'Send manuelt på vanlig FM og håp på det beste.', target:'radio_gamble'},
+    ]
+  },
+
+  radio_gamble:{
+    shortName:'FM-GAMBLING',
+    img:img('https://images.unsplash.com/photo-1584984180436-b51f0f09b552?auto=format&fit=crop&w=760&q=80'),
+    time:'04:00:00', radDelta:3,
+    title:'SVAK SENDING',
+    text:`<p>Signalet ditt rekker kanskje ti kilometer. Kanskje ingen hører deg. Kanskje de rette menneskene gjør det.</p>
+<em>Du snakker inn i mikrofonen med skjelvende stemme og forteller alt du vet.</em>
+<p>Så venter du. I mørket. Alene.</p>`,
+    stats:{frykt:{delta:+15,label:'FRYKT'}, mot:{delta:+25,label:'MOT'}},
+    choices:[
+      {text:'Lukk deg inne og vent. Kanskje noen hørte deg.', target:'slutt3'},
+      {text:'Ikke nok. Løp til nyhuskanalen. Det er den eneste muligheten.', target:'nyhetshuset'},
+    ]
+  },
+
+  nyhetshuset:{
+    shortName:'NYHETER',
+    img:img('https://images.unsplash.com/photo-1585829365295-ab7cd400c167?auto=format&fit=crop&w=760&q=80'),
+    time:'10:00:00', radDelta:4,
+    title:'NYHETSREDAKSJONEN',
+    text:`<p>Du har tatt deg inn. Bygningen er full av bevæpnede vakter. Kameraer overalt.</p>
+<em>VIP-kortet åpner en sidedør. Serverrommet er i kjelleren. Direkte sendestudio er i andre etasje.</em>
+<p>Du har bevisene. Spørsmålet er bare: hvor bruker du dem?</p>`,
+    stats:{mot:{delta:+10,label:'MOT'}},
+    choices:[
+      {text:'Snik deg ned til serverrommet. Last opp alt.', target:'serverrommet'},
+      {text:'Streb direkte til sendestudioet. Gå live på TV!', target:'sendestudio', requires:{statMin:{mot:60}}},
+      {text:'Gi opp. Hender i været. Overgi deg.', target:'slutt1'},
+    ]
+  },
+
+  sendestudio:{
+    shortName:'STUDIO',
+    img:img('https://images.unsplash.com/photo-1587202372775-e229f172b9d7?auto=format&fit=crop&w=760&q=80'),
+    time:'06:00:00', radDelta:2,
+    title:'DIREKTE SENDING',
+    text:`<p>Du braker inn i sendestudioet. Ankeren spretter opp av stolen. Kameraet er på. Rødt lys blinker: <strong>PÅ LUFTA.</strong></p>
+<em>Millioner av seere. Noen i bilen. Noen i bunkerkøen. Alle ser rett på deg.</em>
+<p>Fingrene dine rister. Kameraet venter.</p>`,
+    stats:{frykt:{delta:+30,label:'FRYKT'}, mot:{delta:+30,label:'MOT'}},
+    choices:[
+      {text:'Snakk. Alt du vet. Direkte til nasjonen.', target:'slutt2'},
+      {text:'Fryser til. Klarer ikke snakke. Vaktene stormer inn.', target:'slutt1'},
+    ]
+  },
+
+  opproret:{
+    shortName:'OPPRØRET',
+    img:img('https://images.unsplash.com/photo-1510418386411-bd6b79f67a68?auto=format&fit=crop&w=760&q=80'),
+    time:'09:00:00', radDelta:5,
+    title:'MOTSTANDEN',
+    text:`<p>I undergrunnen møter du en gruppe desperat overlevere. En ingeniør. En lege. En pensjonert offiser.</p>
+<em>Plan: spreng transformatoren til strømsentralen — bunkerens dører kan ikke låses uten strøm.</em>
+<p>Men de mangler to ting: sprengstoff-kode og noen med mot til å bære den.</p>`,
+    stats:{mot:{delta:+20,label:'MOT'}, kunnskap:{delta:+15,label:'KUNNSKAP'}},
+    choices:[
+      {text:'Bli med. Du bærer sprengladningen.', target:'stromsentralen'},
+      {text:'Forlat gruppa. Flykt alene.', target:'slutt3'},
+      {text:'Du vet om radiomasten — det er mer kirurgisk enn sprengstoff.', target:'skogen', requires:{statMin:{kunnskap:35}}},
+    ]
+  },
+
+  radiomasten:{
+    shortName:'MASTEN',
+    img:img('https://images.unsplash.com/photo-1584984180436-b51f0f09b552?auto=format&fit=crop&w=760&q=80'),
+    time:'02:00:00', radDelta:8,
+    title:'SISTE SJANSE',
+    text:`<p>Du knuser vinduet. Kontrollpanelet lyser opp. Vaktene banker mot ståldøren med riflekolber.</p>
+<em>«KLAR TIL KRINGKASTING — NASJONAL NØDKANAL — KREVER AUTENTISERING»</em>
+<p>Skjermen ber om enten en kode — eller en manuell overstyring som tar 90 sekunder. Dørene holder kanskje 60.</p>`,
+    stats:{frykt:{delta:+25,label:'FRYKT'}, mot:{delta:+20,label:'MOT'}},
+    choices:[
+      {text:'Bruk radiokoden. Kringkast sannheten momentant!', target:'slutt2', requires:{item:'radiokode'}},
+      {text:'Ignorer koden. Aktiver manuell overstyring. Kjøp 90 sekunder.', target:'slutt2_hard'},
+      {text:'Panikk. Gjøm deg under bordet.', target:'slutt1'},
+    ]
+  },
+
+  slutt2_hard:{
+    shortName:'OVERSTYRING',
+    img:img('https://images.unsplash.com/photo-1584984180436-b51f0f09b552?auto=format&fit=crop&w=760&q=80'),
+    time:'01:30:00', radDelta:12,
+    title:'90 SEKUNDER',
+    text:`<p>Fremdriftsindikatoren kryper. 30%. Dørene gir seg. 60%. En riflekolbe gjennom vinduet. <strong>80%.</strong></p>
+<em>En hanske griper skulderen din. 95%.</em>
+<p>Du lar deg ikke stoppe.</p>`,
+    stats:{frykt:{delta:+30,label:'FRYKT'}, mot:{delta:+40,label:'MOT'}},
+    choices:[
+      {text:'HOLD UT. IKKE SLIPP KNAPPEN.', target:'slutt2'},
+      {text:'Gi etter for kreftene som drar deg tilbake.', target:'slutt1'},
+    ]
+  },
+
+  serverrommet:{
+    shortName:'SERVER',
+    img:img('https://images.unsplash.com/photo-1558494949-ef010cbdcc31?auto=format&fit=crop&w=760&q=80'),
+    time:'02:00:00', radDelta:5,
+    title:'SERVERROMMET',
+    text:`<p>Du har stengt deg inne. Skjermen blinker: <strong>KREVER MANUELL OVERSTYRING.</strong></p>
+<em>Utenfor sager vaktene gjennom ståldøren. Gnister regner ned fra taket.</em>
+<p>VIP-kortet kan omgå en av sperrelagene — men ikke alle.</p>`,
+    stats:{mot:{delta:+15,label:'MOT'}},
+    choices:[
+      {text:'Bruk VIP-kortet som override. Last opp alt — NÅ!', target:'slutt2', requires:{item:'adgangskort'}},
+      {text:'Overstyr manuelt. Det tar 90 sekunder du kanskje ikke har.', target:'slutt2_hard'},
+      {text:'Legg deg på gulvet. Overgi deg.', target:'slutt1'},
+    ]
+  },
+
+  stromsentralen:{
+    shortName:'STRØM',
+    img:img('https://images.unsplash.com/photo-1496247749665-49cf5b1022e9?auto=format&fit=crop&w=760&q=80'),
+    time:'03:00:00', radDelta:10,
+    title:'STRØMSENTRALEN',
+    text:`<p>Dere stormer inn. Politiet i bakhold. Røde laserprikker krysser brystet ditt.</p>
+<em>Hovedbryteren er to meter foran deg.</em>
+<p>To meter.</p>`,
+    stats:{frykt:{delta:+35,label:'FRYKT'}, mot:{delta:+25,label:'MOT'}},
+    choices:[
+      {text:'IGNORER VÅPNENE. Kast deg mot bryteren!', target:'slutt2'},
+      {text:'Løft hendene. Overgi deg.', target:'slutt1'},
+    ]
+  },
+
+  bunker_utgang:{
+    shortName:'BUNKER-EXIT',
+    img:img('https://images.unsplash.com/photo-1485628390555-1a7bd503f9fe?auto=format&fit=crop&w=760&q=80'),
+    time:'06:00:00', radDelta:6,
+    title:'NØDUTGANGEN',
+    text:`<p>Kartet viser en hemmelig nødutgang bak kjøkkenblokken. Du finner den. Den er ulåst.</p>
+<em>På innsiden: en komplett kommunikasjonssentral. Emergency broadcast-utstyr. Koblet til alle norske TV- og radiokanaler.</em>
+<p>Det er tomt her inne. Alle ble sendt til andre poster i panikkens kaos. Du er alene med en mulighet ingen andre vet om.</p>`,
+    stats:{kunnskap:{delta:+30,label:'KUNNSKAP'}, mot:{delta:+20,label:'MOT'}},
+    choices:[
+      {text:'Kringkast nødmeldingen på alle kanaler samtidig!', target:'slutt_hemmelig'},
+      {text:'For risikabelt alene. Finn resten av opprørsgruppen.', target:'opproret'},
+    ]
+  },
+
+  // ─── ENDINGS ───
+
+  slutt1:{
+    shortName:'FANGET',
+    img:img('https://images.unsplash.com/photo-1513694203232-719a280e022f?auto=format&fit=crop&w=760&q=80'),
+    time:'00:00:00', radDelta:0,
+    title:'FASE TO',
+    ending:'bad',
+    endingLabel:'SLUTT 1 — SYSTEMETS FANGE',
+    endingDesc:'Du ga opp, stolte på systemet, eller handlet for sent.',
+    text:`<p>Klokken tikker ned til null. Ingen varmebølge. Ingen stråling. Stillhet.</p>
+<p>Et stikk i nakken. Verden dimmer langsomt. Du våkner fastspent til en metallstol i et hvitt rom uten vinduer.</p>
+<em>«Subjekt sikret. Initierer Fase To. Permanent observasjon.»</em>
+<p>Du var ikke rask nok. Ikke modig nok. Eller du stolte for mye på de som betraktet deg som et eksperimentdyr. Nå er du en del av statistikken de ikke vil at noen skal se.</p>`,
+    choices:[]
+  },
+
+  slutt2:{
+    shortName:'HELT',
+    img:img('https://images.unsplash.com/photo-1506501139174-099022df5260?auto=format&fit=crop&w=760&q=80'),
+    time:'00:00:00', radDelta:0,
+    title:'AVSLØRT',
+    ending:'good',
+    endingLabel:'SLUTT 2 — BYENS HELT',
+    endingDesc:'Du ofret alt og holdt ut til det siste.',
+    text:`<p>Signalet sprer seg som ild gjennom tørt gress. Innen minutter er bløffen avslørt på alle skjermer i landet.</p>
+<p>Bunkerens strøm kortslutter. Dørene kan ikke forsegles. Folkemassene snur.</p>
+<em>«Den ukjente helten som våget å ofre alt for sannheten.»</em>
+<p>Fordi du nektet å gi opp — fordi du valgte de andre fremfor deg selv — reddet du millioner av liv. Og kanskje, bare kanskje, lever du ennå.</p>`,
+    choices:[]
+  },
+
+  slutt3:{
+    shortName:'ALENE',
+    img:img('https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=760&q=80'),
+    time:'00:00:00', radDelta:0,
+    title:'HORISONTEN',
+    ending:'solo',
+    endingLabel:'SLUTT 3 — DEN ENSOMME OVERLEVEREN',
+    endingDesc:'Du overlevde — men til hvilken pris?',
+    text:`<p>Du er fri. Frisk luft. Taus horisont. Ingen solstorm. Du hadde rett.</p>
+<p>Men reiseradioen din: gråtende reportere. Lyden av massive ståldører som forsegles fra utsiden. Titusenvis låst inne.</p>
+<em>Du kunne ha stoppet det.</em>
+<p>Du lever. Men stillheten som vil følge deg de neste tiårene er ikke akkurat frihet heller.</p>`,
+    choices:[]
+  },
+
+  slutt_hemmelig:{
+    shortName:'SEIEREN',
+    img:img('https://images.unsplash.com/photo-1462331940025-496dfbfc7564?auto=format&fit=crop&w=760&q=80'),
+    time:'00:00:00', radDelta:0,
+    title:'SIGNAL X',
+    ending:'secret',
+    endingLabel:'SKJULT SLUTT — SIGNAL X',
+    endingDesc:'Du fant den hemmelige ruten og tok fullstendig kontroll.',
+    text:`<p>Du overstyrte ikke bare én kanal. Du tok kontroll over alle 47 norske kringkastere samtidig.</p>
+<em>Dokumentene. Lydfilene. Videobevisene. Regjeringens interne kommunikasjon. Alt sendt til hele nasjonen, og derfra til verden.</em>
+<p>Innen 11 minutter trakk statsministeren seg. Prosjekt Solnedgang ble offisielt bekreftet som en statssponset psykologisk operasjon. Bunkerdørene åpnet seg.</p>
+<p>Du ble aldri funnet. Ingen vet hvem Signal X var.</p>
+<p>Men du vet.</p>`,
+    choices:[]
+  },
+};
+
+// ═══════════════════════════════════════════
+//  TYPEWRITER
+// ═══════════════════════════════════════════
+function typewrite(container, html, speed=10, onDone){
+  container.innerHTML = html;
+  const paras = container.querySelectorAll('p, em');
+  let doneCount = 0;
+  if(!paras.length){ if(onDone) onDone(); return; }
+  paras.forEach((p, pi) => {
+    const orig = p.innerHTML;
+    p.innerHTML = '';
+    const chars = orig;
+    let idx = 0;
+    setTimeout(() => {
+      const iv = setInterval(() => {
+        idx += 4;
+        if(idx >= chars.length){
+          p.innerHTML = chars; clearInterval(iv); doneCount++;
+          if(doneCount === paras.length && onDone) onDone();
+        } else { p.innerHTML = chars.substring(0, idx) + '▌'; }
+      }, speed);
+    }, pi * 200);
+  });
+}
+
+// ═══════════════════════════════════════════
+//  RENDER
+// ═══════════════════════════════════════════
+function render(passageId){
+  initAudio();
+  playClick();
+  flash();
+  shake();
+
+  setTimeout(() => {
+    const p = story[passageId];
+    if(!p) return;
+
+    state.visited.add(passageId);
+    updatePath(passageId);
+    setCountdown(p.time);
+
+    // apply radiation delta
+    if(p.radDelta) applyStat('rad', p.radDelta, p.radDelta>0?'STRÅLING ↑':null);
+
+    // apply scene stats
+    if(p.stats) applyStatDeltas(p.stats);
+
+    // give items
+    if(p.items) p.items.forEach(id => addItem(id, itemDefs[id]?.label || id));
+
+    // ending audio
+    if(p.ending){
+      setTimeout(()=>playEndingSound(p.ending), 600);
+      if(p.ending==='bad'){ flash('#ff2020'); shake(); }
+      if(p.ending==='good'){ flash('#ffbe00'); }
+      if(p.ending==='secret'){ flash('#00e5ff'); glitchScreen(); }
+    }
+
+    const container = document.getElementById('scene-container');
+    container.className = 'fade-in';
+    void container.offsetWidth;
+
+    const titleEl = `<div id="scene-title" data-text="${p.title}">${p.title}</div>`;
+
+    // Build choices HTML
+    let choicesHtml = '';
+    if(p.choices && p.choices.length){
+      p.choices.forEach(c => {
+        const req = c.requires;
+        let locked = false, lockReason = '';
+        if(req){
+          if(req.item && !hasItem(req.item)){ locked=true; lockReason=`Krever: ${itemDefs[req.item]?.label||req.item}`; }
+          if(req.statMin) Object.entries(req.statMin).forEach(([k,v])=>{
+            if(state[k]<v){ locked=true; lockReason=`Krever ${k.toUpperCase()} ≥ ${v} (du har ${state[k]})`; }
+          });
+        }
+        const lockClass = locked ? ' locked' : '';
+        const onclick = locked ? '' : `onclick="handleChoice('${c.target}')"`;
+        const badge = lockReason ? `<span class="req-badge">🔒 ${lockReason}</span>` : '';
+        choicesHtml += `<button class="choice-btn${lockClass}" ${onclick}><span>${c.text}${badge}</span></button>`;
+      });
+    } else {
+      choicesHtml = `<button class="restart-btn" onclick="handleChoice('start')">↺ START HISTORIEN PÅ NYTT</button>`;
+    }
+
+    // Ending
+    let endingHtml = '';
+    if(p.ending){
+      const colors = {bad:'#ff2020',good:'#ffbe00',solo:'#778899',secret:'#00e5ff'};
+      const c=colors[p.ending]||'#fff';
+      endingHtml = `
+        <div class="ending-wrap">
+          <div class="ending-title ${p.ending}">${p.endingLabel}</div>
+          <div class="ending-sub" style="color:${c};opacity:.6;">${p.endingDesc}</div>
+        </div>`;
+    }
+
+    container.innerHTML = `
+      <div class="img-wrap">
+        ${p.img}
+        <div class="img-glitch"></div>
+        <div class="scan-line"></div>
+      </div>
+      ${titleEl}
+      <div id="story-text">${p.text}</div>
+      ${endingHtml}
+      <div id="choices" style="opacity:0;transition:opacity .6s ease;">${choicesHtml}</div>
+    `;
+
+    const st = document.getElementById('story-text');
+    const ch = document.getElementById('choices');
+    typewrite(st, p.text, 9, () => { ch.style.opacity='1'; });
+    glitchScreen();
+  }, 120);
+}
+
+function handleChoice(target){
+  window.scrollTo({top:0,behavior:'smooth'});
+  render(target);
+}
+
+// ═══════════════════════════════════════════
+//  BOOT SEQUENCE
+// ═══════════════════════════════════════════
+const bootLines = [
+  'INITIERER NØDPROTOKOLL v7.9.2...',
+  'SIKKERHETSNIVÅ: RØDESTE.',
+  'LASTER KRYPTERINGSMODUL... [OK]',
+  'AUTENTISERER BRUKERIDENTITET... [UKJENT]',
+  'SYSTEMADVARSEL: UAUTORISERT TILGANG OPPDAGET',
+  'TIL TROSS FOR DETTE — TILGANG INNVILGET',
+  'NØDPROTOKOLL OVERRIDER NORMAL TILGANGSKONTROLL',
+  '> SOLSTORM X99 — BEKREFTET AV 14 UAVHENGIGE OBSERVATORIER',
+  '> FJELLBUNKER PROSJEKT: KAPASITET 50 000 SUBJEKTER',
+  '> PROSJEKT SOLNEDGANG: STATUS AKTIV',
+  '> ADVARSEL: DETTE SYSTEMET ER OVERVÅKET',
+  '> ADVARSEL: DIN POSISJON ER KJENT',
+  '',
+  'LASTER HISTORIEPROTOKOLL...',
+  '████████████████████████ 100%',
+  '',
+  'HUSK: ALLE VALG HAR KONSEKVENSER.',
+  'HUSK: NOEN SLUTT ER HEMMELIG.',
+  'HUSK: INVENTAR OG STATS BESTEMMER HVA DU KAN GJØRE.',
+  '',
+  'STARTER SOLSTORMEN...',
+];
+
+let bootIdx=0, charIdx=0;
+const bootTextEl=document.getElementById('boot-text');
+let bootIv=null;
+
+function typeBoot(){
+  if(bootIdx>=bootLines.length){ finishBoot(); return; }
+  const line=bootLines[bootIdx];
+  if(charIdx<=line.length){
+    bootTextEl.textContent=bootLines.slice(0,bootIdx).join('\n')+(bootIdx>0?'\n':'')+line.substring(0,charIdx);
+    charIdx++;
+    bootIv=setTimeout(typeBoot, line.startsWith('>')? 15 : 20);
+  } else {
+    bootIdx++; charIdx=0;
+    bootIv=setTimeout(typeBoot, line===''?80:120);
+  }
+}
+
+function finishBoot(){
+  setTimeout(()=>{
+    document.getElementById('boot').classList.add('hidden');
+    render('start');
+  },700);
+}
+
+function skipBoot(){
+  if(bootIv) clearTimeout(bootIv);
+  document.getElementById('boot').classList.add('hidden');
+  render('start');
+}
+
+// Start on user interaction (for audio context)
+document.addEventListener('click', initAudio, {once:true});
+window.onload = () => typeBoot();
+</script>
+</body>
+</html>
