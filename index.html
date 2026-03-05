@@ -24,7 +24,7 @@ body{background:var(--bg);color:var(--text);font-family:'Crimson Pro',Georgia,se
 /* ── CANVAS LAYERS ── */
 #solar-canvas{position:fixed;inset:0;z-index:0;pointer-events:none;}
 #particle-canvas{position:fixed;inset:0;z-index:1;pointer-events:none;}
-#static-canvas{position:fixed;inset:0;z-index:2;pointer-events:none;opacity:.03;mix-blend-mode:screen;}
+#static-canvas{position:fixed;inset:0;z-index:2;pointer-events:none;opacity:.03;mix-blend-mode:screen;image-rendering:pixelated;width:100%;height:100%;}
 
 /* ── CRT ── */
 #crt{position:fixed;inset:0;z-index:9990;pointer-events:none;}
@@ -56,89 +56,6 @@ body{background:var(--bg);color:var(--text);font-family:'Crimson Pro',Georgia,se
 }
 #pre-boot.gone{display:none;}
 
-/* ── EBS EMERGENCY BROADCAST ── */
-#ebs-screen{
-  position:absolute;inset:0;display:flex;flex-direction:column;
-  opacity:0;pointer-events:none;transition:opacity .08s;
-}
-#ebs-screen.show{opacity:1;}
-#ebs-top-bar{
-  flex:0 0 auto;background:#ff1a00;padding:.8rem 1.5rem;
-  display:flex;align-items:center;justify-content:center;gap:1rem;
-}
-#ebs-top-bar-txt{
-  font-family:'Bebas Neue',sans-serif;
-  font-size:clamp(.9rem,3.5vw,1.6rem);
-  letter-spacing:8px;color:#fff;
-  animation:ebsBlink .6s step-end infinite;
-}
-@keyframes ebsBlink{0%,100%{opacity:1}50%{opacity:.4}}
-#ebs-top-icon{font-size:1.4rem;animation:ebsBlink .6s step-end infinite;}
-#ebs-center{
-  flex:1;background:#0a0000;
-  display:flex;flex-direction:column;align-items:center;justify-content:center;
-  gap:1.2rem;padding:2rem;
-}
-#ebs-logo{
-  font-family:'Bebas Neue',sans-serif;
-  font-size:clamp(4rem,15vw,9rem);
-  color:#ff1a00;letter-spacing:8px;line-height:1;
-  text-shadow:0 0 60px rgba(255,26,0,.9),0 0 120px rgba(255,26,0,.5),0 0 200px rgba(255,26,0,.2);
-  animation:ebsGlow 1s ease-in-out infinite;
-}
-@keyframes ebsGlow{
-  0%,100%{text-shadow:0 0 50px rgba(255,26,0,.8),0 0 100px rgba(255,26,0,.4)}
-  50%{text-shadow:0 0 90px rgba(255,26,0,1),0 0 180px rgba(255,26,0,.7),0 0 280px rgba(255,26,0,.3)}
-}
-#ebs-tagline{
-  font-family:'Share Tech Mono',monospace;
-  font-size:clamp(.6rem,2vw,.95rem);
-  color:#cc3300;letter-spacing:5px;text-align:center;line-height:2;
-}
-#ebs-tagline span{color:#ff4400;}
-#ebs-cd{
-  font-family:'Bebas Neue',sans-serif;font-size:clamp(1.8rem,6vw,3.5rem);
-  color:#fff;letter-spacing:6px;
-  text-shadow:0 0 20px rgba(255,255,255,.4);
-  border:1px solid rgba(255,26,0,.4);padding:.3rem 1.5rem;
-}
-#ebs-bar-wrap{width:min(400px,80%);height:4px;background:rgba(255,26,0,.15);border-radius:1px;overflow:hidden;}
-#ebs-bar-fill{height:100%;background:#ff1a00;width:0%;transition:width .1s linear;box-shadow:0 0 12px rgba(255,26,0,.8);}
-#ebs-bottom{
-  flex:0 0 auto;background:#ff1a00;overflow:hidden;
-  padding:.45rem 0;
-}
-#ebs-ticker{
-  font-family:'Share Tech Mono',monospace;font-size:clamp(.55rem,1.8vw,.78rem);
-  color:#fff;white-space:nowrap;
-  animation:ebsTick 14s linear infinite;
-}
-@keyframes ebsTick{0%{transform:translateX(110vw)}100%{transform:translateX(-100%)}}
-/* glitch lines on EBS */
-#ebs-screen::before{
-  content:'';position:absolute;inset:0;pointer-events:none;z-index:5;
-  background:repeating-linear-gradient(0deg,transparent,transparent 3px,rgba(255,0,0,.03) 3px,rgba(255,0,0,.03) 4px);
-}
-
-/* TV STATIC */
-#tv-static-wrap{
-  position:absolute;inset:0;opacity:0;pointer-events:none;
-  display:flex;align-items:center;justify-content:center;
-  background:#000;
-}
-#tv-static-canvas{width:100%;height:100%;display:block;}
-#tv-static-wrap.show{opacity:1;}
-
-/* Ambient room */
-#pre-boot-room{
-  position:absolute;inset:0;
-  background:radial-gradient(ellipse at 50% 60%, rgba(20,8,8,.8) 0%, #000 70%);
-  opacity:0;transition:opacity 2s ease;
-}
-#pre-boot-room::after{
-  content:'';position:absolute;bottom:0;left:0;right:0;height:35%;
-  background:linear-gradient(to top,rgba(15,5,5,.9),transparent);
-}
 
 /* PHONE MOCKUP */
 #phone{
@@ -329,12 +246,6 @@ body{background:var(--bg);color:var(--text);font-family:'Crimson Pro',Georgia,se
 #pre-skip:hover{color:rgba(255,255,255,.5);}
 
 /* red bloom when alert fires */
-#alert-bloom{
-  position:absolute;inset:0;z-index:1;pointer-events:none;
-  background:radial-gradient(ellipse at 50% 50%,rgba(255,26,26,.18),transparent 65%);
-  opacity:0;transition:opacity .5s;
-}
-#alert-bloom.show{opacity:1;}
 
 /* ── BOOT SCREEN ── */
 #boot{position:fixed;inset:0;background:#000;z-index:99998;display:none;flex-direction:column;justify-content:flex-start;padding:2.5rem 3rem;font-family:'Share Tech Mono',monospace;font-size:.82rem;line-height:2;overflow:hidden;}
@@ -496,7 +407,6 @@ body{background:var(--bg);color:var(--text);font-family:'Crimson Pro',Georgia,se
   40%{transform:translate(5px,-4px)}60%{transform:translate(3px,-2px)}80%{transform:translate(2px,-2px)}
 }
 .shake{animation:shake .5s ease-in-out;}
-#game-wrap.hb-slow{}
 #game-wrap.hb-fast{animation:heartbeatBorder .7s ease-in-out infinite;}
 @keyframes heartbeatBorder{0%,100%{box-shadow:0 0 0 0 rgba(255,26,26,0)}50%{box-shadow:0 0 35px 4px rgba(255,26,26,.18)}}
 </style>
@@ -519,7 +429,7 @@ body{background:var(--bg);color:var(--text);font-family:'Crimson Pro',Georgia,se
 <canvas id="solar-canvas"></canvas>
 <canvas id="particle-canvas"></canvas>
 <canvas id="static-canvas"></canvas>
-<canvas id="lightning-canvas" style="position:fixed;inset:0;z-index:3;pointer-events:none;opacity:0;"></canvas>
+<canvas id="lightning-canvas"></canvas>
 
 <!-- CRT + overlays -->
 <div id="crt"></div>
@@ -542,6 +452,138 @@ body{background:var(--bg);color:var(--text);font-family:'Crimson Pro',Georgia,se
 
 <!-- Toast -->
 <div id="toast"></div>
+
+<!-- CLICK TO START -->
+<div id="start-gate" onclick="beginExperience()">
+  <style>
+    #start-gate{
+      position:fixed;inset:0;z-index:999999;background:#000;
+      display:flex;flex-direction:column;align-items:center;justify-content:center;
+      cursor:pointer;overflow:hidden;
+    }
+    #start-gate::before{
+      content:'';position:absolute;inset:0;
+      background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(255,26,26,.03) 2px,rgba(255,26,26,.03) 4px);
+      pointer-events:none;
+    }
+    #start-gate::after{
+      content:'';position:absolute;inset:0;
+      background:radial-gradient(ellipse at 50% 50%,transparent 30%,rgba(0,0,0,.85) 100%);
+      pointer-events:none;
+    }
+    #sg-top{
+      position:absolute;top:0;left:0;right:0;
+      padding:.6rem 1.2rem;
+      display:flex;justify-content:space-between;align-items:center;
+      border-bottom:1px solid rgba(255,26,26,.12);
+      font-family:'Share Tech Mono',monospace;font-size:clamp(.42rem,1.3vw,.6rem);
+      color:rgba(255,26,26,.3);letter-spacing:4px;z-index:2;
+    }
+    #sg-bottom{
+      position:absolute;bottom:0;left:0;right:0;
+      padding:.6rem 1.2rem;
+      display:flex;justify-content:space-between;align-items:center;
+      border-top:1px solid rgba(255,26,26,.12);
+      font-family:'Share Tech Mono',monospace;font-size:clamp(.42rem,1.3vw,.6rem);
+      color:rgba(255,26,26,.3);letter-spacing:4px;z-index:2;
+    }
+    #sg-corner-tl,#sg-corner-tr,#sg-corner-bl,#sg-corner-br{
+      position:absolute;width:18px;height:18px;z-index:2;
+      border-color:rgba(255,26,26,.25);border-style:solid;
+    }
+    #sg-corner-tl{top:1rem;left:1rem;border-width:1px 0 0 1px;}
+    #sg-corner-tr{top:1rem;right:1rem;border-width:1px 1px 0 0;}
+    #sg-corner-bl{bottom:1rem;left:1rem;border-width:0 0 1px 1px;}
+    #sg-corner-br{bottom:1rem;right:1rem;border-width:0 1px 1px 0;}
+    #sg-center{
+      display:flex;flex-direction:column;align-items:center;gap:1.2rem;
+      position:relative;z-index:2;
+    }
+    #sg-eyebrow{
+      font-family:'Share Tech Mono',monospace;
+      font-size:clamp(.45rem,1.4vw,.62rem);
+      color:rgba(255,26,26,.4);letter-spacing:7px;
+      animation:sgEyeB 1.8s ease-in-out infinite;
+    }
+    @keyframes sgEyeB{0%,100%{opacity:.4}50%{opacity:.75}}
+    #sg-title{
+      font-family:'Bebas Neue',sans-serif;
+      font-size:clamp(4.5rem,18vw,12rem);
+      color:#fff;letter-spacing:14px;line-height:.95;
+      text-shadow:0 0 120px rgba(255,26,26,.18),0 0 60px rgba(255,26,26,.08);
+      animation:sgTitle 4s ease-in-out infinite;
+    }
+    @keyframes sgTitle{0%,100%{text-shadow:0 0 80px rgba(255,26,26,.12)}50%{text-shadow:0 0 160px rgba(255,26,26,.28),0 0 60px rgba(255,26,26,.12)}}
+    #sg-sub{
+      font-family:'Share Tech Mono',monospace;
+      font-size:clamp(.45rem,1.4vw,.6rem);
+      color:rgba(255,26,26,.25);letter-spacing:6px;
+      margin-top:-.3rem;
+    }
+    #sg-divider{
+      width:clamp(120px,28vw,220px);height:1px;
+      background:linear-gradient(90deg,transparent,rgba(255,26,26,.3),transparent);
+    }
+    #sg-cta{
+      font-family:'Share Tech Mono',monospace;
+      font-size:clamp(.5rem,1.6vw,.68rem);
+      color:rgba(255,255,255,.55);letter-spacing:5px;
+      animation:sgCta .95s step-end infinite;
+    }
+    @keyframes sgCta{0%,100%{opacity:.55}50%{opacity:.15}}
+    #sg-status{
+      display:flex;gap:1.8rem;margin-top:.4rem;
+    }
+    .sg-stat{
+      display:flex;align-items:center;gap:.4rem;
+      font-family:'Share Tech Mono',monospace;
+      font-size:clamp(.38rem,1.1vw,.52rem);
+      color:rgba(255,26,26,.22);letter-spacing:3px;
+    }
+    .sg-dot{
+      width:5px;height:5px;border-radius:50%;background:rgba(255,26,26,.4);
+      animation:sgDot 1.1s step-end infinite;
+    }
+    .sg-dot:nth-child(1){animation-delay:0s;}
+    .sg-dot:nth-child(2){animation-delay:.37s;}
+    .sg-dot:nth-child(3){animation-delay:.74s;}
+    @keyframes sgDot{0%,100%{opacity:.4;transform:scale(1)}50%{opacity:1;transform:scale(1.4)}}
+  </style>
+  <div id="sg-corner-tl"></div>
+  <div id="sg-corner-tr"></div>
+  <div id="sg-corner-bl"></div>
+  <div id="sg-corner-br"></div>
+  <div id="sg-top">
+    <span>59°54'N 10°44'Ø · OSLO</span>
+    <span id="sg-time-display">02:17:03</span>
+    <span>KLASSIFISERT · SIKKERHETSNIVÅ RØDT</span>
+  </div>
+  <div id="sg-center">
+    <div id="sg-eyebrow">NØDPROTOKOLL AKTIV · TILGANG BEKREFTET</div>
+    <div id="sg-title">SOLSTORMEN</div>
+    <div id="sg-sub">INTERAKTIV THRILLER · NORSK</div>
+    <div id="sg-divider"></div>
+    <div id="sg-cta">▶ &nbsp; KLIKK FOR Å STARTE &nbsp; ◀</div>
+    <div id="sg-status">
+      <div class="sg-stat"><div class="sg-dot"></div>SIGNAL AKTIVT</div>
+      <div class="sg-stat"><div class="sg-dot"></div>5 SLUTTER</div>
+      <div class="sg-stat"><div class="sg-dot"></div>LYD ANBEFALT</div>
+    </div>
+  </div>
+  <div id="sg-bottom">
+    <span>PROSJEKT SOLNEDGANG — STATUS: AKTIV</span>
+    <span>ALLE VALG LOGGES · ALLE KONSEKVENSER PERMANENT</span>
+  </div>
+  <script>
+    // Live clock on gate
+    (function(){
+      const el=document.getElementById('sg-time-display');
+      if(!el) return;
+      function tick(){ const n=new Date(); el.textContent=[n.getHours(),n.getMinutes(),n.getSeconds()].map(v=>String(v).padStart(2,'0')).join(':'); }
+      tick(); setInterval(tick,1000);
+    })();
+  </script>
+</div>
 
 <!-- PRE-BOOT: cinematic multi-fase -->
 <div id="pre-boot">
@@ -667,20 +709,36 @@ body{background:var(--bg);color:var(--text);font-family:'Crimson Pro',Georgia,se
 // ══════════════════════════════════════════════════
 //  AUDIO ENGINE
 // ══════════════════════════════════════════════════
-let audioCtx=null, masterGain, heartIv=null, audioEnabled=false;
+let audioCtx=null, masterGain=null;
 
 function initAudio(){
-  if(audioCtx) return;
+  if(audioCtx){
+    if(audioCtx.state==='suspended') audioCtx.resume().then(()=>{ if(!droneStarted) startDrone(); });
+    return;
+  }
   try{
     audioCtx=new(window.AudioContext||window.webkitAudioContext)();
-    masterGain=audioCtx.createGain(); masterGain.gain.value=0.3;
+    masterGain=audioCtx.createGain(); masterGain.gain.value=0.32;
     masterGain.connect(audioCtx.destination);
-    startDrone(); audioEnabled=true;
-  }catch(e){}
+    // Resume async — start drone once context is actually running
+    const go=()=>{ if(!droneStarted) startDrone(); };
+    if(audioCtx.state==='suspended') audioCtx.resume().then(go); else go();
+  }catch(e){ audioCtx=null; }
 }
 
+let droneStarted=false;
+
+// Guard: returns true only if audio is actually ready to play
+function audioReady(){ return audioCtx&&audioCtx.state==='running'; }
+
+// Resume on ANY user interaction
+['click','keydown','touchstart'].forEach(ev=>
+  document.addEventListener(ev, ()=>{ if(audioCtx&&audioCtx.state==='suspended') audioCtx.resume(); }, {passive:true})
+);
+
 function startDrone(){
-  if(!audioCtx)return;
+  if(droneStarted||!audioCtx) return;
+  droneStarted=true;
   const osc1=audioCtx.createOscillator(), osc2=audioCtx.createOscillator();
   const g=audioCtx.createGain(), lp=audioCtx.createBiquadFilter();
   g.gain.setValueAtTime(0,audioCtx.currentTime);
@@ -696,7 +754,7 @@ function startDrone(){
 }
 
 function playClick(){
-  if(!audioCtx)return;
+  if(!audioReady())return;
   const o=audioCtx.createOscillator(), g=audioCtx.createGain();
   o.type='square'; o.frequency.value=750;
   g.gain.setValueAtTime(0.1,audioCtx.currentTime);
@@ -705,7 +763,7 @@ function playClick(){
 }
 
 function playAlarm(){
-  if(!audioCtx)return;
+  if(!audioReady())return;
   [900,1150,900].forEach((f,i)=>{
     const o=audioCtx.createOscillator(), g=audioCtx.createGain();
     const t=audioCtx.currentTime+i*0.17;
@@ -716,24 +774,8 @@ function playAlarm(){
   });
 }
 
-function playHeart(bpm){
-  if(!audioCtx)return;
-  if(heartIv) clearInterval(heartIv);
-  const beat=()=>{
-    if(!audioCtx)return;
-    [[60,0.16,0.09],[52,0.1,0.24]].forEach(([freq,vol,delay])=>{
-      const o=audioCtx.createOscillator(), g=audioCtx.createGain();
-      o.type='sine'; o.frequency.value=freq;
-      const t=audioCtx.currentTime+delay;
-      g.gain.setValueAtTime(vol,t); g.gain.exponentialRampToValueAtTime(0.001,t+0.1);
-      o.connect(g); g.connect(masterGain); o.start(t); o.stop(t+0.12);
-    });
-  };
-  beat(); heartIv=setInterval(beat,60000/bpm);
-}
-
 function playGlitch(){
-  if(!audioCtx)return;
+  if(!audioReady())return;
   const sz=audioCtx.sampleRate*0.05, buf=audioCtx.createBuffer(1,sz,audioCtx.sampleRate);
   const d=buf.getChannelData(0);
   for(let i=0;i<sz;i++) d[i]=(Math.random()*2-1)*0.25;
@@ -744,7 +786,7 @@ function playGlitch(){
 }
 
 function playEmp(){
-  if(!audioCtx)return;
+  if(!audioReady())return;
   const sz=audioCtx.sampleRate*0.25, buf=audioCtx.createBuffer(1,sz,audioCtx.sampleRate);
   const d=buf.getChannelData(0);
   for(let i=0;i<sz;i++) d[i]=(Math.random()*2-1)*Math.exp(-i/(sz*0.3))*0.5;
@@ -754,7 +796,7 @@ function playEmp(){
 }
 
 function playEndSound(type){
-  if(!audioCtx)return;
+  if(!audioReady())return;
   if(type==='bad'){
     [220,196,174,146].forEach((f,i)=>{
       const o=audioCtx.createOscillator(), g=audioCtx.createGain();
@@ -867,11 +909,12 @@ function drawParts(){
 drawParts();
 
 // ══════════════════════════════════════════════════
-//  STATIC NOISE CANVAS
+//  STATIC NOISE CANVAS  (low-res, scaled up — much cheaper)
 // ══════════════════════════════════════════════════
 const stc=document.getElementById('static-canvas');
 const stctx=stc.getContext('2d');
-function rsStatic(){stc.width=window.innerWidth; stc.height=window.innerHeight;}
+stc.style.imageRendering='pixelated';
+function rsStatic(){stc.width=Math.ceil(window.innerWidth/4); stc.height=Math.ceil(window.innerHeight/4);}
 rsStatic(); window.addEventListener('resize',rsStatic);
 function drawStatic(){
   const w=stc.width, h=stc.height;
@@ -879,10 +922,10 @@ function drawStatic(){
   const d=id.data;
   for(let i=0;i<d.length;i+=4){
     const v=Math.random()<0.5?255:0;
-    d[i]=255; d[i+1]=50; d[i+2]=50; d[i+3]=v*0.7;
+    d[i]=255; d[i+1]=50; d[i+2]=50; d[i+3]=v*0.55;
   }
   stctx.putImageData(id,0,0);
-  setTimeout(()=>requestAnimationFrame(drawStatic), 80);
+  setTimeout(()=>requestAnimationFrame(drawStatic), 120);
 }
 drawStatic();
 
@@ -905,6 +948,8 @@ let state={frykt:20,mot:50,kunnskap:10,rad:0,inventory:[],path:[],visited:new Se
 
 function resetState(){
   state={frykt:20,mot:50,kunnskap:10,rad:0,inventory:[],path:[],visited:new Set()};
+  radMilestones=new Set();
+  stopGeiger();
   document.getElementById('inv-bar').innerHTML='';
   document.getElementById('path-nodes').innerHTML='';
   ['frykt','mot','kunnskap','rad'].forEach(k=>{
@@ -937,9 +982,8 @@ function updateCD(){
   if(cdSecs<7200) cdEl.classList.add('crit');
   else if(cdSecs<36000) cdEl.classList.add('amber');
   const wrap=document.getElementById('game-wrap');
-  wrap.classList.remove('hb-slow','hb-fast');
-  if(cdSecs<7200){wrap.classList.add('hb-fast'); playHeart(130);}
-  else if(cdSecs<36000){wrap.classList.add('hb-slow'); playHeart(85);}
+  wrap.classList.remove('hb-fast');
+  if(cdSecs<7200) wrap.classList.add('hb-fast');
 }
 function p2(n){return String(n).padStart(2,'0');}
 
@@ -1083,23 +1127,26 @@ function doLightning(){
   setTimeout(()=>{ctx.clearRect(0,0,lc.width,lc.height); lc.style.opacity='0';},160);
 }
 
-// Random glitch events — more frequent
+// Random glitch events — CSS only (audio only if ready)
 function scheduleGlitch(){
   setTimeout(()=>{doGlitch(); scheduleGlitch();}, 3000+Math.random()*8000);
 }
-scheduleGlitch();
-// Occasional lightning
+// Lightning
 function scheduleLightning(){
   setTimeout(()=>{doLightning(); scheduleLightning();}, 10000+Math.random()*22000);
 }
-scheduleLightning();
+// Distant atmospheric boom
+function scheduleDistantBoom(){
+  setTimeout(()=>{playDistantBoom(); scheduleDistantBoom();}, 18000+Math.random()*35000);
+}
+// Started from window.onload (CSS effects) and after initAudio (sound effects)
 
 // Corrupt story text characters randomly
 function corruptStoryText(){
   const el=document.getElementById('story-text');
   if(!el) return;
   const chars='!@#$%◈▓▒█◆◇◉⚡';
-  const walker=document.createTreeWalker(el,NodeFilter.SHOW_TEXT,null,false);
+  const walker=document.createTreeWalker(el,NodeFilter.SHOW_TEXT,null);
   const nodes=[]; let n;
   while(n=walker.nextNode()){if(n.textContent.trim().length>3) nodes.push(n);}
   if(!nodes.length) return;
@@ -1140,15 +1187,18 @@ function typewrite(container,html,speed,onDone){
   let done=0;
   if(!paras.length){if(onDone)onDone();return;}
   paras.forEach((p,pi)=>{
-    const orig=p.innerHTML; p.innerHTML='';
+    const orig=p.innerHTML;
+    const plain=p.innerText||p.textContent||'';
+    p.textContent='';
     let idx=0;
     setTimeout(()=>{
       const iv=setInterval(()=>{
-        idx+=4; if(idx>=orig.length){
+        idx+=4;
+        if(idx>=plain.length){
           p.innerHTML=orig; clearInterval(iv); done++;
           if(done===paras.length&&onDone) onDone();
         } else {
-          p.innerHTML=orig.substring(0,idx)+'▌';
+          p.textContent=plain.substring(0,idx)+'▌';
           if(idx%16===0) playTypeKey();
         }
       },speed);
@@ -2229,7 +2279,8 @@ function startOver(){
 
 // Hover sounds on choice buttons via event delegation
 document.addEventListener('mouseover', e=>{
-  if(e.target.closest('.choice-btn:not(.locked)')) playHover();
+  const btn=e.target.closest('.choice-btn:not(.locked)');
+  if(btn && e.relatedTarget && !btn.contains(e.relatedTarget)) playHover();
 });
 
 // Alarm on radiation milestones
@@ -2330,23 +2381,13 @@ function pbT(fn,ms){preBootTimers.push(setTimeout(fn,ms));}
 function clearPBT(){preBootTimers.forEach(clearTimeout);}
 
 function skipPreBoot(){
-  clearPBT(); clearInterval(phoneCdIv); clearInterval(ebsCdIv);
+  clearPBT(); clearInterval(phoneCdIv);
   document.getElementById('pre-boot').classList.add('gone');
   document.getElementById('boot').classList.add('active');
   setTimeout(typeBoot,200);
 }
 
 let phoneCdSecs=86400, phoneCdIv=null;
-let ebsCdSecs=86400, ebsCdIv=null;
-function startEbsCd(){
-  const el=document.getElementById('ebs-cd');
-  ebsCdIv=setInterval(()=>{
-    if(ebsCdSecs<=0){clearInterval(ebsCdIv);return;}
-    ebsCdSecs-=60;
-    const h=Math.floor(ebsCdSecs/3600),m=Math.floor((ebsCdSecs%3600)/60),s=ebsCdSecs%60;
-    el.textContent=p2(h)+':'+p2(m)+':'+p2(s);
-  },80);
-}
 function startPhoneCd(){
   const el=document.getElementById('phone-cd');
   phoneCdIv=setInterval(()=>{
@@ -2364,7 +2405,7 @@ function typeAlertText(el,txt,spd,done){
   },spd);
 }
 function playBuzzer(){
-  if(!audioCtx)return;
+  if(!audioReady())return;
   [0,0.38,0.76].forEach(t=>{
     const o=audioCtx.createOscillator(),g=audioCtx.createGain();
     o.type='square'; o.frequency.value=870;
@@ -2375,7 +2416,7 @@ function playBuzzer(){
   });
 }
 function playEbsTone(){
-  if(!audioCtx)return;
+  if(!audioReady())return;
   [853,960].forEach(freq=>{
     const o=audioCtx.createOscillator(),g=audioCtx.createGain();
     o.type='sine'; o.frequency.value=freq;
@@ -2389,7 +2430,7 @@ function playEbsTone(){
 
 // ── SIREN: stiger og faller, repetering ────────────
 function playSiren(reps=2,vol=0.22){
-  if(!audioCtx)return;
+  if(!audioReady())return;
   for(let i=0;i<reps;i++){
     const o=audioCtx.createOscillator(), g=audioCtx.createGain();
     const t=audioCtx.currentTime+i*1.1;
@@ -2406,7 +2447,7 @@ function playSiren(reps=2,vol=0.22){
 
 // ── STATIC CRACKLE: TV-statisk lyd ─────────────────
 function playStaticCrackle(dur=0.8,vol=0.28){
-  if(!audioCtx)return;
+  if(!audioReady())return;
   const sz=Math.floor(audioCtx.sampleRate*dur);
   const buf=audioCtx.createBuffer(1,sz,audioCtx.sampleRate);
   const d=buf.getChannelData(0);
@@ -2419,7 +2460,7 @@ function playStaticCrackle(dur=0.8,vol=0.28){
 
 // ── EXPLOSION: lav boom for dramatiske øyeblikk ─────
 function playExplosion(vol=0.45){
-  if(!audioCtx)return;
+  if(!audioReady())return;
   const sz=Math.floor(audioCtx.sampleRate*1.2);
   const buf=audioCtx.createBuffer(1,sz,audioCtx.sampleRate);
   const d=buf.getChannelData(0);
@@ -2432,7 +2473,7 @@ function playExplosion(vol=0.45){
 
 // ── HOVER: mykt pip på valgknapper ─────────────────
 function playHover(){
-  if(!audioCtx)return;
+  if(!audioReady())return;
   const o=audioCtx.createOscillator(), g=audioCtx.createGain();
   o.type='sine'; o.frequency.value=620;
   g.gain.setValueAtTime(0.055,audioCtx.currentTime);
@@ -2442,7 +2483,7 @@ function playHover(){
 
 // ── INTERCEPT: scanline pip ─────────────────────────
 function playIntercept(){
-  if(!audioCtx)return;
+  if(!audioReady())return;
   [1400,1100,900,1400].forEach((f,i)=>{
     const o=audioCtx.createOscillator(), g=audioCtx.createGain();
     const t=audioCtx.currentTime+i*0.09;
@@ -2455,12 +2496,12 @@ function playIntercept(){
 // ── GEIGER: tikkende strålingsdetektor ─────────────
 let geigerIv=null;
 function startGeiger(intensity=1){
-  if(!audioCtx)return;
+  if(!audioReady())return;
   if(geigerIv) clearInterval(geigerIv);
   const minMs=intensity>2?80:intensity>1?180:380;
   const maxMs=intensity>2?250:intensity>1?600:1400;
   function tick(){
-    if(!audioCtx)return;
+    if(!audioReady())return;
     const o=audioCtx.createOscillator(), g=audioCtx.createGain();
     o.type='square'; o.frequency.value=2200+Math.random()*800;
     g.gain.setValueAtTime(0.07,audioCtx.currentTime);
@@ -2474,7 +2515,7 @@ function stopGeiger(){ if(geigerIv){clearTimeout(geigerIv); geigerIv=null;} }
 
 // ── WHOOSH: sceneskift svupp ────────────────────────
 function playWhoosh(){
-  if(!audioCtx)return;
+  if(!audioReady())return;
   const sz=Math.floor(audioCtx.sampleRate*0.35);
   const buf=audioCtx.createBuffer(1,sz,audioCtx.sampleRate);
   const d=buf.getChannelData(0);
@@ -2487,7 +2528,7 @@ function playWhoosh(){
 
 // ── TYPEKEY: tastetrykk-klikk ──────────────────────
 function playTypeKey(){
-  if(!audioCtx)return;
+  if(!audioReady())return;
   const o=audioCtx.createOscillator(), g=audioCtx.createGain();
   o.type='square'; o.frequency.value=1800+Math.random()*400;
   g.gain.setValueAtTime(0.04,audioCtx.currentTime);
@@ -2497,7 +2538,7 @@ function playTypeKey(){
 
 // ── ITEM PICKUP: positiv pling ──────────────────────
 function playItemGet(){
-  if(!audioCtx)return;
+  if(!audioReady())return;
   [523,659,784,1047].forEach((f,i)=>{
     const o=audioCtx.createOscillator(), g=audioCtx.createGain();
     const t=audioCtx.currentTime+i*0.1; o.type='triangle'; o.frequency.value=f;
@@ -2509,7 +2550,7 @@ function playItemGet(){
 
 // ── DISTANT BOOM: atmosfærisk dyp lyd ──────────────
 function playDistantBoom(){
-  if(!audioCtx)return;
+  if(!audioReady())return;
   const o=audioCtx.createOscillator(), g=audioCtx.createGain();
   o.type='sine'; o.frequency.value=55;
   const t=audioCtx.currentTime;
@@ -2518,44 +2559,30 @@ function playDistantBoom(){
   o.connect(g); g.connect(masterGain); o.start(t); o.stop(t+2.5);
 }
 
-// Schedule random distant booms during gameplay
-function scheduleDistantBoom(){
-  setTimeout(()=>{playDistantBoom(); scheduleDistantBoom();}, 18000+Math.random()*35000);
-}
-scheduleDistantBoom();
-
-// TV static canvas animation
-let tvStaticIv=null;
-function runTvStatic(){
-  const canvas=document.getElementById('tv-static-canvas');
-  if(!canvas) return;
-  canvas.width=window.innerWidth; canvas.height=window.innerHeight;
-  const ctx=canvas.getContext('2d');
-  tvStaticIv=setInterval(()=>{
-    const w=canvas.width,h=canvas.height;
-    const id=ctx.createImageData(w,h);
-    const d=id.data;
-    for(let i=0;i<d.length;i+=4){
-      const v=Math.random()<0.5?255:0;
-      d[i]=d[i+1]=d[i+2]=v; d[i+3]=220;
-    }
-    ctx.putImageData(id,0,0);
-  },40);
-}
-
-// EBS progress bar animation
-function runEbsBar(){
-  const fill=document.getElementById('ebs-bar-fill');
-  if(!fill) return;
-  let w=0;
-  const iv=setInterval(()=>{ w+=1.5; fill.style.width=Math.min(100,w)+'%'; if(w>=100) clearInterval(iv); },40);
-}
+// Schedule random distant booms during gameplay — started from beginExperience()
 
 // ══════════════════════════════════════════════════
-//  PRE-BOOT SEQUENCE: PRELUDE → TELEFON → TERMINAL
+//  ENTRY: click-to-start gate → pre-boot sequence
 // ══════════════════════════════════════════════════
 window.onload=()=>{
+  scheduleGlitch();
+  scheduleLightning();
+  // scheduleDistantBoom started after audio init in beginExperience()
+};
+
+function beginExperience(){
+  const gate=document.getElementById('start-gate');
+  if(!gate) return;
+  gate.style.transition='opacity .3s';
+  gate.style.opacity='0';
+  setTimeout(()=>gate.remove(), 350);
+
   initAudio();
+  scheduleDistantBoom();
+  startPreBoot();
+}
+
+function startPreBoot(){
 
   // ── FASE 0: Prelude — signal kapret ──────────────
   pbT(()=>{
@@ -2563,12 +2590,10 @@ window.onload=()=>{
     pl.classList.add('show');
     playEbsTone();
     playSiren(1,0.10);
-    // progress bar
     let pw=0; const biv=setInterval(()=>{
       pw+=1.8; document.getElementById('prelude-bar-fill').style.width=Math.min(100,pw)+'%';
       if(pw>=100) clearInterval(biv);
     },40);
-    // scrolling data lines
     const lines=[
       'INITIALISERER KRYPTERT TILKOBLING...',
       'NODE: 185.220.101.47 → 10.0.0.1 → OSLO-KNS',
@@ -2585,18 +2610,15 @@ window.onload=()=>{
       setTimeout(nextLine, 360+Math.random()*160);
     }
     setTimeout(nextLine, 300);
-  },200);
+  },100);
 
-  // logo og sub fader inn
   pbT(()=>{
     document.getElementById('prelude-logo').classList.add('show');
     document.getElementById('prelude-sub').classList.add('show');
   },800);
 
-  // Andre EBS-tone
   pbT(()=>{ playEbsTone(); doFlash('#ff0000','.1'); },2800);
 
-  // Glitch-rykk på prelude
   pbT(()=>{
     const pl=document.getElementById('prelude');
     let f=0; const iv=setInterval(()=>{
@@ -2610,7 +2632,6 @@ window.onload=()=>{
     playStaticCrackle(0.3,0.2);
   },4200);
 
-  // Blits + rykk
   pbT(()=>{ doFlash('#ffffff','0.7'); playExplosion(0.35); doShake(); },4700);
   pbT(()=>{ doFlash('#ff0000','.3'); playStaticCrackle(0.2,0.15); },5100);
 
@@ -2628,11 +2649,10 @@ window.onload=()=>{
     playBuzzer();
     const ph=document.getElementById('phone');
     ph.classList.add('vibrate');
-    // prelude sentrum rødmer litt
     document.getElementById('prelude-center').style.background='rgba(40,0,0,.55)';
   },7200);
 
-  // ── FASE 3: Varselskjerm tennes, tekst skrives ───
+  // ── FASE 3: Varselskjerm tennes ───────────────────
   pbT(()=>{
     document.getElementById('phone').classList.remove('vibrate');
     document.getElementById('alert-screen').classList.add('show');
@@ -2644,10 +2664,8 @@ window.onload=()=>{
     );
   },7700);
 
-  // ── FASE 4: Andre buzzerpuls ──────────────────────
   pbT(()=>{ playBuzzer(); doShake(); doFlash('#ff0000','.35'); },11500);
 
-  // ── FASE 5: Tredje buzz, prelude rødmer mørkere ──
   pbT(()=>{
     playBuzzer();
     document.getElementById('prelude-center').style.background='rgba(70,0,0,.75)';
@@ -2655,7 +2673,6 @@ window.onload=()=>{
     playSiren(1,0.12);
   },13000);
 
-  // ── FASE 6: Fjerde buzz + ekstrem glitch-storm ───
   pbT(()=>{
     playBuzzer(); playExplosion(0.3);
     doGlitch(); setTimeout(doGlitch,60); setTimeout(doGlitch,120); setTimeout(doGlitch,200);
@@ -2665,7 +2682,7 @@ window.onload=()=>{
     setTimeout(()=>ph.classList.remove('vibrate'),600);
   },14700);
 
-  // ── FASE 7: Rød flash, telefon blåser ut → terminal
+  // ── FASE 7: Telefon blåser ut → terminal ─────────
   pbT(()=>{
     clearInterval(phoneCdIv);
     const ph=document.getElementById('phone');
@@ -2679,10 +2696,9 @@ window.onload=()=>{
       setTimeout(typeBoot,300);
     },600);
   },16700);
+}
 
-};
-
-document.addEventListener('click',initAudio,{once:true});
+// Audio resumed on any interaction (see top of audio engine)
 </script>
 </body>
 </html>
