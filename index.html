@@ -275,8 +275,12 @@ body{background:var(--bg);color:var(--text);font-family:'Crimson Pro',Georgia,se
 #hud-status{font-family:'Share Tech Mono',monospace;font-size:.62rem;color:var(--red);}
 
 /* ── DANGER BAR ── */
-#danger-outer{height:2px;background:rgba(255,26,26,.07);margin-bottom:.9rem;}
+#danger-outer{height:2px;background:rgba(255,26,26,.07);margin-bottom:.9rem;transition:height .8s;}
 #danger-bar{height:100%;background:linear-gradient(90deg,var(--orange),var(--red));transition:width 1.4s ease;box-shadow:0 0 5px rgba(255,26,26,.4);}
+body.cd-s3 #danger-outer{height:3px;}
+body.cd-s4 #danger-outer{height:4px;}
+body.cd-s4 #danger-bar{animation:dangerShimmer .9s linear infinite;}
+@keyframes dangerShimmer{0%{filter:brightness(1)}50%{filter:brightness(1.5)}100%{filter:brightness(1)}}
 
 /* ── TICKER ── */
 #ticker{overflow:hidden;border-top:1px solid rgba(255,26,26,.15);border-bottom:1px solid rgba(255,26,26,.15);padding:.28rem 0;margin-bottom:1.1rem;position:relative;}
@@ -285,12 +289,57 @@ body{background:var(--bg);color:var(--text);font-family:'Crimson Pro',Georgia,se
 @keyframes tickerScroll{0%{transform:translateX(110vw)}100%{transform:translateX(-100%)}}
 
 /* ── COUNTDOWN ── */
-#cd-wrap{text-align:center;margin-bottom:.9rem;}
-#cd-label{font-family:'Share Tech Mono',monospace;font-size:.62rem;letter-spacing:5px;color:var(--dim);margin-bottom:.15rem;}
-#cd{font-family:'Bebas Neue',sans-serif;font-size:clamp(2.8rem,8vw,5rem);letter-spacing:10px;color:var(--red);text-shadow:var(--glow-red);line-height:1;transition:color .4s,text-shadow .4s;}
-#cd.amber{color:var(--amber);text-shadow:var(--glow-amber);}
-#cd.crit{animation:cdpulse .38s ease-in-out infinite;}
-@keyframes cdpulse{0%,100%{transform:scale(1)}50%{transform:scale(1.04)}}
+#cd-wrap{
+  text-align:center;margin-bottom:.9rem;
+  padding:.5rem .5rem .3rem;border-radius:2px;
+  border:1px solid rgba(255,26,26,0);
+  transition:border-color .8s,background .8s,box-shadow .8s;
+  position:relative;overflow:hidden;
+}
+#cd-wrap::after{
+  content:'';position:absolute;inset:0;pointer-events:none;
+  background:linear-gradient(180deg,rgba(255,26,26,0) 0%,rgba(255,26,26,.04) 100%);
+  opacity:0;transition:opacity .8s;
+}
+#cd-label{
+  font-family:'Share Tech Mono',monospace;font-size:.62rem;
+  letter-spacing:5px;color:var(--dim);margin-bottom:.15rem;
+  transition:color .6s, letter-spacing .6s;
+}
+#cd{
+  font-family:'Bebas Neue',sans-serif;
+  font-size:clamp(2.8rem,8vw,5rem);
+  letter-spacing:10px;color:var(--red);
+  text-shadow:var(--glow-red);line-height:1;
+  transition:color .4s,text-shadow .4s,font-size .5s;
+  display:inline-block;
+}
+/* Per-second tick bounce */
+#cd.tick{animation:cdTick .12s ease-out both;}
+@keyframes cdTick{0%{transform:scale(1.05)}100%{transform:scale(1)}}
+
+/* Stage 1: < 10h — fargen skifter mot amber */
+#cd.s1{color:var(--orange);text-shadow:var(--glow-amber);}
+#cd-wrap.s1 #cd-label{color:var(--orange);letter-spacing:6px;}
+
+/* Stage 2: < 3h — amber, wrap border lyser */
+#cd.s2{color:var(--amber);text-shadow:var(--glow-amber);}
+#cd-wrap.s2{border-color:rgba(255,190,0,.18);box-shadow:0 0 28px rgba(255,190,0,.06) inset;}
+#cd-wrap.s2::after{opacity:1;}
+
+/* Stage 3: < 1h — større font, raskere puls */
+#cd.s3{color:var(--amber);text-shadow:0 0 30px rgba(255,190,0,.9),0 0 80px rgba(255,190,0,.4);font-size:clamp(3.2rem,9vw,5.8rem);}
+#cd-wrap.s3{border-color:rgba(255,190,0,.32);box-shadow:0 0 40px rgba(255,190,0,.1) inset;}
+#cd-wrap.s3 #cd-label{color:var(--amber);letter-spacing:8px;}
+
+/* Stage 4: < 10 min — kritisk rød, kanter blinker */
+#cd.s4{color:#fff;text-shadow:0 0 20px rgba(255,26,26,1),0 0 60px rgba(255,26,26,.7),0 0 120px rgba(255,26,26,.3);font-size:clamp(3.5rem,10vw,6.5rem);}
+#cd-wrap.s4{border-color:rgba(255,26,26,.6);background:rgba(30,0,0,.25);animation:wrapCrit .55s ease-in-out infinite;}
+@keyframes wrapCrit{0%,100%{box-shadow:0 0 30px rgba(255,26,26,.12) inset}50%{box-shadow:0 0 60px rgba(255,26,26,.35) inset,0 0 20px rgba(255,26,26,.2)}}
+#cd-wrap.s4 #cd-label{color:var(--red);letter-spacing:10px;animation:labelCrit .55s step-end infinite;}
+@keyframes labelCrit{0%,100%{opacity:1}50%{opacity:.4}}
+#cd.s4{animation:cdCrit .55s ease-in-out infinite;}
+@keyframes cdCrit{0%,100%{transform:scale(1)}50%{transform:scale(1.05) skewX(-.3deg)}}
 
 /* ── STATS ── */
 #stats-bar{display:flex;gap:.8rem;margin-bottom:.9rem;padding:.6rem .9rem;border:1px solid rgba(255,26,26,.1);background:rgba(10,13,17,.75);border-radius:2px;flex-wrap:wrap;}
@@ -398,6 +447,38 @@ body{background:var(--bg);color:var(--text);font-family:'Crimson Pro',Georgia,se
 .toast-item.info{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.09);color:var(--text);}
 @keyframes toastIn{from{transform:translateX(110%);opacity:0}to{transform:translateX(0);opacity:1}}
 
+/* ── CURSOR COLOR — shifts with radiation ── */
+#cursor{color:#ff1a1a;transition:color 1.5s ease;}
+body.rad-warm   #cursor{color:#dd6600;}
+body.rad-high   #cursor{color:#99cc00;}
+body.rad-crit   #cursor{color:#00ff88;}
+#cursor-trail{transition:left .15s,top .15s,background .8s;}
+body.rad-warm   #cursor-trail{background:rgba(220,100,0,.3);}
+body.rad-high   #cursor-trail{background:rgba(140,200,0,.3);}
+body.rad-crit   #cursor-trail{background:rgba(0,255,136,.3);}
+
+/* ── RAD HAZE — green vignette at milestones ── */
+#rad-haze{
+  position:fixed;inset:0;pointer-events:none;z-index:9981;
+  background:radial-gradient(ellipse at 50% 60%,transparent 20%,rgba(0,255,80,.18) 100%);
+  opacity:0;transition:opacity 3s ease;
+}
+
+/* ── SCAN BAR — horizontal sweep on transitions ── */
+#scan-bar{
+  position:fixed;left:0;right:0;height:2px;top:-4px;
+  pointer-events:none;z-index:9992;opacity:0;
+  background:linear-gradient(90deg,transparent,rgba(255,26,26,.9) 35%,rgba(255,26,26,.9) 65%,transparent);
+}
+
+/* ── VIGNETTE BREATHING — scales with radiation ── */
+@keyframes vigBreathWarm{0%,100%{opacity:.03}50%{opacity:.11}}
+@keyframes vigBreathHigh{0%,100%{opacity:.09}50%{opacity:.24}}
+@keyframes vigBreathCrit{0%,100%{opacity:.17}50%{opacity:.42}}
+body.rad-warm #vignette-pulse{animation:vigBreathWarm 3.5s ease-in-out infinite;}
+body.rad-high #vignette-pulse{animation:vigBreathHigh 2s ease-in-out infinite;}
+body.rad-crit #vignette-pulse{animation:vigBreathCrit 1s ease-in-out infinite;}
+
 /* ── ANIMS ── */
 @keyframes fadeSlide{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
 .fade-in{animation:fadeSlide .45s ease-out both;}
@@ -407,8 +488,46 @@ body{background:var(--bg);color:var(--text);font-family:'Crimson Pro',Georgia,se
   40%{transform:translate(5px,-4px)}60%{transform:translate(3px,-2px)}80%{transform:translate(2px,-2px)}
 }
 .shake{animation:shake .5s ease-in-out;}
+/* violent 8-direction shake for brutal moments */
+@keyframes megaShake{
+  0%,100%{transform:translate(0)}
+  8%{transform:translate(-14px,-6px) rotate(-.8deg) scaleX(1.01)}
+  16%{transform:translate(14px,8px) rotate(.7deg)}
+  24%{transform:translate(-11px,9px) scaleY(1.01)}
+  32%{transform:translate(12px,-8px) rotate(-.5deg)}
+  42%{transform:translate(-8px,6px) rotate(.5deg)}
+  54%{transform:translate(10px,-4px)}
+  66%{transform:translate(-6px,5px)}
+  78%{transform:translate(5px,-3px)}
+  88%{transform:translate(-3px,2px)}
+}
+.mega-shake{animation:megaShake .6s ease-in-out;}
 #game-wrap.hb-fast{animation:heartbeatBorder .7s ease-in-out infinite;}
 @keyframes heartbeatBorder{0%,100%{box-shadow:0 0 0 0 rgba(255,26,26,0)}50%{box-shadow:0 0 35px 4px rgba(255,26,26,.18)}}
+
+/* ── WHITEOUT ── */
+#whiteout{position:fixed;inset:0;background:#fff;pointer-events:none;z-index:9997;opacity:0;transition:opacity .06s;}
+/* ── NEGATIVE FLASH ── */
+body.negative{filter:invert(1) hue-rotate(180deg);transition:filter 0s;}
+/* ── CHROMATIC ABERRATION OVERLAY ── */
+#chromatic{position:fixed;inset:0;pointer-events:none;z-index:9982;opacity:0;mix-blend-mode:screen;
+  background:transparent;transition:opacity .06s;}
+#chromatic.bleed-r{background:rgba(255,0,0,.12);transform:translateX(8px);}
+#chromatic.bleed-g{background:rgba(0,255,80,.08);transform:translateX(-5px);}
+/* zoom pulse on body */
+@keyframes zoomPulse{0%,100%{transform:scale(1)}40%{transform:scale(1.035)}70%{transform:scale(.988)}}
+body.zoom-pulse{animation:zoomPulse .35s ease-out both;}
+/* scan flicker */
+@keyframes scanFlicker{0%,100%{opacity:1}25%{opacity:.05}50%{opacity:.9}75%{opacity:.02}88%{opacity:.85}}
+body.scan-flicker{animation:scanFlicker .18s step-end;}
+/* pre-boot heavy shake — applies to pre-boot container */
+@keyframes pbShake{
+  0%,100%{transform:translate(0)}12%{transform:translate(-18px,-8px) rotate(-1deg)}
+  25%{transform:translate(16px,10px) rotate(.9deg)}
+  37%{transform:translate(-14px,8px)}50%{transform:translate(14px,-10px) rotate(-.6deg)}
+  62%{transform:translate(-9px,7px)}75%{transform:translate(8px,-5px)}87%{transform:translate(-4px,3px)}
+}
+.pb-shake{animation:pbShake .65s ease-in-out;}
 </style>
 </head>
 <body>
@@ -416,11 +535,11 @@ body{background:var(--bg);color:var(--text);font-family:'Crimson Pro',Georgia,se
 <!-- Custom cursor -->
 <div id="cursor">
   <svg viewBox="0 0 22 22" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <line x1="11" y1="0" x2="11" y2="8" stroke="#ff1a1a" stroke-width="1.5"/>
-    <line x1="11" y1="14" x2="11" y2="22" stroke="#ff1a1a" stroke-width="1.5"/>
-    <line x1="0" y1="11" x2="8" y2="11" stroke="#ff1a1a" stroke-width="1.5"/>
-    <line x1="14" y1="11" x2="22" y2="11" stroke="#ff1a1a" stroke-width="1.5"/>
-    <circle cx="11" cy="11" r="3" stroke="#ff1a1a" stroke-width="1.2"/>
+    <line x1="11" y1="0" x2="11" y2="8" stroke="currentColor" stroke-width="1.5"/>
+    <line x1="11" y1="14" x2="11" y2="22" stroke="currentColor" stroke-width="1.5"/>
+    <line x1="0" y1="11" x2="8" y2="11" stroke="currentColor" stroke-width="1.5"/>
+    <line x1="14" y1="11" x2="22" y2="11" stroke="currentColor" stroke-width="1.5"/>
+    <circle cx="11" cy="11" r="3" stroke="currentColor" stroke-width="1.2"/>
   </svg>
 </div>
 <div id="cursor-trail"></div>
@@ -439,6 +558,10 @@ body{background:var(--bg);color:var(--text);font-family:'Crimson Pro',Georgia,se
 <div id="glitch-b"></div>
 <div id="shockwave" style="position:fixed;top:50%;left:50%;width:2px;height:2px;margin:-1px 0 0 -1px;border-radius:50%;pointer-events:none;z-index:9985;transform:scale(0);border:3px solid rgba(255,26,26,0);"></div>
 <div id="vignette-pulse" style="position:fixed;inset:0;pointer-events:none;z-index:9983;background:radial-gradient(ellipse at 50% 50%,transparent 38%,rgba(255,0,0,.18) 100%);opacity:0;transition:opacity .5s;"></div>
+<div id="rad-haze"></div>
+<div id="scan-bar"></div>
+<div id="whiteout"></div>
+<div id="chromatic"></div>
 
 <!-- Intercepted transmission popup -->
 <div id="intercept-popup">
@@ -726,6 +849,28 @@ function initAudio(){
   }catch(e){ audioCtx=null; }
 }
 
+// ── Heartbeat state — declared early: resetState and updateCD reference these ──
+let hbIv=null, heartbeatMode=0, hbRunning=false;
+
+// ── Pre-boot timer list — declared early: inline onclick fires before script end ──
+let preBootTimers=[];
+
+// ── Phone countdown — declared early: skipPreBoot references phoneCdIv ──
+let phoneCdSecs=86400, phoneCdIv=null;
+
+// ── Game state — declared early: drawStatic() reads state.rad before state section ──
+let state={frykt:20,mot:50,kunnskap:10,rad:0,inventory:[],path:[],visited:new Set()};
+
+// ── Rad/cd milestones — declared early: resetState() assigns these before their section ──
+let radMilestones=new Set(), cdMilestones=new Set();
+
+// ── Boot screen vars — declared early: skipBoot/typeBoot called via inline onclick ──
+let bIdx=0, cIdx=0, bootIv=null;
+
+// ── Pre-boot text constants — declared early: startPreBoot uses these ──
+const ALERT_TITLE_TXT='KRISEVARSEL — NORSK METEOROLOGISK INSTITUTT';
+const ALERT_BODY_TXT='Solstorm kategori X99 bekreftet av 14 internasjonale observatorier. Estimert treffpunkt: 24 timer. Dødelig strålingsdose garantert i åpent terreng.\n\nFjellbunkeren ved Gaustablikk er åpen. Kapasitet: 50 000. Evakuer UMIDDELBART.';
+
 let droneStarted=false;
 
 // Guard: returns true only if audio is actually ready to play
@@ -755,34 +900,66 @@ function startDrone(){
 
 function playClick(){
   if(!audioReady())return;
+  // Primary transient
   const o=audioCtx.createOscillator(), g=audioCtx.createGain();
-  o.type='square'; o.frequency.value=750;
-  g.gain.setValueAtTime(0.1,audioCtx.currentTime);
+  o.type='square'; o.frequency.value=820;
+  o.frequency.setValueAtTime(820,audioCtx.currentTime);
+  o.frequency.exponentialRampToValueAtTime(420,audioCtx.currentTime+0.05);
+  g.gain.setValueAtTime(0.12,audioCtx.currentTime);
   g.gain.exponentialRampToValueAtTime(0.001,audioCtx.currentTime+0.07);
   o.connect(g); g.connect(masterGain); o.start(); o.stop(audioCtx.currentTime+0.07);
+  // Metallic resonance
+  const o2=audioCtx.createOscillator(), g2=audioCtx.createGain();
+  o2.type='sine'; o2.frequency.value=3200;
+  g2.gain.setValueAtTime(0.03,audioCtx.currentTime);
+  g2.gain.exponentialRampToValueAtTime(0.001,audioCtx.currentTime+0.04);
+  o2.connect(g2); g2.connect(masterGain); o2.start(); o2.stop(audioCtx.currentTime+0.04);
 }
 
 function playAlarm(){
   if(!audioReady())return;
-  [900,1150,900].forEach((f,i)=>{
+  [880,1200,880,1200].forEach((f,i)=>{
     const o=audioCtx.createOscillator(), g=audioCtx.createGain();
-    const t=audioCtx.currentTime+i*0.17;
+    const lp=audioCtx.createBiquadFilter(); lp.type='lowpass'; lp.frequency.value=2200;
+    const t=audioCtx.currentTime+i*0.15;
     o.type='square'; o.frequency.value=f;
-    g.gain.setValueAtTime(0,t); g.gain.linearRampToValueAtTime(0.13,t+0.02);
-    g.gain.exponentialRampToValueAtTime(0.001,t+0.14);
-    o.connect(g); g.connect(masterGain); o.start(t); o.stop(t+0.15);
+    g.gain.setValueAtTime(0,t); g.gain.linearRampToValueAtTime(0.14,t+0.02);
+    g.gain.setValueAtTime(0.14,t+0.1); g.gain.exponentialRampToValueAtTime(0.001,t+0.14);
+    o.connect(lp); lp.connect(g); g.connect(masterGain); o.start(t); o.stop(t+0.16);
   });
 }
 
 function playGlitch(){
   if(!audioReady())return;
-  const sz=audioCtx.sampleRate*0.05, buf=audioCtx.createBuffer(1,sz,audioCtx.sampleRate);
-  const d=buf.getChannelData(0);
-  for(let i=0;i<sz;i++) d[i]=(Math.random()*2-1)*0.25;
-  const s=audioCtx.createBufferSource(), g=audioCtx.createGain();
-  const f=audioCtx.createBiquadFilter(); f.type='bandpass'; f.frequency.value=2800; f.Q.value=4;
-  s.buffer=buf; g.gain.value=0.18;
-  s.connect(f); f.connect(g); g.connect(masterGain); s.start();
+  const flavor=Math.random();
+  if(flavor<0.33){
+    // Digital corruption burst — bandpass noise
+    const sz=Math.floor(audioCtx.sampleRate*0.05);
+    const buf=audioCtx.createBuffer(1,sz,audioCtx.sampleRate);
+    const d=buf.getChannelData(0);
+    for(let i=0;i<sz;i++) d[i]=(Math.random()*2-1)*0.3;
+    const s=audioCtx.createBufferSource(), g=audioCtx.createGain();
+    const f=audioCtx.createBiquadFilter(); f.type='bandpass'; f.frequency.value=2600+Math.random()*800; f.Q.value=5;
+    g.gain.setValueAtTime(0.2,audioCtx.currentTime); g.gain.exponentialRampToValueAtTime(0.001,audioCtx.currentTime+0.05);
+    s.buffer=buf; s.connect(f); f.connect(g); g.connect(masterGain); s.start();
+  } else if(flavor<0.66){
+    // Bit-crush crunch — square wave stutter
+    [1,2,3].forEach(i=>{
+      const o=audioCtx.createOscillator(), g=audioCtx.createGain();
+      const t=audioCtx.currentTime+i*0.018;
+      o.type='square'; o.frequency.value=220+Math.random()*1800;
+      g.gain.setValueAtTime(0.08,t); g.gain.exponentialRampToValueAtTime(0.001,t+0.015);
+      o.connect(g); g.connect(masterGain); o.start(t); o.stop(t+0.018);
+    });
+  } else {
+    // Frequency sweep — pitch-shift zap
+    const o=audioCtx.createOscillator(), g=audioCtx.createGain();
+    o.type='sawtooth';
+    o.frequency.setValueAtTime(3200,audioCtx.currentTime);
+    o.frequency.exponentialRampToValueAtTime(180,audioCtx.currentTime+0.08);
+    g.gain.setValueAtTime(0.09,audioCtx.currentTime); g.gain.exponentialRampToValueAtTime(0.001,audioCtx.currentTime+0.08);
+    o.connect(g); g.connect(masterGain); o.start(); o.stop(audioCtx.currentTime+0.09);
+  }
 }
 
 function playEmp(){
@@ -838,29 +1015,39 @@ const sctx=sc.getContext('2d');
 let SW=0,SH=0;
 function rsz(){SW=sc.width=window.innerWidth; SH=sc.height=window.innerHeight;}
 rsz(); window.addEventListener('resize',rsz);
+// ── Countdown state — declared early: canvas code reads cdSecs before COUNTDOWN section ──
+let cdSecs=0, cdIv=null;
+
 let ct=0;
 function drawCorona(){
   sctx.clearRect(0,0,SW,SH); ct+=0.0035;
+  // Urgency factor: 0=normal, 1=critical — scales corona with time remaining
+  const urgency=cdSecs>0 ? Math.max(0,Math.min(1,1-cdSecs/86400)) : 0;
+  const baseSpeed=0.0035+urgency*0.009;
+  const pulseAmp=70+urgency*120;
+  const coreBright=0.04+urgency*0.09;
   const cx=SW*0.87, cy=-SH*0.08;
-  const pulse=(Math.sin(ct*1.4)+1)*0.5;
-  const r=Math.min(SW,SH)*0.52+pulse*70;
+  const pulse=(Math.sin(ct*(1.4+urgency*1.8))+1)*0.5;
+  const r=Math.min(SW,SH)*(0.52+urgency*0.18)+pulse*pulseAmp;
   const g=sctx.createRadialGradient(cx,cy,0,cx,cy,r*1.5);
-  g.addColorStop(0,'rgba(255,90,0,0.04)');
-  g.addColorStop(0.35,'rgba(255,35,0,0.02)');
-  g.addColorStop(0.75,'rgba(255,0,0,0.007)');
+  g.addColorStop(0,`rgba(255,90,0,${coreBright})`);
+  g.addColorStop(0.35,`rgba(255,35,0,${coreBright*0.5})`);
+  g.addColorStop(0.75,`rgba(255,0,0,${coreBright*0.18})`);
   g.addColorStop(1,'transparent');
   sctx.fillStyle=g; sctx.fillRect(0,0,SW,SH);
-  for(let i=0;i<14;i++){
-    const a=(i/14)*Math.PI*2+ct*0.18;
-    const len=r*(0.55+Math.sin(ct*2.2+i)*0.32);
-    const sp=0.055+Math.sin(ct+i*1.5)*0.028;
+  const numSpikes=14+Math.floor(urgency*8);
+  for(let i=0;i<numSpikes;i++){
+    const a=(i/numSpikes)*Math.PI*2+ct*(0.18+urgency*0.22);
+    const len=r*(0.55+Math.sin(ct*(2.2+urgency*1.4)+i)*0.32);
+    const sp=0.055+Math.sin(ct+i*1.5)*0.028+urgency*0.022;
     sctx.save(); sctx.translate(cx,cy); sctx.rotate(a);
     const rg=sctx.createLinearGradient(0,0,len,0);
-    rg.addColorStop(0,'rgba(255,70,0,0.045)'); rg.addColorStop(1,'transparent');
+    rg.addColorStop(0,`rgba(255,70,0,${0.045+urgency*0.06})`); rg.addColorStop(1,'transparent');
     sctx.beginPath(); sctx.moveTo(0,0);
     sctx.lineTo(len,len*sp); sctx.lineTo(len,-len*sp); sctx.closePath();
     sctx.fillStyle=rg; sctx.fill(); sctx.restore();
   }
+  ct+=urgency*0.002; // extra tick when urgent
   requestAnimationFrame(drawCorona);
 }
 drawCorona();
@@ -873,11 +1060,12 @@ const pctx=pc.getContext('2d');
 let PW=0,PH=0,parts=[];
 function rpz(){PW=pc.width=window.innerWidth; PH=pc.height=window.innerHeight;}
 rpz(); window.addEventListener('resize',rpz);
-function mkP(){
+function mkP(urgency=0){
   const t=['solar','ash','spark','streak'][Math.floor(Math.random()*4)];
+  const speedScale=1+urgency*1.8;
   return{t,x:Math.random()*PW,y:Math.random()*PH,
-    vx:(Math.random()-.35)*(t==='spark'?2.2:t==='streak'?3.5:.7),
-    vy:-(Math.random()*(t==='solar'?.7:t==='streak'?.3:1.2)+.15),
+    vx:(Math.random()-.35)*(t==='spark'?2.2:t==='streak'?3.5:.7)*speedScale,
+    vy:-(Math.random()*(t==='solar'?.7:t==='streak'?.3:1.2)+.15)*speedScale,
     r:t==='streak'?Math.random()*.8+.2:t==='spark'?Math.random()*1.2+.2:Math.random()*2.4+.4,
     a:Math.random()*.8+.1,life:Math.random()*240+55,age:0,
     hue:t==='solar'?(Math.random()<.5?0:25):t==='ash'?0:t==='streak'?15:55,
@@ -886,6 +1074,10 @@ function mkP(){
 for(let i=0;i<340;i++) parts.push(mkP());
 function drawParts(){
   pctx.clearRect(0,0,PW,PH);
+  const urgency=cdSecs>0 ? Math.max(0,Math.min(1,1-cdSecs/86400)) : 0;
+  // Spawn bonus particles at high urgency
+  while(parts.length<340+Math.floor(urgency*160)) parts.push(mkP(urgency));
+  while(parts.length>340+Math.floor(urgency*160)) parts.pop();
   parts.forEach((p,i)=>{
     p.x+=p.vx; p.y+=p.vy; p.age++;
     if(p.t==='spark'){p.vx*=.97;p.vy+=.06;}
@@ -902,7 +1094,7 @@ function drawParts(){
       pctx.fillStyle=`hsla(${p.hue},${p.sat}%,${p.lit}%,${alpha})`;
       pctx.fill();
     }
-    if(p.age>=p.life) parts[i]=mkP();
+    if(p.age>=p.life) parts[i]=mkP(urgency);
   });
   requestAnimationFrame(drawParts);
 }
@@ -920,12 +1112,17 @@ function drawStatic(){
   const w=stc.width, h=stc.height;
   const id=stctx.createImageData(w,h);
   const d=id.data;
+  // Tint based on rad level: red base, shifts to green at high rad
+  const radFrac=Math.min(1,state.rad/100);
+  const rCh=Math.round(255*(1-radFrac*0.6));
+  const gCh=Math.round(50+radFrac*180);
+  const bCh=Math.round(50*(1-radFrac));
   for(let i=0;i<d.length;i+=4){
     const v=Math.random()<0.5?255:0;
-    d[i]=255; d[i+1]=50; d[i+2]=50; d[i+3]=v*0.55;
+    d[i]=rCh; d[i+1]=gCh; d[i+2]=bCh; d[i+3]=v*0.55;
   }
   stctx.putImageData(id,0,0);
-  setTimeout(()=>requestAnimationFrame(drawStatic), 120);
+  setTimeout(()=>requestAnimationFrame(drawStatic), 110);
 }
 drawStatic();
 
@@ -944,12 +1141,20 @@ document.addEventListener('mouseup',()=>curEl.style.transform='translate(-50%,-5
 // ══════════════════════════════════════════════════
 //  GAME STATE
 // ══════════════════════════════════════════════════
-let state={frykt:20,mot:50,kunnskap:10,rad:0,inventory:[],path:[],visited:new Set()};
+// (state declared early above — drawStatic reads state.rad before this section)
 
 function resetState(){
   state={frykt:20,mot:50,kunnskap:10,rad:0,inventory:[],path:[],visited:new Set()};
   radMilestones=new Set();
+  cdMilestones=new Set();
   stopGeiger();
+  stopHeartbeat();
+  hbRunning=false;
+  heartbeatMode=0;
+  document.body.classList.remove('rad-warm','rad-high','rad-crit','cd-s3','cd-s4');
+  document.getElementById('cd-wrap').classList.remove('s1','s2','s3','s4');
+  cdEl.classList.remove('s1','s2','s3','s4');
+  const sv=document.getElementById('static-canvas'); if(sv) sv.style.opacity='0.03';
   document.getElementById('inv-bar').innerHTML='';
   document.getElementById('path-nodes').innerHTML='';
   ['frykt','mot','kunnskap','rad'].forEach(k=>{
@@ -964,7 +1169,7 @@ function resetState(){
 // ══════════════════════════════════════════════════
 //  COUNTDOWN
 // ══════════════════════════════════════════════════
-let cdSecs=0, cdIv=null;
+// (cdSecs and cdIv declared early above — before canvas code)
 const cdEl=document.getElementById('cd');
 const dangerBar=document.getElementById('danger-bar');
 const radBar=document.getElementById('rad-bar');
@@ -978,12 +1183,56 @@ function updateCD(){
   const h=Math.floor(cdSecs/3600),m=Math.floor((cdSecs%3600)/60),s=cdSecs%60;
   cdEl.textContent=`${p2(h)}:${p2(m)}:${p2(s)}`;
   dangerBar.style.width=Math.min(100,(1-cdSecs/86400)*100)+'%';
-  cdEl.classList.remove('amber','crit');
-  if(cdSecs<7200) cdEl.classList.add('crit');
-  else if(cdSecs<36000) cdEl.classList.add('amber');
-  const wrap=document.getElementById('game-wrap');
-  wrap.classList.remove('hb-fast');
-  if(cdSecs<7200) wrap.classList.add('hb-fast');
+
+  // 5-stage system based on time remaining
+  const wrap=document.getElementById('cd-wrap');
+  cdEl.classList.remove('s1','s2','s3','s4');
+  wrap.classList.remove('s1','s2','s3','s4');
+  document.body.classList.remove('cd-s3','cd-s4');
+  if(cdSecs<600){          // < 10 min
+    cdEl.classList.add('s4'); wrap.classList.add('s4');
+    document.body.classList.add('cd-s4');
+  } else if(cdSecs<3600){  // < 1h
+    cdEl.classList.add('s3'); wrap.classList.add('s3');
+    document.body.classList.add('cd-s3');
+  } else if(cdSecs<10800){ // < 3h
+    cdEl.classList.add('s2'); wrap.classList.add('s2');
+  } else if(cdSecs<36000){ // < 10h
+    cdEl.classList.add('s1'); wrap.classList.add('s1');
+  }
+
+  // Per-second tick bounce on the digit element
+  cdEl.classList.remove('tick');
+  void cdEl.offsetWidth;
+  cdEl.classList.add('tick');
+
+  // Per-second sounds at critical stages
+  if(cdSecs<600 && cdSecs>0) playSecondTick();
+  else if(cdSecs<3600 && cdSecs%60===0) playSecondTick(true);
+
+  // Milestone events — fire once each
+  if(cdSecs<36000&&!cdMilestones.has(36000)){
+    cdMilestones.add(36000); playCountdownMilestone('amber');
+  }
+  if(cdSecs<3600&&!cdMilestones.has(3600)){
+    cdMilestones.add(3600); playCountdownMilestone('warn');
+    doFlash('#ffbe00','.18');
+  }
+  if(cdSecs<600&&!cdMilestones.has(600)){
+    cdMilestones.add(600); playCountdownMilestone('crit');
+    doFlash('#ff0000','.35'); doScanBar();
+    showToast('☠ UNDER 10 MINUTTER IGJEN','warn');
+  }
+
+  // Heartbeat mode management
+  document.getElementById('game-wrap').classList.remove('hb-fast');
+  if(cdSecs<600) document.getElementById('game-wrap').classList.add('hb-fast');
+  const newMode=cdSecs<600?2:cdSecs<3600?1:0;
+  if(newMode!==heartbeatMode){
+    heartbeatMode=newMode;
+    if(newMode===0) stopHeartbeat();
+    else startHeartbeat(newMode===2);
+  }
 }
 function p2(n){return String(n).padStart(2,'0');}
 
@@ -998,6 +1247,7 @@ function applyStat(k,d,label){
   if(bar) bar.style.width=state[k]+'%';
   if(val) val.textContent=state[k];
   if(k==='rad') radBar.style.width=state.rad+'%';
+  if(k==='rad') updateRadAmbience();
   if(label) showToast(`${d>0?'+':''}${d} ${label}`, d>0&&k!=='frykt'&&k!=='rad'?'good':'stat');
   if(k==='rad'&&d>0) checkRadMilestone(state.rad);
   // RADIATION DEATH
@@ -1060,33 +1310,52 @@ function updatePath(id){
 // ══════════════════════════════════════════════════
 function doShake(){
   const w=document.getElementById('game-wrap');
+  if(!w) return;
   w.classList.remove('shake'); void w.offsetWidth; w.classList.add('shake');
   setTimeout(()=>w.classList.remove('shake'),520);
 }
 function doFlash(color='#ff1a1a',strength='.4'){
   const f=document.getElementById('flash');
+  if(!f) return;
   f.style.background=color; f.style.opacity=strength;
   setTimeout(()=>{f.style.transition='opacity .3s';f.style.opacity='0';setTimeout(()=>f.style.transition='',350);},45);
 }
 function doEmp(){
   const e=document.getElementById('emp-flash');
-  e.style.opacity='.7'; playEmp();
-  doShake();
-  setTimeout(()=>{e.style.transition='opacity .6s';e.style.opacity='0';setTimeout(()=>e.style.transition='',650);},60);
+  if(!e) return;
+  e.style.opacity='.75'; playEmp();
+  doShake(); doScreenTear(3);
+  setTimeout(()=>{e.style.transition='opacity .7s';e.style.opacity='0';setTimeout(()=>e.style.transition='',750);},55);
 }
 function doGlitch(){
   const gr=document.getElementById('glitch-r'), gb=document.getElementById('glitch-b');
+  if(!gr||!gb) return;
   playGlitch();
-  gr.style.opacity='.85'; gb.style.opacity='.75';
-  gr.style.clipPath=`inset(${Math.random()*60}% 0 ${Math.random()*30}% 0)`;
-  gb.style.clipPath=`inset(${Math.random()*40}% 0 ${Math.random()*50}% 0)`;
-  gr.style.transform=`translate(${(Math.random()-.5)*18}px) skewX(${(Math.random()-.5)*3}deg)`;
-  gb.style.transform=`translate(${(Math.random()-.5)*14}px)`;
+  // Frame 1 — full split
+  const rx=(Math.random()-.5)*22, bx=(Math.random()-.5)*18;
+  const ry=(Math.random()-.5)*3;
+  gr.style.opacity='.9'; gb.style.opacity='.8';
+  gr.style.clipPath=`inset(${Math.random()*55}% 0 ${Math.random()*28}% 0)`;
+  gb.style.clipPath=`inset(${Math.random()*35}% 0 ${Math.random()*45}% 0)`;
+  gr.style.transform=`translate(${rx}px,${ry}px) skewX(${(Math.random()-.5)*4}deg)`;
+  gb.style.transform=`translate(${bx}px) scaleX(${1+(Math.random()-.5)*.04})`;
+  // Frame 2 — 55ms later: new random positions (re-query to be safe)
   setTimeout(()=>{
-    gr.style.clipPath=`inset(${Math.random()*80}% 0 ${Math.random()*15}% 0)`;
-    gr.style.transform=`translate(${(Math.random()-.5)*10}px)`;
-  },50);
-  setTimeout(()=>{gr.style.opacity='0';gb.style.opacity='0';gr.style.clipPath='';gb.style.clipPath='';gr.style.transform='';gb.style.transform='';},110);
+    const gr2=document.getElementById('glitch-r'), gb2=document.getElementById('glitch-b');
+    if(!gr2||!gb2) return;
+    gr2.style.clipPath=`inset(${Math.random()*75}% 0 ${Math.random()*12}% 0)`;
+    gr2.style.transform=`translate(${(Math.random()-.5)*12}px) skewX(${(Math.random()-.5)*2}deg)`;
+    gb2.style.clipPath=`inset(${Math.random()*20}% 0 ${Math.random()*60}% 0)`;
+    gb2.style.transform=`translate(${(Math.random()-.5)*16}px)`;
+  },55);
+  // Frame 3 — 105ms: clear
+  setTimeout(()=>{
+    const gr3=document.getElementById('glitch-r'), gb3=document.getElementById('glitch-b');
+    if(!gr3||!gb3) return;
+    gr3.style.opacity='0'; gb3.style.opacity='0';
+    gr3.style.clipPath=''; gb3.style.clipPath='';
+    gr3.style.transform=''; gb3.style.transform='';
+  },105);
 }
 function doShockwave(){
   const s=document.getElementById('shockwave');
@@ -1109,22 +1378,154 @@ function doLightning(){
   lc.width=window.innerWidth; lc.height=window.innerHeight;
   const ctx=lc.getContext('2d');
   lc.style.opacity='1';
-  function bolt(x1,y1,x2,y2,spread,depth){
+  function bolt(x1,y1,x2,y2,spread,depth,bright=1){
     if(depth<=0)return;
     ctx.beginPath(); ctx.moveTo(x1,y1); ctx.lineTo(x2,y2);
-    ctx.strokeStyle=`rgba(255,210,60,${0.55*depth/4})`; ctx.lineWidth=depth*.9; ctx.stroke();
+    // Core white bolt
+    ctx.strokeStyle=`rgba(255,255,255,${0.9*bright*depth/4})`; ctx.lineWidth=depth*0.8; ctx.stroke();
+    // Outer glow in amber
+    ctx.strokeStyle=`rgba(255,200,60,${0.35*bright*depth/4})`; ctx.lineWidth=depth*2.5; ctx.stroke();
     if(depth>1){
       const mx=(x1+x2)/2+(Math.random()-.5)*spread, my=(y1+y2)/2+(Math.random()-.5)*spread;
-      bolt(x1,y1,mx,my,spread/2,depth-1); bolt(mx,my,x2,y2,spread/2,depth-1);
-      if(Math.random()>.55) bolt(mx,my,mx+(Math.random()-.5)*spread*2,my+spread,spread/2,depth-2);
+      bolt(x1,y1,mx,my,spread/2,depth-1,bright);
+      bolt(mx,my,x2,y2,spread/2,depth-1,bright);
+      if(Math.random()>.45) bolt(mx,my,mx+(Math.random()-.5)*spread*2.2,my+spread*1.1,spread*.55,depth-2,bright*.7);
     }
   }
-  for(let i=0;i<3;i++){
+  const numBolts=Math.random()>.5?2:1;
+  for(let i=0;i<numBolts;i++){
     const sx=Math.random()*window.innerWidth;
-    bolt(sx,-10,sx+(Math.random()-.5)*400,window.innerHeight*.5+Math.random()*300,140,4);
+    bolt(sx,-10,sx+(Math.random()-.5)*500,window.innerHeight*.6+Math.random()*350,160,4);
   }
-  doFlash('#ffee88','.22');
-  setTimeout(()=>{ctx.clearRect(0,0,lc.width,lc.height); lc.style.opacity='0';},160);
+  // Double flash: instant white then amber decay
+  doFlash('#ffffff','.38');
+  setTimeout(()=>doFlash('#ffee88','.18'),90);
+  setTimeout(()=>{ctx.clearRect(0,0,lc.width,lc.height); lc.style.opacity='0';},180);
+  // Thunder follows with realistic delay (sound travels ~300m/s)
+  const delay=600+Math.random()*2200;
+  setTimeout(playThunder, delay);
+}
+
+// ── SCREEN TEAR: horisontale svarte striper ──────────
+function doScreenTear(n=4){
+  for(let i=0;i<n;i++){
+    const el=document.createElement('div');
+    const y=5+Math.random()*90;
+    const h=2+Math.random()*14;
+    const x=(Math.random()-.5)*60;
+    el.style.cssText=`position:fixed;top:${y}%;left:0;right:0;height:${h}px;background:#000;z-index:9993;pointer-events:none;transform:translateX(${x}px);`;
+    document.body.appendChild(el);
+    setTimeout(()=>el.remove(), 55+Math.random()*70);
+  }
+}
+
+// ── SCAN BAR: rask rød strek over skjermen ───────────
+function doScanBar(){
+  const el=document.getElementById('scan-bar');
+  if(!el) return;
+  el.style.transition='none'; el.style.top='-4px'; el.style.opacity='0.85';
+  void el.offsetWidth;
+  el.style.transition='top .22s linear';
+  el.style.top='102%';
+  setTimeout(()=>{ el.style.opacity='0'; },250);
+}
+
+// ── RAD HAZE: grønn glød ved strålings-milepæler ────
+function doRadHaze(alpha=0.22){
+  const el=document.getElementById('rad-haze');
+  if(!el) return;
+  el.style.transition='none'; el.style.opacity=alpha;
+  void el.offsetWidth;
+  setTimeout(()=>{ el.style.transition='opacity 3s ease'; el.style.opacity='0'; setTimeout(()=>el.style.transition='',3100); }, 400);
+}
+
+// ── UPDATE RAD AMBIENCE: body-klasser + static-canvas intensitet ──
+function updateRadAmbience(){
+  const r=state.rad;
+  const b=document.body;
+  b.classList.remove('rad-warm','rad-high','rad-crit');
+  if(r>=85)      b.classList.add('rad-crit');
+  else if(r>=55) b.classList.add('rad-high');
+  else if(r>=30) b.classList.add('rad-warm');
+  const sv=document.getElementById('static-canvas');
+  if(sv) sv.style.opacity=(0.03+Math.min(r,100)*0.001).toFixed(4);
+}
+
+// ── WHITEOUT: vedvarende hvit blending ──────────────
+function doWhiteout(holdMs=120,fadeMs=350){
+  const el=document.getElementById('whiteout');
+  if(!el) return;
+  el.style.transition='none'; el.style.opacity='1';
+  setTimeout(()=>{
+    el.style.transition=`opacity ${fadeMs}ms ease`;
+    el.style.opacity='0';
+  }, holdMs);
+}
+
+// ── NEGATIVE: inverterer farger momentant ───────────
+function doNegative(dur=90){
+  document.body.classList.add('negative');
+  setTimeout(()=>document.body.classList.remove('negative'), dur);
+}
+
+// ── CHROMATIC BLEED: RGB-kanal separasjon ───────────
+function doChromaticBleed(dur=140){
+  const el=document.getElementById('chromatic');
+  if(!el) return;
+  el.className=''; el.style.opacity='0.85';
+  const phase=Math.random()>.5?'bleed-r':'bleed-g';
+  el.classList.add(phase);
+  setTimeout(()=>{
+    el.classList.remove(phase);
+    const phase2=phase==='bleed-r'?'bleed-g':'bleed-r';
+    el.classList.add(phase2);
+    setTimeout(()=>{ el.classList.remove(phase2); el.style.opacity='0'; el.className=''; }, dur*.5);
+  }, dur*.5);
+}
+
+// ── ZOOM PULSE: kamera-sjokk zoom ───────────────────
+function doZoomPulse(){
+  document.body.classList.remove('zoom-pulse');
+  void document.body.offsetWidth;
+  document.body.classList.add('zoom-pulse');
+  setTimeout(()=>document.body.classList.remove('zoom-pulse'), 380);
+}
+
+// ── PIXEL BREAK: skjermen sprekker i piksler ────────
+function doPixelBreak(n=30){
+  const colors=['#ff1a1a','#ffffff','#ff8800','#ff0000','#000000'];
+  for(let i=0;i<n;i++){
+    const el=document.createElement('div');
+    const sz=3+Math.random()*18;
+    const x=Math.random()*100, y=Math.random()*100;
+    const c=colors[Math.floor(Math.random()*colors.length)];
+    const life=60+Math.random()*180;
+    el.style.cssText=`position:fixed;left:${x}%;top:${y}%;width:${sz}px;height:${sz}px;background:${c};z-index:9994;pointer-events:none;opacity:${0.5+Math.random()*.5};`;
+    document.body.appendChild(el);
+    setTimeout(()=>el.remove(), life);
+  }
+}
+
+// ── SCAN FLICKER: rask opasitets-flimring ───────────
+function doScanFlicker(n=3){
+  let count=0;
+  const pb=document.getElementById('pre-boot') || document.body;
+  function flick(){
+    pb.style.opacity=count%2===0?'0.04':'1';
+    count++;
+    if(count<n*2) setTimeout(flick, 38);
+    else pb.style.opacity='1';
+  }
+  flick();
+}
+
+// ── MEGA SHAKE: voldsomt 8-retnings rystelse ────────
+function doMegaShake(){
+  const el=document.getElementById('pre-boot')||document.getElementById('game-wrap');
+  if(!el) return;
+  el.classList.remove('pb-shake','mega-shake'); void el.offsetWidth;
+  el.classList.add('pb-shake');
+  setTimeout(()=>el.classList.remove('pb-shake'), 700);
 }
 
 // Random glitch events — CSS only (audio only if ready)
@@ -1342,8 +1743,8 @@ const STORY={
     stats:{kunnskap:{d:+35,label:'KUNNSKAP'},mot:{d:+15,label:'MOT'}},
     items:['minnepenn','presseID'],
     choices:[
-      {text:'Hopp ut nå. Du vet nok. Gå til journalistene.',target:'etter_flukt'},
-      {text:'Sett USB-stikken i en av maskinene og last ned alt du kan.',target:'etter_flukt'},
+      {text:'Hopp ut nå. Du vet mer enn nok. Gå til journalistene.',target:'etter_flukt'},
+      {text:'Sett USB-stikken i systemet og last ned alt du kan. Hopp ut etter.',target:'etter_flukt'},
     ]
   },
 
@@ -1429,7 +1830,7 @@ const STORY={
     title:'JOURNALISTEN',
     text:`<p>Journalisten svarer på første ring. Stemmen er hes og klar — hun er allerede våken. <em>«Vi vet. Vi har visst i to dager. Men vi trenger bevis som kan stå i retten. Alt vi publiserer uten dem, brukes mot oss som desinformasjon.»</em></p>
 <p>Du hører banking på din egen dør. Tre harde slag. Ingen sier noe. Fire slag til.</p>
-<em>Hun sier lavt: «Kom til nyhusbygget. Bruk baksideinngang. Presse-ID gjelder som pass. Ikke ta E18.»</em>`,
+<em>Hun sier lavt: «Kom til nyhetsbygget. Bruk baksideinngang. Presse-ID gjelder som pass. Ikke ta E18.»</em>`,
     stats:{kunnskap:{d:+15,label:'KUNNSKAP'},mot:{d:+20,label:'MOT'}},
     items:['presseID'],
     choices:[
@@ -1591,8 +1992,8 @@ const STORY={
     img:I('https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=760&q=80'),
     time:'07:00:00',rad:8,
     title:'SISTE 30 SEKUNDER',
-    text:`<p>Du utløser sprengkapselen i korridoren utenfor. Et lynraskt elektromagnetisk puls-blink smelter låssystemene og stopper de inkommende vaktene. Tretti sekunder.</p>
-<em>Elstad sier: «Det er klart. Trykk.»</em>
+    text:`<p>Du utløser sprengkapselen i korridoren utenfor. Et lynraskt elektromagnetisk blink smelter låssystemene og stanser de inkommende vaktene i spor. Tretti sekunder.</p>
+<em>Elstad sier rolig, nesten stille: «Det er klart. Trykk.»</em>
 <p>Meldingen er klar. 14 millioner telefoner. Bevisene. Videoene. Koordinatene til nødutgangene i alle bunkere. Alt.</p>`,
     stats:{mot:{d:+30,label:'MOT'}},
     choices:[
@@ -1661,7 +2062,7 @@ const STORY={
     img:I('https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=760&q=80'),
     time:'09:00:00',rad:6,
     title:'MARINE VHF',
-    text:`<p>Havneradioen er aktiv. VHF kanal 16 — internasjonal nødfrekens. Du sender meldingen på engelsk, norsk og improvisert tysk: fullt navn på alle involverte, full beskrivelse av Prosjekt Solnedgang.</p>
+    text:`<p>Havneradioen er aktiv. VHF kanal 16 — internasjonal nødfrekvens. Du sender meldingen på engelsk, norsk og improvisert tysk: fullt navn på alle involverte, full beskrivelse av Prosjekt Solnedgang.</p>
 <em>Etter 40 sekunder: et svar på gebrokkent norsk med finsk aksent. «Vi hørte deg. Vi sender videre. Gå til internett via satellitt i 20 minutter.»</em>
 <p>Det er noe. Men er det nok?</p>`,
     stats:{mot:{d:+25,label:'MOT'},kunnskap:{d:+10,label:'KUNNSKAP'}},
@@ -1679,12 +2080,12 @@ const STORY={
     title:'KNM UREDD',
     intercept:'NAVAL KRYPTERT: «KNM Uredd avgår 06:00 uansett ordre. Kaptein Lie nekter å forsegle passasjerene.»',
     text:`<p>Ubåten er kortere enn du forestilte deg. Kapteinen — en 58 år gammel kvinne med grå flette og et ansiktsuttrykk som forteller deg at hun ikke har sovet på to dager — møter deg på kaidekket.</p>
-<em>«Jeg har sett ordrene. Jeg nekter å gjennomføre dem. Men jeg kan ikke alene stoppe hva som skjer på land. Hvis du har bevisene, har jeg en satelittsender med global rekkevidde.»</em>
+<em>«Jeg har sett ordrene. Jeg nekter å gjennomføre dem. Men jeg kan ikke alene stoppe hva som skjer på land. Hvis du har bevisene og koden fra havnekontoret, har jeg en satellittsender med global rekkevidde.»</em>
 <p>Ubåten er det sikreste stedet i Norge akkurat nå. Men å gå om bord er en vei som ikke enkelt reverseres.</p>`,
     stats:{mot:{d:+30,label:'MOT'},kunnskap:{d:+15,label:'KUNNSKAP'}},
     choices:[
-      {text:'Gå om bord. Bruk ubåtens satellittsender til å sende bevisene globalt.',target:'ubat_sender', requires:{item:'minnepenn'}},
-      {text:'Kapteinen er en ressurs. Ta henne med til nyhusbygget.',target:'nyhetshuset'},
+      {text:'Gå om bord. Bruk ubåtens satellittsender til å sende bevisene globalt.',target:'ubat_sender', requires:{item:'minnepenn',item2:'ubatkode'}},
+      {text:'Kapteinen er en ressurs. Ta henne med til nyhetsbygget.',target:'nyhetshuset'},
     ]
   },
 
@@ -1710,8 +2111,8 @@ const STORY={
     img:I('https://images.unsplash.com/photo-1448375240586-882707db8855?auto=format&fit=crop&w=760&q=80'),
     time:'12:00:00',rad:5,
     title:'SKOGSTIEN',
-    text:`<p>Du injiserer serumet. Det svir stygt, men det fungerer — strålingsnivåene på telefonen din stopper å stige. Serum Type B. Kjøpt tid.</p>
-<p>To kilometer inn i skogen: en inngjerdet militær radiomast, og en forlatt skogshytte med røyk fra pipa. <em>Noen er her inne.</em></p>`,
+    text:`<p>Skogen tar imot deg uten spørsmål. Tett granskog og fuktig mørke. Borte fra asfalt, lys og menneskemasser synker strålingsnivåene merkbart — her er det betong og metall som trekker til seg det meste.</p>
+<p>To kilometer inn: en inngjerdet militær radiomast tegner seg mot himmelen, og en forlatt skogshytte med røyk fra pipa. <em>Noen er her inne.</em></p>`,
     stats:{rad:{d:-18,label:'STRÅLING REDUSERT'},mot:{d:+15,label:'MOT'}},
     choices:[
       {text:'Radiomasten. Snik deg inn og send sannheten.',target:'radiomasten'},
@@ -1757,9 +2158,9 @@ const STORY={
     img:I('https://images.unsplash.com/photo-1584984180436-b51f0f09b552?auto=format&fit=crop&w=760&q=80'),
     time:'04:00:00',rad:10,
     title:'90 SEKUNDER',
-    text:`<p>Fremdriftslinjen kryper. 30%. Dørene gir etter litt. 60%. Riflekolber mot stål. <strong>80%</strong>.</p>
-<em>En arm i gjennom et sprekket panel. Grep rundt skulderen din. 92%.</em>
-<p>Det er et valg. Et av de siste.</p>`,
+    text:`<p>Fremdriftslinjen kryper. 30%. Dørene gir etter litt. 60%. Riflekolber mot stål. <strong>80%.</strong></p>
+<em>En arm gjennom et sprekket panel. Grep rundt skulderen din. 92%.</em>
+<p>Tre sekunder. En av dem er nok. <strong>Det er et valg igjen.</strong></p>`,
     stats:{mot:{d:+35,label:'MOT'},frykt:{d:+30,label:'FRYKT'}},
     choices:[
       {text:'HOLD. IKKE SLIPP. KJØP DE SISTE SEKUNDENE.',target:'slutt2'},
@@ -1871,11 +2272,12 @@ const STORY={
     img:I('https://images.unsplash.com/photo-1496247749665-49cf5b1022e9?auto=format&fit=crop&w=760&q=80'),
     time:'03:30:00',rad:10,
     title:'ELEKTROMAGNETISK PULS',
-    text:`<p>Du løser ut kapselen. Et blendende hvitt blink. Alle lysene i rommet slukner i 1,4 sekunder. Laservåpnene slukner. I det en sekundet:</p>
-<em>Du er ved bryteren.</em>`,
+    text:`<p>Du løser ut kapselen. Et blendende hvitt blink. Alle lysene i rommet slukner i 1,4 sekunder. Laservåpnene slukner. Uniformene dimmer.</p>
+<em>I det ene sekundet er du allerede i bevegelse.</em>
+<p>Du er ved bryteren.</p>`,
     stats:{mot:{d:+40,label:'MOT'}},
     choices:[
-      {text:'DRETT NED. BUNKERENE MISTER STRØM.',target:'slutt2'},
+      {text:'BRYT NED. BUNKERENE MISTER STRØM.',target:'slutt2'},
     ]
   },
 
@@ -1895,7 +2297,7 @@ const STORY={
     stats:{frykt:{d:+28,label:'FRYKT'},rad:{d:+5,label:'STRÅLING'}},
     choices:[
       {text:'Bruk presse-ID. Krev pressefrihet og passasje.',target:'checkpoint_passert', requires:{item:'presseID'}},
-      {text:'Snudd rundt. Finn en gåsti gjennom skogen.',target:'skogens_inngang'},
+      {text:'Snu rundt. Finn en gåsti gjennom skogen.',target:'skogens_inngang'},
       {text:'Overgi kjøretøyet og bli med til bunkeren. Se hva som skjer.',target:'bunker_ankomst'},
     ]
   },
@@ -1907,7 +2309,7 @@ const STORY={
     title:'GJENNOM LINJENE',
     text:`<p>Soldaten ser på kortet ditt. Ser på deg. To lange sekunder. Deretter vinker ham deg gjennom uten å si et ord — men han noterer nummerskiltregistreringen på en liten blokk.</p>
 <em>Du er gjennom. For nå.</em>
-<p>Fra bilradioen: et svakt signal fra en piratfrekevens. En stemme du kjenner igjen — en journalist som jobbet for NRK frem til 2022, da han ble «frivillig» pensjonert. Han gir koordinater til et møtepunkt i Oslosentrum.</p>`,
+<p>Fra bilradioen: et svakt signal fra en piratfrekvens. En stemme du kjenner igjen — en journalist som jobbet for NRK frem til 2022, da han ble «frivillig» pensjonert. Han gir koordinater til et møtepunkt i Oslosentrum.</p>`,
     stats:{mot:{d:+18,label:'MOT'},kunnskap:{d:+12,label:'KUNNSKAP'}},
     items:['radiokode'],
     choices:[
@@ -1943,7 +2345,7 @@ const STORY={
     stats:{kunnskap:{d:+40,label:'KUNNSKAP'},frykt:{d:+20,label:'FRYKT'}},
     items:['bunkerkart'],
     choices:[
-      {text:'Bruk nødutgangen NE-7. Forlat bunkeren og gå til nyhusbygget.',target:'nyhetshuset'},
+      {text:'Bruk nødutgangen NE-7. Forlat bunkeren og gå til nyhetsbygget.',target:'nyhetshuset'},
       {text:'Finn andre fanger og organiser en masseutgang.',target:'bunker_opprør'},
     ]
   },
@@ -1954,7 +2356,7 @@ const STORY={
     time:'08:00:00',rad:4,
     title:'MASSEUTGANG',
     text:`<p>Du finner seks andre som tenker som deg. En ex-advokat, en lege, to lærere og to unge menn med ingeniørbakgrunn. Ingen har gitt opp ennå.</p>
-<em>Legen hvísker: «NE-7-utgangen leder ut i en tunnel som ender 400 meter nord for perimeteren. Hvis bunkerkartenheten er ekte, kan vi gå. Men vi trenger noen til å holde vakten opptatt.»</em>
+<em>Legen hvisker: «NE-7-utgangen leder ut i en tunnel som ender 400 meter nord for perimeteren. Hvis bunkerkartenheten er ekte, kan vi gå. Men vi trenger noen til å holde vakten opptatt.»</em>
 <p>Syv mennesker. Én sjanse. Mørket er din beste allierte — bunkeren slukker lyset i fem minutter kl. 03:00 for å spare strøm.</p>`,
     stats:{mot:{d:+35,label:'MOT'},kunnskap:{d:+15,label:'KUNNSKAP'}},
     choices:[
@@ -1975,7 +2377,7 @@ const STORY={
     items:['presseID'],
     choices:[
       {text:'Send alt du har via hans oppsett — nå.',target:'slutt2', requires:{item:'minnepenn'}},
-      {text:'Hans bevis alene er ikke nok. Dra til nyhusbygget med ham.',target:'nyhetshuset'},
+      {text:'Hans bevis alene er ikke nok. Dra til nyhetsbygget med ham.',target:'nyhetshuset'},
       {text:'Del det via hans satelittkanal — ingen trenger å vite hvem du er.',target:'slutt_hemmelig', requires:{item:'minnepenn',statMin:{kunnskap:65}}},
     ]
   },
@@ -2023,9 +2425,9 @@ const STORY={
     stats:{kunnskap:{d:+35,label:'KUNNSKAP'},rad:{d:-25,label:'STRÅLING BEHANDLET'}},
     items:['serum'],
     choices:[
-      {text:'Dette endrer alt. Gå til radiomasten og kringkast NI nyheten.',target:'radiomasten'},
-      {text:'Overdrivelsen er selve beviset. Gå til nyhusbygget med dette.',target:'nyhetshuset'},
-      {text:'Behandle strålingen er det viktigste nå. Gå til skogen og hvil.',target:'skogens_inngang'},
+      {text:'Dette endrer alt. Gå til radiomasten og kringkast denne nyheten.',target:'radiomasten'},
+      {text:'Overdrivelsen er selve beviset. Gå til nyhetsbygget med dette.',target:'nyhetshuset'},
+      {text:'Å behandle strålingen er det viktigste nå. Gå til skogen og hvil.',target:'skogens_inngang'},
     ]
   },
 
@@ -2040,7 +2442,7 @@ const STORY={
     stats:{mot:{d:+25,label:'MOT'},kunnskap:{d:+15,label:'KUNNSKAP'}},
     choices:[
       {text:'Overfør alt via ambassadens sikre linje. Ber dem spre det internasjonalt.',target:'slutt2', requires:{item:'minnepenn'}},
-      {text:'Be om diplomatisk eskorte til nyhusbygget — bevisene trenger norsk publikum.',target:'nyhetshuset'},
+      {text:'Be om diplomatisk eskorte til nyhetsbygget — bevisene trenger norsk publikum.',target:'nyhetshuset'},
       {text:'Be ambassaden huse deg mens du koordinerer med motstanden.',target:'undergrunn_møte'},
     ]
   },
@@ -2067,6 +2469,7 @@ const STORY={
     img:I('https://images.unsplash.com/photo-1527689368864-3a821dbccc34?auto=format&fit=crop&w=760&q=80'),
     time:'21:00:00',rad:6,
     title:'DEN FORLATTE TRIKKEN',
+    intercept:'AM-SIGNAL FANGET — 612 kHz: «...til alle som hører dette: elektrisiteten er ennå ikke kuttet. Dere har et vindu. Bruk det.»',
     text:`<p>En gammel trikk står stille på skinnene ved Nationaltheatret. Dørene åpne. Motoren av. Men inni: sju mennesker som valgte den tredje muligheten — verken bunker eller flukt. Bare her.</p>
 <em>En eldre ingeniørpensjonist har koblet opp et gammeldags AM-radiosystem via trikken strømskinne. Han sier rolig: «Den når alle bilradioer i en radius på ti kilometer. Gammel teknologi. Ingen kan blokkere den raskt nok.»</em>
 <p>Det er noe uventet beroligende med dette rommet. Noen mennesker som bare nekter å la seg styre av frykt.</p>`,
@@ -2088,7 +2491,7 @@ const STORY={
 <p>Du er klar. For første gang hele natten: faktisk klar.</p>`,
     stats:{mot:{d:+35,label:'MOT'},frykt:{d:-30,label:'FRYKT REDUSERT'},rad:{d:-8,label:'HVILE'}},
     choices:[
-      {text:'SEND. Fortell Norge alt du vet.',target:'slutt2'},
+      {text:'SEND. Fortell Norge sannheten — ord for ord.',target:'slutt2'},
     ]
   },
 
@@ -2133,6 +2536,7 @@ const STORY={
     ending:'good',
     endingLabel:'SLUTT 2 — BYENS HELT',
     endingDesc:'Du ofret alt og holdt ut til siste sekund.',
+    intercept:'SISTE AVLYTTEDE MELDING — PROSJEKTLEDER: «Det er over. Trekk alle team ut. Prosjekt Solnedgang er kompromittert. Gjenta: kompromittert.»',
     text:`<p>Signalet sprer seg som ild gjennom tørt gress. Innen tre minutter er varselet i alle aviser, alle radio-kanaler, alle telefoner i hele Norden. Innen seks minutter er bunkerdørene i teknisk trøbbel. Innen ti: åpne.</p>
 <p>Folkemassene snur sin kollektive panikk mot en ny retning. Innen soloppgang er bakmennene arrestert på bestilling fra fem ulike internasjonale domstoler.</p>
 <em>«En ukjent person — eller kanskje flere, sier etterforskningsmyndigheter — reddet 50 000 liv i en natt.»</em>
@@ -2179,7 +2583,7 @@ function render(passageId){
   initAudio();
   playClick();
   playWhoosh();
-  doEmp();
+  doScanBar();
   doShockwave();
   doVignette();
 
@@ -2261,7 +2665,124 @@ function render(passageId){
     typewrite(document.getElementById('story-text'),p.text,9,()=>{
       document.getElementById('choices').style.opacity='1';
     });
+    // Every scene transition gets a scan bar sweep + whoosh
+    doScanBar();
+    playWhoosh();
     doGlitch();
+
+    // Scene-specific SFX — fires after 250ms once scene is up
+    const sfxMap={
+      // ── EMP-scener — alt slutter ──────────────────────────────────────
+      kontrollrom_eps:    ()=>{
+        doEmp(); doScreenTear(8); doWhiteout(80,300);
+        doChromaticBleed(400); doZoomPulse();
+        doFlash('#00e5ff','.65'); playDeepRumble(1.4,0.4); playSubBoom(0.4);
+      },
+      stromsentralen_eps: ()=>{
+        doEmp(); doScreenTear(10); doWhiteout(120,400); doMegaShake();
+        doChromaticBleed(500); doNegative(80); doZoomPulse();
+        doFlash('#ffffff','1.0'); playDeepRumble(1.8,0.5); playSubBoom(0.5);
+        setTimeout(()=>doFlash('#00e5ff','.3'),400);
+      },
+
+      // ── Høy spenning — tension stinger ───────────────────────────────
+      kontrollrom:      ()=>{
+        playTension(); playAlarm(); playSubBoom(0.28);
+        doFlash('#ff1a1a','.35'); doZoomPulse(); doChromaticBleed(200);
+      },
+      radiomasten:      ()=>{
+        playTension(); playStaticBurst(0.22);
+        doFlash('#ff0000','.28'); doChromaticBleed(180);
+      },
+      radiomasten_hard: ()=>{
+        playTension(); playSiren(2,0.12); playDeepRumble(1.0,0.32); playSubBoom(0.35);
+        doShake(); doFlash('#ff0000','.55'); doChromaticBleed(350); doZoomPulse();
+        doScreenTear(5);
+      },
+      stromsentralen:   ()=>{
+        playTension(); playAlarm(); playDeepRumble(1.2,0.38);
+        doMegaShake(); doFlash('#ff1a1a','.45'); doChromaticBleed(300);
+        doScreenTear(6); doZoomPulse(); playSubBoom(0.3);
+      },
+      server_uten_kort: ()=>{
+        playTension(); playStaticBurst(0.28); playAlarm();
+        doShake(); doChromaticBleed(200); doScreenTear(3);
+      },
+      sendestudio:      ()=>{
+        playAlarm(); playStaticBurst(0.2);
+        doFlash('#ff0000','.22'); doChromaticBleed(160);
+      },
+
+      // ── Radio-scener ──────────────────────────────────────────────────
+      trikken: ()=>{
+        setTimeout(playRadioChatter,600); setTimeout(playRadioChatter,1900);
+        setTimeout(playRadioChatter,3200); setTimeout(()=>playStaticBurst(0.12),800);
+        setTimeout(()=>doChromaticBleed(120),1200);
+      },
+      trikken_hvil: ()=>{ setTimeout(playRadioChatter,800); setTimeout(()=>playStaticBurst(0.1),1000); },
+      havn_radio:   ()=>{
+        setTimeout(playRadioChatter,300); setTimeout(playRadioChatter,1400);
+        setTimeout(()=>doChromaticBleed(140),500);
+      },
+      hytten:       ()=>{ setTimeout(playRadioChatter,1000); setTimeout(()=>playStaticBurst(0.1),1500); },
+
+      // ── Avsløringer og oppdagelser ────────────────────────────────────
+      vanen_dypere:   ()=>{
+        doGlitch(); setTimeout(doGlitch,120); doScreenTear(4);
+        doChromaticBleed(280); playIntercept(); doZoomPulse();
+        playStaticBurst(0.18);
+      },
+      bunker_nod:     ()=>{
+        doGlitch(); setTimeout(doGlitch,100); doScreenTear(4);
+        doChromaticBleed(320); playIntercept(); doRadHaze(.12);
+        doZoomPulse(); playStaticBurst(0.2); playDeepRumble(0.8,0.22);
+      },
+      tunnelens_dyp:  ()=>{
+        doFlash('#00e5ff','.28'); doScreenTear(5);
+        doChromaticBleed(200); playSubBoom(0.22); doZoomPulse();
+      },
+      hacking_start:  ()=>{
+        doGlitch(); setTimeout(doGlitch,100); setTimeout(doGlitch,240);
+        playIntercept(); doScreenTear(5); doChromaticBleed(350);
+        doZoomPulse(); playStaticBurst(0.25); doNegative(60);
+      },
+      ambassaden:     ()=>{
+        doFlash('#ffffff','.18'); doChromaticBleed(140); playStaticBurst(0.12);
+      },
+
+      // ── Sluttscener — finaler ─────────────────────────────────────────
+      slutt1: ()=>{
+        doEmp(); doScreenTear(10); doMegaShake();
+        doWhiteout(100,400); doChromaticBleed(500); doNegative(120);
+        playDeepRumble(2.0,0.5); playSubBoom(0.55); playStaticBurst(0.38);
+        doZoomPulse(); doPixelBreak(35); doScanBar();
+      },
+      slutt2: ()=>{
+        doFlash('#ffbe00','.32'); doChromaticBleed(200); doZoomPulse();
+        setTimeout(()=>{ doFlash('#ffffff','.22'); playSubBoom(0.28); },700);
+        setTimeout(()=>{ doFlash('#ffbe00','.18'); doChromaticBleed(160); },1400);
+        setTimeout(()=>{ doWhiteout(80,500); doFlash('#ffbe00','.12'); playResonance(220,2.0,0.1); },2100);
+        setTimeout(()=>{ doScanBar(); doZoomPulse(); },2500);
+      },
+      slutt3: ()=>{
+        doFlash('#334455','.4'); doChromaticBleed(250); playDeepRumble(1.0,0.22);
+        setTimeout(()=>doFlash('#223344','.2'),600);
+      },
+      slutt_rad: ()=>{
+        doRadHaze(.55); startGeiger(3); playDeepRumble(2.0,0.44);
+        doScreenTear(6); doChromaticBleed(400); doNegative(80);
+        doZoomPulse(); playIonScream(2.2,0.16); doScanBar();
+        setTimeout(()=>{ stopGeiger(); doFlash('#00ff88','.25'); doWhiteout(60,300); },3200);
+      },
+      slutt_hemmelig: ()=>{
+        doScreenTear(6); doChromaticBleed(600); doNegative(100);
+        [80,200,380,600,880,1200].forEach(d=>setTimeout(doGlitch,d));
+        setTimeout(()=>{ doFlash('#00e5ff','.5'); doZoomPulse(); playStaticBurst(0.28); },350);
+        setTimeout(()=>{ doFlash('#00e5ff','.28'); doWhiteout(60,250); },900);
+        setTimeout(()=>{ doPixelBreak(30); doChromaticBleed(300); doScanBar(); },1400);
+      },
+    };
+    if(sfxMap[passageId]) setTimeout(()=>{ try{ sfxMap[passageId](); }catch(e){} }, 250);
   }, 160);
 }
 
@@ -2284,12 +2805,23 @@ document.addEventListener('mouseover', e=>{
 });
 
 // Alarm on radiation milestones
-let radMilestones=new Set();
+// (radMilestones/cdMilestones declared early above)
 function checkRadMilestone(v){
-  [25,50,75,90].forEach(m=>{
-    if(v>=m&&!radMilestones.has(m)){
-      radMilestones.add(m);
-      playAlarm(); doFlash('#ff4400','.3');
+  const milestones=[
+    {at:25, msg:'⚠ STRÅLINGSNIVÅ FARLIG', haze:.18},
+    {at:50, msg:'☢ KRITISK STRÅLING', haze:.26},
+    {at:75, msg:'☢ EKSPONERING AKUTT DØDELIG', haze:.36},
+    {at:90, msg:'☠ TERMINAL DOSE NÅDD', haze:.48},
+  ];
+  milestones.forEach(({at,msg,haze})=>{
+    if(v>=at&&!radMilestones.has(at)){
+      radMilestones.add(at);
+      playAlarm();
+      playRadPulse();
+      doFlash('#ff4400','.35');
+      doRadHaze(haze);
+      doScanBar();
+      showToast(msg,'warn');
       if(v>=75) startGeiger(v>=90?3:2);
     }
   });
@@ -2315,7 +2847,7 @@ const BOOT_LINES=[
   '> BEFOLKNINGSESTIMATER: 2.3 MILLIONER SUBJEKTER UNDER INNLÅSING',
   '',
   'ADVARSEL: DETTE SYSTEMET ER AKTIVT OVERVÅKET',
-  'ADVARSEL: DIN POSISJON MAY ALREADY BE KNOWN',
+  'ADVARSEL: DIN POSISJON KAN ALLEREDE VÆRE KJENT',
   'ADVARSEL: ALLE VALG LOGGES',
   '',
   'LASTER HISTORIEDATABASE...',
@@ -2336,7 +2868,7 @@ const BOOT_LINES=[
   '',
 ];
 
-let bIdx=0, cIdx=0, bootIv=null;
+// (bIdx, cIdx, bootIv declared early above)
 const bootTxtEl=document.getElementById('boot-text');
 
 function typeBoot(){
@@ -2373,10 +2905,7 @@ function skipBoot(){
 // ══════════════════════════════════════════════════
 //  PRE-BOOT HELPERS
 // ══════════════════════════════════════════════════
-const ALERT_TITLE_TXT='KRISEVARSEL — NORSK METEOROLOGISK INSTITUTT';
-const ALERT_BODY_TXT='Solstorm kategori X99 bekreftet av 14 internasjonale observatorier. Estimert treffpunkt: 24 timer. Dødelig strålingsdose garantert i åpent terreng.\n\nFjellbunkeren ved Gaustablikk er åpen. Kapasitet: 50 000. Evakuer UMIDDELBART.';
-
-let preBootTimers=[];
+// (ALERT_TITLE_TXT, ALERT_BODY_TXT declared early above)
 function pbT(fn,ms){preBootTimers.push(setTimeout(fn,ms));}
 function clearPBT(){preBootTimers.forEach(clearTimeout);}
 
@@ -2387,7 +2916,6 @@ function skipPreBoot(){
   setTimeout(typeBoot,200);
 }
 
-let phoneCdSecs=86400, phoneCdIv=null;
 function startPhoneCd(){
   const el=document.getElementById('phone-cd');
   phoneCdIv=setInterval(()=>{
@@ -2516,14 +3044,22 @@ function stopGeiger(){ if(geigerIv){clearTimeout(geigerIv); geigerIv=null;} }
 // ── WHOOSH: sceneskift svupp ────────────────────────
 function playWhoosh(){
   if(!audioReady())return;
+  // Air whoosh — shaped noise
   const sz=Math.floor(audioCtx.sampleRate*0.35);
   const buf=audioCtx.createBuffer(1,sz,audioCtx.sampleRate);
   const d=buf.getChannelData(0);
   for(let i=0;i<sz;i++) d[i]=(Math.random()*2-1)*(i/sz)*(1-i/sz)*4;
   const s=audioCtx.createBufferSource(), g=audioCtx.createGain();
-  const bp=audioCtx.createBiquadFilter(); bp.type='bandpass'; bp.frequency.value=600; bp.Q.value=0.8;
-  g.gain.value=0.22; s.buffer=buf;
+  const bp=audioCtx.createBiquadFilter(); bp.type='bandpass'; bp.frequency.value=700; bp.Q.value=0.7;
+  g.gain.value=0.20; s.buffer=buf;
   s.connect(bp); bp.connect(g); g.connect(masterGain); s.start();
+  // Sub bass thump
+  const ob=audioCtx.createOscillator(), gb=audioCtx.createGain();
+  const lp=audioCtx.createBiquadFilter(); lp.type='lowpass'; lp.frequency.value=90;
+  ob.type='sine'; ob.frequency.setValueAtTime(65,audioCtx.currentTime);
+  ob.frequency.exponentialRampToValueAtTime(30,audioCtx.currentTime+0.22);
+  gb.gain.setValueAtTime(0.14,audioCtx.currentTime); gb.gain.exponentialRampToValueAtTime(0.001,audioCtx.currentTime+0.25);
+  ob.connect(lp); lp.connect(gb); gb.connect(masterGain); ob.start(); ob.stop(audioCtx.currentTime+0.26);
 }
 
 // ── TYPEKEY: tastetrykk-klikk ──────────────────────
@@ -2548,7 +3084,177 @@ function playItemGet(){
   });
 }
 
-// ── DISTANT BOOM: atmosfærisk dyp lyd ──────────────
+// ── HEARTBEAT: ekte lub-dub for høy fare ────────────
+function startHeartbeat(fast=false){
+  if(hbIv) clearTimeout(hbIv);
+  hbRunning=true;
+  const bpm=fast?128:70;
+  function beat(){
+    if(!hbRunning||!audioReady()){hbIv=null;return;}
+    try{
+      // Lub
+      const o1=audioCtx.createOscillator(),g1=audioCtx.createGain();
+      const lp1=audioCtx.createBiquadFilter(); lp1.type='lowpass'; lp1.frequency.value=110;
+      o1.type='sine'; o1.frequency.value=60;
+      g1.gain.setValueAtTime(0.2,audioCtx.currentTime);
+      g1.gain.exponentialRampToValueAtTime(0.001,audioCtx.currentTime+0.13);
+      o1.connect(lp1); lp1.connect(g1); g1.connect(masterGain); o1.start(); o1.stop(audioCtx.currentTime+0.14);
+      // Dub
+      const o2=audioCtx.createOscillator(),g2=audioCtx.createGain();
+      const lp2=audioCtx.createBiquadFilter(); lp2.type='lowpass'; lp2.frequency.value=100;
+      o2.type='sine'; o2.frequency.value=48;
+      const t2=audioCtx.currentTime+0.2;
+      g2.gain.setValueAtTime(0.13,t2); g2.gain.exponentialRampToValueAtTime(0.001,t2+0.1);
+      o2.connect(lp2); lp2.connect(g2); g2.connect(masterGain); o2.start(t2); o2.stop(t2+0.11);
+    }catch(e){}
+    if(hbRunning) hbIv=setTimeout(beat,60000/bpm);
+  }
+  beat();
+}
+function stopHeartbeat(){
+  hbRunning=false;
+  if(hbIv){clearTimeout(hbIv);hbIv=null;}
+  heartbeatMode=0;
+}
+
+// ── TENSION STINGER: stigende dissonant akkord ──────
+function playTension(){
+  if(!audioReady())return;
+  try{
+  [218,231].forEach(f=>{
+    const o=audioCtx.createOscillator(),g=audioCtx.createGain();
+    const lp=audioCtx.createBiquadFilter(); lp.type='lowpass'; lp.frequency.value=850;
+    o.type='sawtooth';
+    o.frequency.setValueAtTime(f,audioCtx.currentTime);
+    o.frequency.linearRampToValueAtTime(f*1.9,audioCtx.currentTime+1.8);
+    g.gain.setValueAtTime(0,audioCtx.currentTime);
+    g.gain.linearRampToValueAtTime(0.07,audioCtx.currentTime+0.3);
+    g.gain.setValueAtTime(0.07,audioCtx.currentTime+1.4);
+    g.gain.linearRampToValueAtTime(0,audioCtx.currentTime+2.0);
+    o.connect(lp); lp.connect(g); g.connect(masterGain);
+    o.start(); o.stop(audioCtx.currentTime+2.1);
+  });
+  }catch(e){}
+}
+
+// ── RADIO CHATTER: AM-filtrert støy som ligner stemme ──
+function playRadioChatter(){
+  if(!audioReady())return;
+  try{
+  const dur=0.45+Math.random()*0.7;
+  const sz=Math.floor(audioCtx.sampleRate*dur);
+  const buf=audioCtx.createBuffer(1,sz,audioCtx.sampleRate);
+  const d=buf.getChannelData(0);
+  for(let i=0;i<sz;i++){
+    const env=Math.sin(i/sz*Math.PI);
+    const am=0.5+0.5*Math.sin(i/audioCtx.sampleRate*160*Math.PI*2);
+    d[i]=(Math.random()*2-1)*env*am;
+  }
+  const s=audioCtx.createBufferSource();
+  const bp=audioCtx.createBiquadFilter(); bp.type='bandpass'; bp.frequency.value=1050; bp.Q.value=2.8;
+  const hp=audioCtx.createBiquadFilter(); hp.type='highpass'; hp.frequency.value=550;
+  const g=audioCtx.createGain(); g.gain.value=0.11;
+  s.buffer=buf; s.connect(bp); bp.connect(hp); hp.connect(g); g.connect(masterGain); s.start();
+  }catch(e){}
+}
+
+// ── RAD PULSE: lav tung puls ved strålings-milepæler ──
+function playRadPulse(){
+  if(!audioReady())return;
+  [52,42,35].forEach((f,i)=>{
+    const o=audioCtx.createOscillator(),g=audioCtx.createGain();
+    const lp=audioCtx.createBiquadFilter(); lp.type='lowpass'; lp.frequency.value=150;
+    const t=audioCtx.currentTime+i*0.6;
+    o.type='sine'; o.frequency.value=f;
+    g.gain.setValueAtTime(0.28,t); g.gain.exponentialRampToValueAtTime(0.001,t+0.55);
+    o.connect(lp); lp.connect(g); g.connect(masterGain); o.start(t); o.stop(t+0.6);
+  });
+}
+
+// Random ambient radio chatter — started from beginExperience()
+function scheduleRadioChatter(){
+  setTimeout(()=>{
+    playRadioChatter();
+    if(Math.random()>.45) setTimeout(playRadioChatter, 900+Math.random()*600);
+    scheduleRadioChatter();
+  }, 40000+Math.random()*55000);
+}
+
+
+// ── SECOND TICK: metronomisk tikk i kritisk fase ────
+function playSecondTick(soft=false){
+  if(!audioReady())return;
+  const o=audioCtx.createOscillator(), g=audioCtx.createGain();
+  o.type='sine'; o.frequency.value=soft?640:1100;
+  const vol=soft?0.028:0.055;
+  g.gain.setValueAtTime(vol,audioCtx.currentTime);
+  g.gain.exponentialRampToValueAtTime(0.001,audioCtx.currentTime+0.045);
+  o.connect(g); g.connect(masterGain); o.start(); o.stop(audioCtx.currentTime+0.05);
+}
+
+// ── COUNTDOWN MILESTONE: dramatisk overgangs-stinger ──
+function playCountdownMilestone(level='amber'){
+  if(!audioReady())return;
+  if(level==='amber'){
+    // Soft descending chime
+    [523,440,349].forEach((f,i)=>{
+      const o=audioCtx.createOscillator(), g=audioCtx.createGain();
+      const t=audioCtx.currentTime+i*0.28; o.type='triangle'; o.frequency.value=f;
+      g.gain.setValueAtTime(0,t); g.gain.linearRampToValueAtTime(0.09,t+0.04);
+      g.gain.exponentialRampToValueAtTime(0.001,t+0.4);
+      o.connect(g); g.connect(masterGain); o.start(t); o.stop(t+0.42);
+    });
+  } else if(level==='warn'){
+    // Sharp two-tone alert
+    [330,495,330,495].forEach((f,i)=>{
+      const o=audioCtx.createOscillator(), g=audioCtx.createGain();
+      const lp=audioCtx.createBiquadFilter(); lp.type='lowpass'; lp.frequency.value=1800;
+      const t=audioCtx.currentTime+i*0.16; o.type='square'; o.frequency.value=f;
+      g.gain.setValueAtTime(0,t); g.gain.linearRampToValueAtTime(0.12,t+0.02);
+      g.gain.exponentialRampToValueAtTime(0.001,t+0.14);
+      o.connect(lp); lp.connect(g); g.connect(masterGain); o.start(t); o.stop(t+0.15);
+    });
+  } else {
+    // Critical — rising screech then bass slam
+    const o=audioCtx.createOscillator(), g=audioCtx.createGain();
+    o.type='sawtooth';
+    o.frequency.setValueAtTime(110,audioCtx.currentTime);
+    o.frequency.exponentialRampToValueAtTime(2200,audioCtx.currentTime+0.35);
+    g.gain.setValueAtTime(0,audioCtx.currentTime); g.gain.linearRampToValueAtTime(0.18,audioCtx.currentTime+0.12);
+    g.gain.exponentialRampToValueAtTime(0.001,audioCtx.currentTime+0.38);
+    o.connect(g); g.connect(masterGain); o.start(); o.stop(audioCtx.currentTime+0.4);
+    // Bass slam
+    const ob=audioCtx.createOscillator(), gb=audioCtx.createGain();
+    const lp=audioCtx.createBiquadFilter(); lp.type='lowpass'; lp.frequency.value=120;
+    ob.type='sine'; ob.frequency.setValueAtTime(80,audioCtx.currentTime+0.3);
+    ob.frequency.exponentialRampToValueAtTime(30,audioCtx.currentTime+0.9);
+    gb.gain.setValueAtTime(0,audioCtx.currentTime+0.3); gb.gain.linearRampToValueAtTime(0.35,audioCtx.currentTime+0.38);
+    gb.gain.exponentialRampToValueAtTime(0.001,audioCtx.currentTime+0.95);
+    ob.connect(lp); lp.connect(gb); gb.connect(masterGain); ob.start(audioCtx.currentTime+0.3); ob.stop(audioCtx.currentTime+1.0);
+  }
+}
+
+// ── THUNDER: romling etter lyn ───────────────────────
+function playThunder(){
+  if(!audioReady())return;
+  const dur=1.8+Math.random()*1.4;
+  const sz=Math.floor(audioCtx.sampleRate*dur);
+  const buf=audioCtx.createBuffer(1,sz,audioCtx.sampleRate);
+  const d=buf.getChannelData(0);
+  // Shaped noise — initial crack then rumble decay
+  for(let i=0;i<sz;i++){
+    const t=i/sz;
+    const env=t<0.05 ? t/0.05 : Math.exp(-(t-0.05)*3.5);
+    d[i]=(Math.random()*2-1)*env;
+  }
+  const s=audioCtx.createBufferSource(), g=audioCtx.createGain();
+  const lp=audioCtx.createBiquadFilter(); lp.type='lowpass'; lp.frequency.value=260;
+  const lp2=audioCtx.createBiquadFilter(); lp2.type='lowpass'; lp2.frequency.value=180;
+  g.gain.value=0.45;
+  s.buffer=buf; s.connect(lp); lp.connect(lp2); lp2.connect(g); g.connect(masterGain); s.start();
+}
+
+
 function playDistantBoom(){
   if(!audioReady())return;
   const o=audioCtx.createOscillator(), g=audioCtx.createGain();
@@ -2557,6 +3263,119 @@ function playDistantBoom(){
   g.gain.setValueAtTime(0,t); g.gain.linearRampToValueAtTime(0.18,t+0.3);
   g.gain.setValueAtTime(0.18,t+0.6); g.gain.exponentialRampToValueAtTime(0.001,t+2.2);
   o.connect(g); g.connect(masterGain); o.start(t); o.stop(t+2.5);
+}
+
+// ── ION SCREAM: ionosfærisk stigende hvin ──────────
+function playIonScream(dur=2.8,vol=0.19){
+  if(!audioReady())return;
+  try{
+  const o=audioCtx.createOscillator(), g=audioCtx.createGain();
+  const dist=audioCtx.createWaveShaper();
+  const curve=new Float32Array(256);
+  for(let i=0;i<256;i++){const x=i*2/255-1; curve[i]=x<0?-Math.pow(-x,.6):Math.pow(x,.6)*1.3;}
+  dist.curve=curve;
+  o.type='sawtooth';
+  o.frequency.setValueAtTime(65,audioCtx.currentTime);
+  o.frequency.exponentialRampToValueAtTime(3800,audioCtx.currentTime+dur*0.82);
+  o.frequency.setValueAtTime(3800,audioCtx.currentTime+dur*0.82);
+  o.frequency.exponentialRampToValueAtTime(180,audioCtx.currentTime+dur);
+  g.gain.setValueAtTime(0,audioCtx.currentTime);
+  g.gain.linearRampToValueAtTime(vol,audioCtx.currentTime+0.18);
+  g.gain.setValueAtTime(vol,audioCtx.currentTime+dur*0.75);
+  g.gain.exponentialRampToValueAtTime(0.001,audioCtx.currentTime+dur+0.1);
+  const lp=audioCtx.createBiquadFilter(); lp.type='bandpass'; lp.frequency.value=900; lp.Q.value=1.2;
+  o.connect(dist); dist.connect(lp); lp.connect(g); g.connect(masterGain);
+  o.start(); o.stop(audioCtx.currentTime+dur+0.15);
+  }catch(e){}
+}
+
+// ── DEEP RUMBLE: jordskjelvende lav-frekvensstøy ───
+function playDeepRumble(dur=1.4,vol=0.38){
+  if(!audioReady())return;
+  try{
+  const sz=Math.floor(audioCtx.sampleRate*dur);
+  const buf=audioCtx.createBuffer(1,sz,audioCtx.sampleRate);
+  const d=buf.getChannelData(0);
+  for(let i=0;i<sz;i++){
+    const t=i/sz;
+    const env=t<0.08?t/0.08:Math.exp(-(t-0.08)*2.2);
+    d[i]=(Math.random()*2-1)*env;
+  }
+  const s=audioCtx.createBufferSource(), g=audioCtx.createGain();
+  const lp=audioCtx.createBiquadFilter(); lp.type='lowpass'; lp.frequency.value=95;
+  const lp2=audioCtx.createBiquadFilter(); lp2.type='lowpass'; lp2.frequency.value=65;
+  g.gain.value=vol; s.buffer=buf;
+  s.connect(lp); lp.connect(lp2); lp2.connect(g); g.connect(masterGain); s.start();
+  }catch(e){}
+}
+
+// ── METAL STRESS: infrastruktur som knaker ─────────
+function playMetalStress(){
+  if(!audioReady())return;
+  try{
+  const freqs=[180,243,187,260,155];
+  freqs.forEach((f,i)=>{
+    const o=audioCtx.createOscillator(), g=audioCtx.createGain();
+    const mod=audioCtx.createOscillator(), modG=audioCtx.createGain();
+    const t=audioCtx.currentTime+i*0.06;
+    o.type='sawtooth'; o.frequency.value=f;
+    mod.type='sine'; mod.frequency.value=3.5+Math.random()*4;
+    modG.gain.value=f*0.28;
+    mod.connect(modG); modG.connect(o.frequency);
+    g.gain.setValueAtTime(0,t); g.gain.linearRampToValueAtTime(0.07,t+0.04);
+    g.gain.exponentialRampToValueAtTime(0.001,t+0.32+Math.random()*0.2);
+    const bp=audioCtx.createBiquadFilter(); bp.type='bandpass'; bp.frequency.value=f*1.8; bp.Q.value=4;
+    o.connect(bp); bp.connect(g); g.connect(masterGain);
+    o.start(t); o.stop(t+0.55); mod.start(t); mod.stop(t+0.55);
+  });
+  }catch(e){}
+}
+
+// ── STATIC BURST: skarp bred støysmell ─────────────
+function playStaticBurst(vol=0.32){
+  if(!audioReady())return;
+  try{
+  const sz=Math.floor(audioCtx.sampleRate*0.12);
+  const buf=audioCtx.createBuffer(1,sz,audioCtx.sampleRate);
+  const d=buf.getChannelData(0);
+  for(let i=0;i<sz;i++) d[i]=(Math.random()*2-1)*Math.exp(-i/(sz*0.25));
+  const s=audioCtx.createBufferSource(), g=audioCtx.createGain();
+  const hp=audioCtx.createBiquadFilter(); hp.type='highpass'; hp.frequency.value=2200;
+  g.gain.value=vol; s.buffer=buf;
+  s.connect(hp); hp.connect(g); g.connect(masterGain); s.start();
+  }catch(e){}
+}
+
+// ── SUB BOOM: enkelt massivt sub-slag ──────────────
+function playSubBoom(vol=0.55){
+  if(!audioReady())return;
+  try{
+  const o=audioCtx.createOscillator(), g=audioCtx.createGain();
+  const lp=audioCtx.createBiquadFilter(); lp.type='lowpass'; lp.frequency.value=75;
+  o.type='sine'; o.frequency.setValueAtTime(88,audioCtx.currentTime);
+  o.frequency.exponentialRampToValueAtTime(22,audioCtx.currentTime+0.55);
+  g.gain.setValueAtTime(0,audioCtx.currentTime);
+  g.gain.linearRampToValueAtTime(vol,audioCtx.currentTime+0.03);
+  g.gain.exponentialRampToValueAtTime(0.001,audioCtx.currentTime+0.7);
+  o.connect(lp); lp.connect(g); g.connect(masterGain); o.start(); o.stop(audioCtx.currentTime+0.75);
+  }catch(e){}
+}
+
+// ── RESONANCE: svevende resonant bølge ─────────────
+function playResonance(freq=220,dur=1.8,vol=0.12){
+  if(!audioReady())return;
+  try{
+  [freq, freq*1.498, freq*1.999].forEach((f,i)=>{
+    const o=audioCtx.createOscillator(), g=audioCtx.createGain();
+    const t=audioCtx.currentTime+i*0.08;
+    o.type='sine'; o.frequency.value=f;
+    g.gain.setValueAtTime(0,t);
+    g.gain.linearRampToValueAtTime(vol/(i+1),t+dur*0.25);
+    g.gain.setValueAtTime(vol/(i+1),t+dur*0.6);
+    g.gain.exponentialRampToValueAtTime(0.001,t+dur);
+    o.connect(g); g.connect(masterGain); o.start(t); o.stop(t+dur+0.1);
+  });
+  }catch(e){}
 }
 
 // Schedule random distant booms during gameplay — started from beginExperience()
@@ -2579,21 +3398,28 @@ function beginExperience(){
 
   initAudio();
   scheduleDistantBoom();
+  scheduleRadioChatter();
   startPreBoot();
 }
 
 function startPreBoot(){
 
-  // ── FASE 0: Prelude — signal kapret ──────────────
+  // ══ FASE 0: Signalkapring — verden slutter å gi mening ══════════
+
   pbT(()=>{
     const pl=document.getElementById('prelude');
     pl.classList.add('show');
-    playEbsTone();
-    playSiren(1,0.10);
+    // Første lyd: ionosfærisk hvin starter med en gang
+    playIonScream(3.2, 0.22);
+    playDeepRumble(2.2, 0.42);
+    doScreenTear(10);
+    doScanBar();
+    // Progressbar
     let pw=0; const biv=setInterval(()=>{
       pw+=1.8; document.getElementById('prelude-bar-fill').style.width=Math.min(100,pw)+'%';
       if(pw>=100) clearInterval(biv);
     },40);
+    // Datalinjer som vises
     const lines=[
       'INITIALISERER KRYPTERT TILKOBLING...',
       'NODE: 185.220.101.47 → 10.0.0.1 → OSLO-KNS',
@@ -2612,51 +3438,113 @@ function startPreBoot(){
     setTimeout(nextLine, 300);
   },100);
 
+  // Chromatic bleed + EBS starter
+  pbT(()=>{ doChromaticBleed(200); playStaticBurst(0.18); },380);
+  pbT(()=>{ playEbsTone(); doScanBar(); },500);
+
+  // Logo og subtittel vises
   pbT(()=>{
     document.getElementById('prelude-logo').classList.add('show');
     document.getElementById('prelude-sub').classList.add('show');
+    playMetalStress();
+    doChromaticBleed(180);
   },800);
 
-  pbT(()=>{ playEbsTone(); doFlash('#ff0000','.1'); },2800);
+  // Første sub boom + scan flicker
+  pbT(()=>{ playSubBoom(0.38); doScanFlicker(4); },1200);
+  pbT(()=>{ doScreenTear(4); playStaticBurst(0.22); doChromaticBleed(120); },1650);
 
+  // Negative flash + resonanse
+  pbT(()=>{ doNegative(75); playResonance(110,1.4,0.14); playSubBoom(0.28); },2100);
+
+  // ══ STOR GLITCH-STORM #1 ════════════════════════════════════════
   pbT(()=>{
+    playEbsTone();
+    doFlash('#ff0000','.22');
+    doScreenTear(12);
+    doScanBar();
+    doChromaticBleed(300);
+    playStaticBurst(0.28);
+    // 6 glitcher staggered
+    doGlitch();
+    setTimeout(doGlitch,55); setTimeout(doGlitch,120);
+    setTimeout(doGlitch,195); setTimeout(doGlitch,280); setTimeout(doGlitch,390);
     const pl=document.getElementById('prelude');
     let f=0; const iv=setInterval(()=>{
-      pl.style.opacity=f%2===0?'0.05':'1';
-      pl.style.transform=f%2===0?`skewX(${(Math.random()-.5)*6}deg) translateX(${(Math.random()-.5)*28}px) scaleY(${0.95+Math.random()*.1})`:'none';
-      pl.style.filter=f%2===0?`hue-rotate(${Math.random()*120}deg) saturate(2.5)`:'none';
-      f++; if(f>10){clearInterval(iv); pl.style.opacity='1'; pl.style.transform='none'; pl.style.filter='none';}
-    },55);
-    doFlash('#ff0000','.3');
-    playEmp();
-    playStaticCrackle(0.3,0.2);
+      pl.style.opacity=f%2===0?'0.04':'1';
+      pl.style.transform=f%2===0?`skewX(${(Math.random()-.5)*8}deg) translateX(${(Math.random()-.5)*36}px) scaleY(${0.93+Math.random()*.14})`:'none';
+      pl.style.filter=f%2===0?`hue-rotate(${Math.random()*180}deg) saturate(3)`:'none';
+      f++; if(f>14){clearInterval(iv); pl.style.opacity='1'; pl.style.transform='none'; pl.style.filter='none';}
+    },45);
+  },2800);
+
+  pbT(()=>{ playDeepRumble(1.6,0.44); doZoomPulse(); doScanBar(); },3200);
+  pbT(()=>{ doScreenTear(7); playSiren(1,0.16); doChromaticBleed(200); doNegative(60); },3600);
+  pbT(()=>{ playMetalStress(); doPixelBreak(22); },4000);
+
+  // ══ FASE 1: PRE-KOLLAPS — MAKSIMAL KAOS ═════════════════════════
+  pbT(()=>{
+    doMegaShake();
+    doEmp(); playDeepRumble(1.8,0.48);
+    doScreenTear(14); doZoomPulse();
+    doChromaticBleed(400); doNegative(100);
+    doScanBar(); doScanFlicker(6);
+    playStaticBurst(0.38); playMetalStress();
+    doFlash('#ff1a1a','.42');
+    doGlitch(); setTimeout(doGlitch,60); setTimeout(doGlitch,130);
+    setTimeout(doGlitch,220); setTimeout(doGlitch,340); setTimeout(doGlitch,480);
+    setTimeout(doGlitch,650);
   },4200);
 
-  pbT(()=>{ doFlash('#ffffff','0.7'); playExplosion(0.35); doShake(); },4700);
-  pbT(()=>{ doFlash('#ff0000','.3'); playStaticCrackle(0.2,0.15); },5100);
+  // Pixel dissolution
+  pbT(()=>{ doPixelBreak(45); doChromaticBleed(180); playSubBoom(0.45); },4480);
 
-  // ── FASE 1: Telefonen glir inn over prelude ───────
+  // ══ HVITBLENDING + EKSPLOSJON ════════════════════════════════════
+  pbT(()=>{
+    doWhiteout(180, 500);
+    playExplosion(0.65); playIonScream(1.8,0.18);
+    doShake(); doScanBar();
+    doFlash('#ffffff','1.0');
+  },4700);
+
+  pbT(()=>{ doScanBar(); playSubBoom(0.4); doScreenTear(7); doPixelBreak(18); },5000);
+  pbT(()=>{ doFlash('#ff0000','.35'); playStaticCrackle(0.2,0.18); doChromaticBleed(160); },5100);
+  pbT(()=>{ doScanFlicker(4); doNegative(55); doZoomPulse(); },5380);
+
+  // ══ FASE 2: Telefonen glir inn ═══════════════════════════════════
   pbT(()=>{
     const ph=document.getElementById('phone');
     ph.style.pointerEvents='none';
     ph.classList.add('visible');
+    playWhoosh(); doScanBar();
     setTimeout(()=>document.getElementById('phone-time').classList.add('show'),400);
     setTimeout(()=>document.getElementById('phone-date').classList.add('show'),700);
   },5800);
 
-  // ── FASE 2: Vibrasjon + nødvarsellyd ─────────────
+  pbT(()=>{ doScreenTear(4); playMetalStress(); doChromaticBleed(140); },6150);
+  pbT(()=>{ doScanBar(); playStaticBurst(0.18); },6550);
+  pbT(()=>{ playDeepRumble(0.9,0.28); doNegative(50); },6950);
+
+  // ══ FASE 3: VIBRASJON + NØDVARSELLYD ═════════════════════════════
   pbT(()=>{
     playBuzzer();
     const ph=document.getElementById('phone');
     ph.classList.add('vibrate');
+    doMegaShake();
     document.getElementById('prelude-center').style.background='rgba(40,0,0,.55)';
+    doScreenTear(9); doNegative(65); doChromaticBleed(280);
+    doFlash('#ff0000','.4');
+    playSubBoom(0.35); playStaticBurst(0.26);
   },7200);
 
-  // ── FASE 3: Varselskjerm tennes ───────────────────
+  pbT(()=>{ doScanBar(); playStaticBurst(0.22); doScanFlicker(3); },7500);
+
+  // ══ FASE 4: Varselskjerm tennes ══════════════════════════════════
   pbT(()=>{
     document.getElementById('phone').classList.remove('vibrate');
     document.getElementById('alert-screen').classList.add('show');
     startPhoneCd();
+    playStaticBurst(0.2);
     typeAlertText(
       document.getElementById('alert-title'),
       ALERT_TITLE_TXT,40,
@@ -2664,32 +3552,79 @@ function startPreBoot(){
     );
   },7700);
 
-  pbT(()=>{ playBuzzer(); doShake(); doFlash('#ff0000','.35'); },11500);
+  pbT(()=>{ playMetalStress(); doScreenTear(3); doChromaticBleed(120); },8500);
+  pbT(()=>{ playStaticBurst(0.2); doScanBar(); doNegative(45); },9500);
+  pbT(()=>{ playDeepRumble(1.2,0.32); doPixelBreak(14); },10200);
+  pbT(()=>{ doScreenTear(5); doChromaticBleed(180); playMetalStress(); },10800);
 
+  // ══ FASE 5: BUZZ RUNDE #2 — HARDERE ═════════════════════════════
+  pbT(()=>{
+    playBuzzer(); playDeepRumble(1.4,0.4);
+    doShake(); doFlash('#ff0000','.38');
+    doScreenTear(6); doScanBar();
+    doGlitch(); setTimeout(doGlitch,80); setTimeout(doGlitch,180); setTimeout(doGlitch,300);
+    doChromaticBleed(220); doZoomPulse();
+    playStaticBurst(0.3);
+  },11500);
+
+  pbT(()=>{ playIonScream(1.4,0.14); doNegative(80); doChromaticBleed(160); },12000);
+  pbT(()=>{ doScanBar(); playStaticBurst(0.24); doScanFlicker(3); doPixelBreak(16); },12500);
+
+  // ══ FASE 6: BUZZ RUNDE #3 — KRITISK ═════════════════════════════
   pbT(()=>{
     playBuzzer();
     document.getElementById('prelude-center').style.background='rgba(70,0,0,.75)';
-    doFlash('#cc0000','.45');
-    playSiren(1,0.12);
+    doFlash('#cc0000','.5');
+    playSiren(2, 0.14); playResonance(82, 2.2, 0.16);
+    doScanBar(); doZoomPulse();
+    doMegaShake(); doScreenTear(8);
+    doChromaticBleed(350); doNegative(90);
+    playSubBoom(0.5);
   },13000);
 
+  pbT(()=>{ playDeepRumble(1.6,0.45); doScreenTear(7); doScanBar(); },13500);
+  pbT(()=>{ playMetalStress(); doPixelBreak(25); doNegative(60); },14000);
+  pbT(()=>{ doScanFlicker(5); doChromaticBleed(200); doZoomPulse(); },14400);
+
+  // ══ FASE 7: ABSOLUTT KAOS — OPPBYGGING TIL FINALE ════════════════
   pbT(()=>{
-    playBuzzer(); playExplosion(0.3);
-    doGlitch(); setTimeout(doGlitch,60); setTimeout(doGlitch,120); setTimeout(doGlitch,200);
-    doFlash('#ff1a1a','0.65'); doShake();
-    const ph=document.getElementById('phone');
-    ph.classList.add('vibrate');
-    setTimeout(()=>ph.classList.remove('vibrate'),600);
+    playBuzzer(); playExplosion(0.45); playDeepRumble(1.2,0.5);
+    doMegaShake(); doEmp(); doZoomPulse();
+    doWhiteout(60, 250);
+    doChromaticBleed(500); doNegative(110);
+    doScreenTear(16); doPixelBreak(55); doScanBar();
+    // 10 glitcher spread over 800ms
+    [0,55,120,195,285,390,510,650,790,960].forEach(d=>setTimeout(doGlitch,d));
+    doFlash('#ff1a1a','0.7');
+    playStaticBurst(0.42); playMetalStress(); playIonScream(1.2,0.16);
   },14700);
 
-  // ── FASE 7: Telefon blåser ut → terminal ─────────
+  pbT(()=>{ doScanBar(); doScanFlicker(5); playSubBoom(0.55); doChromaticBleed(220); },15200);
+  pbT(()=>{ doWhiteout(180,320); doChromaticBleed(280); playStaticBurst(0.35); },15500);
+  pbT(()=>{ doScreenTear(9); playMetalStress(); doNegative(70); },16000);
+  pbT(()=>{ doScanFlicker(4); doZoomPulse(); doChromaticBleed(180); },16350);
+
+  // ══ FASE 8: TELEFON SPRENGES — OVERGANG TIL TERMINAL ════════════
   pbT(()=>{
     clearInterval(phoneCdIv);
     const ph=document.getElementById('phone');
-    ph.style.transition='opacity .2s,transform .2s';
-    ph.style.opacity='0'; ph.style.transform='scale(1.2) rotate(-3deg)';
-    doFlash('#ff2200','1.0'); doEmp(); doShake();
-    playExplosion(0.55); playStaticCrackle(0.4,0.2);
+    ph.style.transition='opacity .15s,transform .15s';
+    ph.style.opacity='0'; ph.style.transform='scale(1.28) rotate(-4deg)';
+
+    // MEGA finale SFX
+    doWhiteout(280, 600);
+    doEmp(); doMegaShake(); doZoomPulse();
+    playExplosion(0.85); playIonScream(2.0,0.22); playDeepRumble(2.0,0.55);
+    playSubBoom(0.6); playStaticBurst(0.45); playStaticCrackle(0.5,0.24);
+
+    // VFX bombardement
+    doFlash('#ff2200','1.0');
+    doScreenTear(18); doPixelBreak(70);
+    doChromaticBleed(550); doNegative(140);
+    doScanBar(); setTimeout(doScanBar,180); setTimeout(doScanBar,360);
+    doScanFlicker(8);
+    [0,60,140,260,400,580,800].forEach(d=>setTimeout(doGlitch,d));
+
     pbT(()=>{
       document.getElementById('pre-boot').classList.add('gone');
       document.getElementById('boot').classList.add('active');
