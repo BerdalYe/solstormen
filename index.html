@@ -261,108 +261,177 @@ body{background:var(--bg);color:var(--text);font-family:'Crimson Pro',Georgia,se
 #boot-skip{position:absolute;bottom:1.5rem;right:2rem;font-size:.68rem;color:var(--dim);letter-spacing:2px;cursor:pointer;border:none;background:none;font-family:'Share Tech Mono',monospace;transition:color .2s;}
 #boot-skip:hover{color:var(--red);}
 
-/* ── HUD ── */
-#game-wrap{position:relative;z-index:10;max-width:760px;margin:0 auto;padding:1.5rem 1.5rem 5rem;}
-#hud{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;border-bottom:1px solid rgba(255,26,26,.18);padding-bottom:.75rem;margin-bottom:.9rem;gap:.5rem;}
-#hud-left{font-family:'Bebas Neue',sans-serif;font-size:1.3rem;letter-spacing:8px;color:var(--dim);}
-#rad-wrap{display:flex;align-items:center;gap:.5rem;}
-#rad-label{font-family:'Share Tech Mono',monospace;font-size:.62rem;color:var(--red);letter-spacing:2px;}
-#rad-bar-outer{width:80px;height:5px;background:rgba(255,32,32,.12);border-radius:1px;overflow:hidden;}
-#rad-bar{height:100%;background:linear-gradient(90deg,#ff5500,#ff1a1a);width:0%;transition:width 1.2s ease;box-shadow:0 0 6px rgba(255,26,26,.5);}
-#hud-right{display:flex;gap:.6rem;justify-content:flex-end;align-items:center;}
-#alert-dot{width:7px;height:7px;border-radius:50%;background:var(--red);box-shadow:var(--glow-red);animation:bdot 1.1s step-end infinite;}
-@keyframes bdot{0%,100%{opacity:1}50%{opacity:0}}
-#hud-status{font-family:'Share Tech Mono',monospace;font-size:.62rem;color:var(--red);}
+/* ══════════════════════════════════════════════════
+   GAME LAYOUT
+   ══════════════════════════════════════════════════ */
+#game-wrap{
+  position:relative;z-index:10;
+  max-width:860px;margin:0 auto;
+  display:flex;flex-direction:column;
+  min-height:100vh;
+}
 
-/* ── DANGER BAR ── */
-#danger-outer{height:2px;background:rgba(255,26,26,.07);margin-bottom:.9rem;transition:height .8s;}
-#danger-bar{height:100%;background:linear-gradient(90deg,var(--orange),var(--red));transition:width 1.4s ease;box-shadow:0 0 5px rgba(255,26,26,.4);}
-body.cd-s3 #danger-outer{height:3px;}
-body.cd-s4 #danger-outer{height:4px;}
-body.cd-s4 #danger-bar{animation:dangerShimmer .9s linear infinite;}
-@keyframes dangerShimmer{0%{filter:brightness(1)}50%{filter:brightness(1.5)}100%{filter:brightness(1)}}
+/* ── STICKY CHROME (HUD + stats + ticker) ── */
+#game-chrome{
+  position:sticky;top:0;z-index:500;
+  background:rgba(4,6,8,.96);
+  border-bottom:2px solid rgba(255,26,26,.28);
+  box-shadow:0 4px 40px rgba(0,0,0,.85),0 1px 0 rgba(255,26,26,.1);
+  backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
+}
 
-/* ── TICKER ── */
-#ticker{overflow:hidden;border-top:1px solid rgba(255,26,26,.15);border-bottom:1px solid rgba(255,26,26,.15);padding:.28rem 0;margin-bottom:1.1rem;position:relative;}
-#ticker::before{content:'KRISE';position:absolute;left:0;top:0;bottom:0;background:var(--red);color:#fff;font-family:'Bebas Neue';font-size:.78rem;letter-spacing:3px;padding:.28rem .55rem;z-index:2;display:flex;align-items:center;}
-#ticker-text{font-family:'Share Tech Mono',monospace;font-size:.7rem;color:var(--red);white-space:nowrap;padding-left:75px;animation:tickerScroll 35s linear infinite;}
-@keyframes tickerScroll{0%{transform:translateX(110vw)}100%{transform:translateX(-100%)}}
+/* ── HUD ROW ── */
+#hud{
+  display:grid;grid-template-columns:1fr auto 1fr;
+  align-items:center;
+  padding:.65rem 1.6rem .5rem;
+  gap:1rem;
+  border-bottom:1px solid rgba(255,26,26,.1);
+}
+#hud-left{display:flex;flex-direction:column;gap:.1rem;}
+.hud-game-title{
+  font-family:'Bebas Neue',sans-serif;font-size:1.2rem;
+  letter-spacing:9px;color:rgba(255,26,26,.6);
+  text-shadow:0 0 20px rgba(255,26,26,.3);
+}
+#scene-counter{
+  font-family:'Share Tech Mono',monospace;font-size:.52rem;
+  color:rgba(255,255,255,.3);letter-spacing:3px;margin-top:.05rem;
+}
 
-/* ── COUNTDOWN ── */
+/* ── COUNTDOWN (centred in HUD) ── */
 #cd-wrap{
-  text-align:center;margin-bottom:.9rem;
-  padding:.5rem .5rem .3rem;border-radius:2px;
-  border:1px solid rgba(255,26,26,0);
-  transition:border-color .8s,background .8s,box-shadow .8s;
+  text-align:center;padding:.15rem .8rem;border-radius:2px;
+  border:1px solid rgba(255,26,26,.15);
+  background:rgba(255,26,26,.03);
   position:relative;overflow:hidden;
+  transition:border-color .8s,background .8s,box-shadow .8s;
 }
 #cd-wrap::after{
   content:'';position:absolute;inset:0;pointer-events:none;
-  background:linear-gradient(180deg,rgba(255,26,26,0) 0%,rgba(255,26,26,.04) 100%);
+  background:linear-gradient(180deg,rgba(255,26,26,0),rgba(255,26,26,.04));
   opacity:0;transition:opacity .8s;
 }
 #cd-label{
-  font-family:'Share Tech Mono',monospace;font-size:.62rem;
-  letter-spacing:5px;color:var(--dim);margin-bottom:.15rem;
-  transition:color .6s, letter-spacing .6s;
+  font-family:'Share Tech Mono',monospace;font-size:.52rem;
+  letter-spacing:4px;color:rgba(255,255,255,.3);margin-bottom:.05rem;
+  transition:color .6s,letter-spacing .6s;
 }
 #cd{
   font-family:'Bebas Neue',sans-serif;
-  font-size:clamp(2.8rem,8vw,5rem);
-  letter-spacing:10px;color:var(--red);
+  font-size:clamp(1.9rem,4.5vw,3rem);
+  letter-spacing:8px;color:var(--red);
   text-shadow:var(--glow-red);line-height:1;
-  transition:color .4s,text-shadow .4s,font-size .5s;
-  display:inline-block;
+  transition:color .4s,text-shadow .4s;display:inline-block;
 }
-/* Per-second tick bounce */
 #cd.tick{animation:cdTick .12s ease-out both;}
 @keyframes cdTick{0%{transform:scale(1.05)}100%{transform:scale(1)}}
-
-/* Stage 1: < 10h — fargen skifter mot amber */
 #cd.s1{color:var(--orange);text-shadow:var(--glow-amber);}
-#cd-wrap.s1 #cd-label{color:var(--orange);letter-spacing:6px;}
-
-/* Stage 2: < 3h — amber, wrap border lyser */
+#cd-wrap.s1 #cd-label{color:var(--orange);}
 #cd.s2{color:var(--amber);text-shadow:var(--glow-amber);}
-#cd-wrap.s2{border-color:rgba(255,190,0,.18);box-shadow:0 0 28px rgba(255,190,0,.06) inset;}
+#cd-wrap.s2{border-color:rgba(255,190,0,.25);box-shadow:0 0 18px rgba(255,190,0,.06) inset;}
 #cd-wrap.s2::after{opacity:1;}
-
-/* Stage 3: < 1h — større font, raskere puls */
-#cd.s3{color:var(--amber);text-shadow:0 0 30px rgba(255,190,0,.9),0 0 80px rgba(255,190,0,.4);font-size:clamp(3.2rem,9vw,5.8rem);}
-#cd-wrap.s3{border-color:rgba(255,190,0,.32);box-shadow:0 0 40px rgba(255,190,0,.1) inset;}
-#cd-wrap.s3 #cd-label{color:var(--amber);letter-spacing:8px;}
-
-/* Stage 4: < 10 min — kritisk rød, kanter blinker */
-#cd.s4{color:#fff;text-shadow:0 0 20px rgba(255,26,26,1),0 0 60px rgba(255,26,26,.7),0 0 120px rgba(255,26,26,.3);font-size:clamp(3.5rem,10vw,6.5rem);}
-#cd-wrap.s4{border-color:rgba(255,26,26,.6);background:rgba(30,0,0,.25);animation:wrapCrit .55s ease-in-out infinite;}
-@keyframes wrapCrit{0%,100%{box-shadow:0 0 30px rgba(255,26,26,.12) inset}50%{box-shadow:0 0 60px rgba(255,26,26,.35) inset,0 0 20px rgba(255,26,26,.2)}}
-#cd-wrap.s4 #cd-label{color:var(--red);letter-spacing:10px;animation:labelCrit .55s step-end infinite;}
-@keyframes labelCrit{0%,100%{opacity:1}50%{opacity:.4}}
+#cd.s3{color:var(--amber);text-shadow:0 0 30px rgba(255,190,0,.9),0 0 60px rgba(255,190,0,.3);font-size:clamp(2.1rem,5vw,3.4rem);}
+#cd-wrap.s3{border-color:rgba(255,190,0,.35);box-shadow:0 0 30px rgba(255,190,0,.08) inset;}
+#cd-wrap.s3 #cd-label{color:var(--amber);}
+#cd.s4{color:#fff;text-shadow:0 0 20px #ff1a1a,0 0 55px rgba(255,26,26,.6),0 0 100px rgba(255,26,26,.25);font-size:clamp(2.3rem,5.5vw,3.8rem);}
+#cd-wrap.s4{border-color:rgba(255,26,26,.65);background:rgba(30,0,0,.3);animation:wrapCrit .55s ease-in-out infinite;}
+@keyframes wrapCrit{0%,100%{box-shadow:0 0 20px rgba(255,26,26,.1) inset}50%{box-shadow:0 0 50px rgba(255,26,26,.3) inset,0 0 15px rgba(255,26,26,.15)}}
+#cd-wrap.s4 #cd-label{color:var(--red);animation:labelCrit .55s step-end infinite;}
+@keyframes labelCrit{0%,100%{opacity:1}50%{opacity:.3}}
 #cd.s4{animation:cdCrit .55s ease-in-out infinite;}
-@keyframes cdCrit{0%,100%{transform:scale(1)}50%{transform:scale(1.05) skewX(-.3deg)}}
+@keyframes cdCrit{0%,100%{transform:scale(1)}50%{transform:scale(1.04) skewX(-.3deg)}}
 
-/* ── STATS ── */
-#stats-bar{display:flex;gap:.8rem;margin-bottom:.9rem;padding:.6rem .9rem;border:1px solid rgba(255,26,26,.1);background:rgba(10,13,17,.75);border-radius:2px;flex-wrap:wrap;}
-.stat{display:flex;flex-direction:column;gap:3px;flex:1;min-width:75px;}
-.stat-label{font-family:'Share Tech Mono',monospace;font-size:.58rem;letter-spacing:3px;color:var(--dim);}
-.stat-bar-outer{height:3px;background:rgba(255,255,255,.06);border-radius:1px;overflow:hidden;}
+/* ── HUD RIGHT ── */
+#hud-right{display:flex;flex-direction:column;gap:.25rem;align-items:flex-end;}
+#threat-hud{display:flex;align-items:center;gap:.4rem;font-family:'Share Tech Mono',monospace;font-size:.55rem;letter-spacing:2px;}
+#threat-dot{width:6px;height:6px;border-radius:50%;transition:background .5s,box-shadow .5s;flex-shrink:0;}
+#threat-label-txt{color:rgba(255,255,255,.3);font-size:.5rem;}
+#threat-level{padding:.1rem .35rem;border-radius:1px;font-size:.55rem;letter-spacing:2px;transition:background .5s,color .5s;}
+#threat-dot.lav,  #threat-level.lav  {color:var(--cyan);}
+#threat-dot.lav                       {background:var(--cyan);box-shadow:0 0 5px var(--cyan);}
+#threat-level.lav                     {background:rgba(0,229,255,.1);}
+#threat-dot.medium,#threat-level.medium{color:var(--amber);}
+#threat-dot.medium                     {background:var(--amber);box-shadow:0 0 5px var(--amber);}
+#threat-level.medium                   {background:rgba(255,190,0,.1);}
+#threat-dot.hoy,  #threat-level.hoy  {color:#ff8800;}
+#threat-dot.hoy                       {background:#ff8800;box-shadow:0 0 7px #ff8800;}
+#threat-level.hoy                     {background:rgba(255,136,0,.12);}
+#threat-dot.krit, #threat-level.krit {color:var(--red);animation:threatBlink .6s step-end infinite;}
+#threat-dot.krit                      {background:var(--red);box-shadow:0 0 10px var(--red);}
+#threat-level.krit                    {background:rgba(255,26,26,.14);}
+@keyframes threatBlink{0%,100%{opacity:1}50%{opacity:.3}}
+#hud-status-row{display:flex;gap:.5rem;align-items:center;}
+#alert-dot{width:6px;height:6px;border-radius:50%;background:var(--red);box-shadow:var(--glow-red);animation:bdot 1.1s step-end infinite;flex-shrink:0;}
+@keyframes bdot{0%,100%{opacity:1}50%{opacity:0}}
+#hud-status{font-family:'Share Tech Mono',monospace;font-size:.52rem;color:var(--red);letter-spacing:1px;}
+
+/* ── STATS ROW ── */
+#stats-bar{
+  display:flex;align-items:center;gap:1rem;
+  padding:.45rem 1.6rem;
+  border-bottom:1px solid rgba(255,26,26,.08);
+  flex-wrap:nowrap;
+}
+.stat{display:flex;align-items:center;gap:.5rem;flex:1;min-width:0;}
+.stat-label{font-family:'Share Tech Mono',monospace;font-size:.5rem;letter-spacing:2px;color:rgba(255,255,255,.35);white-space:nowrap;flex-shrink:0;}
+.stat-bar-outer{height:3px;background:rgba(255,255,255,.07);border-radius:1px;overflow:hidden;flex:1;min-width:30px;}
 .stat-bar{height:100%;border-radius:1px;transition:width .9s ease;}
 .stat-bar.frykt{background:linear-gradient(90deg,#ff4444,#ff0000);}
 .stat-bar.mot{background:linear-gradient(90deg,#00bb77,#00ff88);}
 .stat-bar.kunnskap{background:linear-gradient(90deg,#0099ee,#00e5ff);}
 .stat-bar.rad{background:linear-gradient(90deg,#ff6600,#ff1a1a);}
-.stat-val{font-family:'Share Tech Mono',monospace;font-size:.62rem;color:var(--text);}
+.stat-val{font-family:'Share Tech Mono',monospace;font-size:.55rem;color:rgba(255,255,255,.5);white-space:nowrap;flex-shrink:0;min-width:18px;text-align:right;}
+#rad-wrap{display:flex;align-items:center;gap:.35rem;margin-left:auto;padding-left:.6rem;border-left:1px solid rgba(255,26,26,.15);flex-shrink:0;}
+#rad-label{font-family:'Share Tech Mono',monospace;font-size:.5rem;color:var(--red);letter-spacing:2px;opacity:.7;}
+#rad-bar-outer{width:60px;height:3px;background:rgba(255,32,32,.12);border-radius:1px;overflow:hidden;}
+#rad-bar{height:100%;background:linear-gradient(90deg,#ff5500,#ff1a1a);width:0%;transition:width 1.2s ease;box-shadow:0 0 5px rgba(255,26,26,.4);}
+
+/* ── DANGER BAR ── */
+#danger-outer{height:2px;background:rgba(255,26,26,.06);transition:height .8s;}
+#danger-bar{height:100%;background:linear-gradient(90deg,var(--orange),var(--red));transition:width 1.4s ease;box-shadow:0 0 4px rgba(255,26,26,.35);}
+body.cd-s3 #danger-outer{height:3px;}
+body.cd-s4 #danger-outer{height:4px;}
+body.cd-s4 #danger-bar{animation:dangerShimmer .9s linear infinite;}
+@keyframes dangerShimmer{0%{filter:brightness(1)}50%{filter:brightness(1.6)}100%{filter:brightness(1)}}
+
+/* ── TICKER ── */
+#ticker{overflow:hidden;position:relative;padding:.22rem 0;background:rgba(255,26,26,.03);}
+#ticker::before{content:'KRISE';position:absolute;left:0;top:0;bottom:0;background:var(--red);color:#fff;font-family:'Bebas Neue';font-size:.72rem;letter-spacing:3px;padding:.22rem .55rem;z-index:2;display:flex;align-items:center;}
+#ticker-text{font-family:'Share Tech Mono',monospace;font-size:.66rem;color:rgba(255,60,60,.85);white-space:nowrap;padding-left:72px;animation:tickerScroll 40s linear infinite;}
+@keyframes tickerScroll{0%{transform:translateX(110vw)}100%{transform:translateX(-100%)}}
+
+/* ── SCENE AREA ── */
+#scene-area{padding:1.8rem 1.6rem 5rem;flex:1;}
 
 /* ── INVENTORY ── */
-#inv-bar{display:flex;gap:.4rem;margin-bottom:.8rem;min-height:26px;flex-wrap:wrap;}
-.inv-item{font-family:'Share Tech Mono',monospace;font-size:.65rem;padding:.2rem .5rem;border:1px solid rgba(0,229,255,.3);color:var(--cyan);border-radius:2px;background:rgba(0,229,255,.04);text-shadow:var(--glow-cyan);animation:itemPop .35s ease-out both;}
+#inv-bar{display:flex;gap:.4rem;margin-bottom:.9rem;min-height:24px;flex-wrap:wrap;}
+.inv-item{font-family:'Share Tech Mono',monospace;font-size:.62rem;padding:.18rem .48rem;border:1px solid rgba(0,229,255,.3);color:var(--cyan);border-radius:2px;background:rgba(0,229,255,.04);text-shadow:var(--glow-cyan);animation:itemPop .35s ease-out both;}
 @keyframes itemPop{from{transform:scale(0) rotate(-6deg);opacity:0}to{transform:scale(1) rotate(0);opacity:1}}
 
 /* ── SCENE IMAGE ── */
-.img-wrap{position:relative;width:100%;height:220px;margin-bottom:1.4rem;overflow:hidden;border-radius:2px;}
-.img-wrap::before{content:'';position:absolute;inset:0;background:linear-gradient(to bottom,transparent 25%,var(--bg) 100%);z-index:2;}
-.img-wrap::after{content:'';position:absolute;inset:0;background:rgba(255,26,26,.05);z-index:3;mix-blend-mode:screen;}
-.img-wrap img{width:100%;height:100%;object-fit:cover;filter:saturate(.4) contrast(1.25) brightness(.9);display:block;}
+.img-wrap{
+  position:relative;width:100%;
+  height:clamp(180px,28vw,280px);
+  margin-bottom:1.6rem;
+  overflow:hidden;border-radius:3px;
+  border:1px solid rgba(255,26,26,.12);
+  box-shadow:0 8px 32px rgba(0,0,0,.6);
+}
+.img-wrap::before{
+  content:'';position:absolute;inset:0;
+  background:linear-gradient(to bottom,rgba(4,6,8,.1) 0%,rgba(4,6,8,.0) 35%,rgba(4,6,8,.75) 100%);
+  z-index:2;
+}
+.img-wrap::after{
+  content:'';position:absolute;inset:0;
+  background:rgba(255,26,26,.06);z-index:3;mix-blend-mode:screen;
+}
+.img-wrap img{
+  width:100%;height:100%;object-fit:cover;
+  filter:saturate(.6) contrast(1.15) brightness(1.0);
+  display:block;
+}
 .img-glitch{position:absolute;inset:0;z-index:4;pointer-events:none;animation:imgTear 9s step-end infinite;}
 @keyframes imgTear{
   0%,91%,100%{clip-path:none;transform:none;}
@@ -372,11 +441,16 @@ body.cd-s4 #danger-bar{animation:dangerShimmer .9s linear infinite;}
   95%{clip-path:inset(8% 0 82% 0);transform:translate(-5px);}
   96%{clip-path:none;}
 }
-.scan-line{position:absolute;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,rgba(255,26,26,.35),transparent);z-index:5;animation:scanDown 3.5s linear infinite;}
+.scan-line{position:absolute;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,rgba(255,26,26,.3),transparent);z-index:5;animation:scanDown 3.5s linear infinite;}
 @keyframes scanDown{0%{top:-4px}100%{top:110%}}
 
 /* ── SCENE TITLE ── */
-#scene-title{font-family:'Bebas Neue',sans-serif;font-size:clamp(1.7rem,6.5vw,3.2rem);letter-spacing:6px;line-height:1;color:#fff;margin-bottom:1.1rem;position:relative;display:inline-block;}
+#scene-title{
+  font-family:'Bebas Neue',sans-serif;
+  font-size:clamp(1.8rem,5vw,3.4rem);
+  letter-spacing:6px;line-height:1;color:#fff;
+  margin-bottom:1.2rem;position:relative;display:inline-block;
+}
 #scene-title::before,#scene-title::after{content:attr(data-text);position:absolute;top:0;left:0;width:100%;pointer-events:none;}
 #scene-title::before{color:var(--red);animation:gtA 6s step-end infinite;}
 #scene-title::after{color:var(--cyan);animation:gtB 6s step-end infinite;}
@@ -384,25 +458,80 @@ body.cd-s4 #danger-bar{animation:dangerShimmer .9s linear infinite;}
 @keyframes gtB{0%,89%,100%{opacity:0}90%{opacity:.6;clip-path:inset(32% 0 48% 0);transform:translate(-4px)}91%{clip-path:inset(72% 0 4% 0);transform:translate(5px)}92%{opacity:0}}
 
 /* ── STORY TEXT ── */
-#story-text{font-size:1.1rem;line-height:1.92;color:var(--text);margin-bottom:1.4rem;}
-#story-text p{margin-bottom:.85rem;}
-#story-text em{display:block;color:#b5afaa;border-left:2px solid var(--red);padding:.55rem .85rem;margin:.65rem 0;background:rgba(255,26,26,.04);font-style:italic;font-size:1.04rem;border-radius:0 2px 2px 0;}
+#story-text{font-size:1.08rem;line-height:1.95;color:var(--text);margin-bottom:1.6rem;}
+#story-text p{margin-bottom:.9rem;}
+#story-text em{
+  display:block;color:#c0bbb5;
+  border-left:2px solid var(--red);
+  padding:.55rem .9rem;margin:.7rem 0;
+  background:rgba(255,26,26,.04);font-style:italic;
+  font-size:1.03rem;border-radius:0 2px 2px 0;
+}
 #story-text strong{color:#fff;}
-#story-text .intercept{display:block;font-family:'Share Tech Mono',monospace;font-size:.78rem;color:var(--cyan);border:1px solid rgba(0,229,255,.25);padding:.5rem .75rem;margin:.75rem 0;background:rgba(0,229,255,.03);letter-spacing:1px;text-shadow:var(--glow-cyan);}
+#story-text .intercept{
+  display:block;font-family:'Share Tech Mono',monospace;
+  font-size:.76rem;color:var(--cyan);
+  border:1px solid rgba(0,229,255,.25);
+  padding:.5rem .75rem;margin:.75rem 0;
+  background:rgba(0,229,255,.03);letter-spacing:1px;
+  text-shadow:var(--glow-cyan);
+}
 
 /* ── CHOICES ── */
-#choices{display:flex;flex-direction:column;gap:.75rem;}
-.choice-btn{background:transparent;border:1px solid rgba(255,26,26,.18);color:var(--text);padding:.85rem 1rem .85rem 1.3rem;text-align:left;font-family:'Crimson Pro',serif;font-size:1.08rem;cursor:none;position:relative;overflow:hidden;transition:border-color .18s,color .18s;border-radius:2px;line-height:1.45;}
-.choice-btn::before{content:'▶';position:absolute;left:-1.6rem;top:50%;transform:translateY(-50%);color:var(--red);font-size:.62rem;transition:left .18s;}
-.choice-btn::after{content:'';position:absolute;inset:0;background:linear-gradient(90deg,rgba(255,26,26,.09),transparent 55%);transform:translateX(-100%);transition:transform .22s ease;}
-.choice-btn:hover{border-color:var(--red);color:#fff;}
-.choice-btn:hover::before{left:.85rem;}
+#choices{display:flex;flex-direction:column;gap:.7rem;}
+.choice-btn{
+  background:rgba(10,13,17,.4);
+  border:1px solid rgba(255,26,26,.2);
+  color:var(--text);
+  padding:.9rem 1rem .9rem 3.5rem;
+  text-align:left;font-family:'Crimson Pro',serif;font-size:1.06rem;
+  cursor:none;position:relative;overflow:hidden;
+  transition:border-color .16s,color .16s,background .16s,box-shadow .16s;
+  border-radius:2px;line-height:1.45;
+}
+.key-hint{
+  position:absolute;left:.65rem;top:50%;transform:translateY(-50%);
+  font-family:'Share Tech Mono',monospace;font-size:.6rem;
+  color:rgba(255,26,26,.5);background:rgba(255,26,26,.08);
+  border:1px solid rgba(255,26,26,.2);border-radius:2px;
+  padding:.1rem .3rem;line-height:1.2;user-select:none;
+  transition:color .14s,background .14s,border-color .14s;
+}
+.choice-btn::before{
+  content:'';position:absolute;left:0;top:0;bottom:0;width:3px;
+  background:var(--red);transform:scaleY(0);transform-origin:bottom;
+  transition:transform .16s ease;
+}
+.choice-btn::after{
+  content:'';position:absolute;inset:0;
+  background:linear-gradient(90deg,rgba(255,26,26,.1),transparent 60%);
+  transform:translateX(-100%);transition:transform .2s ease;
+}
+.choice-btn:hover{
+  border-color:var(--red);color:#fff;
+  background:rgba(20,5,5,.6);
+  box-shadow:0 0 20px rgba(255,26,26,.08) inset,0 2px 8px rgba(0,0,0,.4);
+}
+.choice-btn:hover::before{transform:scaleY(1);}
 .choice-btn:hover::after{transform:translateX(0);}
-.choice-btn span{position:relative;z-index:1;}
+.choice-btn:hover .key-hint{color:var(--red);background:rgba(255,26,26,.16);border-color:rgba(255,26,26,.5);}
+.choice-btn span.choice-text{position:relative;z-index:1;}
 .choice-btn:active{transform:scale(.99);}
-.choice-btn.locked{border-color:rgba(255,190,0,.22);color:var(--dim);cursor:not-allowed;pointer-events:none;}
-.req-badge{font-family:'Share Tech Mono',monospace;font-size:.62rem;color:var(--amber);display:block;margin-top:.22rem;opacity:.75;}
-.restart-btn{background:transparent;border:1px dashed rgba(255,26,26,.35);color:var(--red);width:100%;padding:.8rem;font-family:'Share Tech Mono',monospace;font-size:.82rem;letter-spacing:4px;cursor:none;margin-top:.4rem;transition:all .2s;}
+.choice-btn.locked{
+  border-color:rgba(255,190,0,.18);color:rgba(255,255,255,.2);
+  cursor:not-allowed;pointer-events:none;
+  background:rgba(10,13,17,.2);
+}
+.choice-btn.locked .key-hint{opacity:.25;}
+.choice-btn.kb-active{border-color:var(--red);color:#fff;background:rgba(255,26,26,.07);}
+.choice-btn.kb-active .key-hint{color:var(--red);background:rgba(255,26,26,.22);border-color:var(--red);}
+.req-badge{font-family:'Share Tech Mono',monospace;font-size:.6rem;color:var(--amber);display:block;margin-top:.2rem;opacity:.7;}
+.restart-btn{
+  background:transparent;border:1px dashed rgba(255,26,26,.35);
+  color:var(--red);width:100%;padding:.85rem;
+  font-family:'Share Tech Mono',monospace;font-size:.8rem;
+  letter-spacing:4px;cursor:none;margin-top:.4rem;transition:all .2s;
+}
 .restart-btn:hover{background:rgba(255,26,26,.07);letter-spacing:7px;}
 
 /* ── INTERCEPTED TRANSMISSION POPUP ── */
@@ -488,6 +617,78 @@ body.rad-crit #vignette-pulse{animation:vigBreathCrit 1s ease-in-out infinite;}
   40%{transform:translate(5px,-4px)}60%{transform:translate(3px,-2px)}80%{transform:translate(2px,-2px)}
 }
 .shake{animation:shake .5s ease-in-out;}
+
+/* ── FLOATING STAT NUMBERS ── */
+.stat-float{
+  position:fixed;font-family:'Bebas Neue',sans-serif;font-size:1.5rem;
+  letter-spacing:3px;pointer-events:none;z-index:99999;white-space:nowrap;
+  animation:statFloatUp .95s ease-out both;text-shadow:0 0 14px currentColor;
+}
+@keyframes statFloatUp{
+  0%{opacity:1;transform:translateY(0) scale(1.15);}
+  55%{opacity:1;transform:translateY(-52px) scale(1);}
+  100%{opacity:0;transform:translateY(-90px) scale(.8);}
+}
+
+/* ── ZONE ENTRY OVERLAY ── */
+#zone-overlay{
+  position:fixed;inset:0;z-index:9996;pointer-events:none;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  opacity:0;background:rgba(0,0,0,.55);
+}
+#zone-overlay.fire{animation:zoneIn 1.1s ease-out both;}
+@keyframes zoneIn{
+  0%{opacity:0;}8%{opacity:1;}72%{opacity:1;}100%{opacity:0;}
+}
+#zone-label{
+  font-family:'Share Tech Mono',monospace;font-size:.72rem;
+  letter-spacing:9px;color:var(--dim);margin-bottom:.45rem;text-transform:uppercase;
+}
+#zone-title{
+  font-family:'Bebas Neue',sans-serif;font-size:clamp(2.4rem,9vw,5rem);
+  letter-spacing:14px;color:#fff;
+  text-shadow:0 0 40px rgba(255,26,26,.9),0 0 80px rgba(255,26,26,.4);
+  text-transform:uppercase;
+}
+#zone-divider{
+  height:2px;background:var(--red);margin:.65rem 0;
+  animation:zoneLine .6s .1s ease-out both;width:0;
+}
+#zone-overlay.fire #zone-divider{animation:zoneLine .55s .08s ease-out both;}
+@keyframes zoneLine{from{width:0;opacity:0}to{width:340px;opacity:1}}
+#zone-sub{
+  font-family:'Share Tech Mono',monospace;font-size:.62rem;
+  letter-spacing:6px;color:var(--red);opacity:.8;
+}
+
+/* ── SCREEN EDGE DAMAGE — FPS-STYLE ── */
+#edge-t,#edge-b,#edge-l,#edge-r{
+  position:fixed;pointer-events:none;z-index:9979;opacity:0;transition:opacity .07s;
+}
+#edge-t{top:0;left:0;right:0;height:90px;background:linear-gradient(to bottom,rgba(255,26,26,.6),transparent);}
+#edge-b{bottom:0;left:0;right:0;height:90px;background:linear-gradient(to top,rgba(255,26,26,.6),transparent);}
+#edge-l{top:0;left:0;bottom:0;width:70px;background:linear-gradient(to right,rgba(255,26,26,.5),transparent);}
+#edge-r{top:0;right:0;bottom:0;width:70px;background:linear-gradient(to left,rgba(255,26,26,.5),transparent);}
+
+/* threat-hud moved to main block */
+
+/* session-6 choice-btn moved to main CSS block */
+
+/* ── IMPACT LABEL (big momentary overlay text) ── */
+#impact-label{
+  position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);
+  font-family:'Bebas Neue',sans-serif;font-size:clamp(2rem,9vw,5.5rem);
+  letter-spacing:14px;pointer-events:none;z-index:9998;opacity:0;
+  text-shadow:0 0 30px currentColor;text-align:center;
+}
+#impact-label.fire{animation:impactPop .75s ease-out both;}
+@keyframes impactPop{
+  0%{opacity:0;transform:translate(-50%,-50%) scale(1.45);}
+  16%{opacity:1;transform:translate(-50%,-50%) scale(1);}
+  68%{opacity:.95;}
+  100%{opacity:0;transform:translate(-50%,-50%) scale(.88);}
+}
+
 /* violent 8-direction shake for brutal moments */
 @keyframes megaShake{
   0%,100%{transform:translate(0)}
@@ -528,6 +729,141 @@ body.scan-flicker{animation:scanFlicker .18s step-end;}
   62%{transform:translate(-9px,7px)}75%{transform:translate(8px,-5px)}87%{transform:translate(-4px,3px)}
 }
 .pb-shake{animation:pbShake .65s ease-in-out;}
+
+/* ════════════════════════════════════════════════════
+   RESPONSIVE — TABLET & MOBILE
+   ════════════════════════════════════════════════════ */
+
+/* Tablet (≤ 900px) */
+@media (max-width: 900px) {
+  #game-wrap { max-width: 100%; }
+  #hud { padding: .6rem 1.2rem .45rem; gap: .7rem; }
+  #scene-area { padding: 1.4rem 1.2rem 4rem; }
+}
+
+/* Mobile (≤ 768px) */
+@media (max-width: 768px) {
+  /* No custom cursor on touch */
+  #cursor, #cursor-trail { display: none !important; }
+  body { cursor: auto; }
+  .choice-btn, .restart-btn { cursor: pointer; }
+
+  #game-wrap { max-width: 100%; }
+
+  /* HUD: tighter */
+  #hud {
+    grid-template-columns: 1fr auto 1fr;
+    padding: .5rem .9rem .4rem;
+    gap: .5rem;
+  }
+  .hud-game-title { font-size: .95rem; letter-spacing: 5px; }
+  #scene-counter { font-size: .46rem; letter-spacing: 2px; }
+
+  /* Countdown smaller */
+  #cd-wrap { padding: .1rem .5rem; }
+  #cd-label { font-size: .45rem; letter-spacing: 3px; }
+  #cd { font-size: clamp(1.4rem, 7vw, 2rem) !important; letter-spacing: 5px; }
+  #cd.s3 { font-size: clamp(1.6rem, 8vw, 2.3rem) !important; }
+  #cd.s4 { font-size: clamp(1.8rem, 9vw, 2.6rem) !important; }
+
+  /* HUD right */
+  #threat-hud { font-size: .46rem; gap: .3rem; }
+  #threat-level { font-size: .46rem; padding: .06rem .25rem; }
+  #hud-status { font-size: .44rem; }
+  #alert-dot { width: 5px; height: 5px; }
+
+  /* Stats row */
+  #stats-bar { padding: .35rem .9rem; gap: .6rem; flex-wrap: nowrap; }
+  .stat-label { font-size: .42rem; letter-spacing: 1px; }
+  .stat-bar-outer { min-width: 24px; }
+  .stat-val { font-size: .46rem; }
+  #rad-wrap { padding-left: .4rem; }
+  #rad-label { font-size: .42rem; }
+  #rad-bar-outer { width: 40px; }
+
+  /* Scene area */
+  #scene-area { padding: 1rem .9rem 3.5rem; }
+
+  /* Image */
+  .img-wrap { height: 160px; margin-bottom: 1.1rem; }
+
+  /* Scene title */
+  #scene-title { font-size: clamp(1.4rem, 6.5vw, 2rem); letter-spacing: 4px; margin-bottom: .9rem; }
+
+  /* Story text */
+  #story-text { font-size: .97rem; line-height: 1.83; margin-bottom: 1.2rem; }
+  #story-text p { margin-bottom: .75rem; }
+  #story-text em { font-size: .94rem; padding: .45rem .7rem; }
+
+  /* Choices */
+  #choices { gap: .55rem; }
+  .choice-btn { padding: .85rem .85rem .85rem 3rem; font-size: .97rem; min-height: 52px; }
+  .key-hint { font-size: .52rem; left: .5rem; padding: .08rem .22rem; }
+
+  /* Inventory */
+  #inv-bar { gap: .3rem; margin-bottom: .7rem; }
+  .inv-item { font-size: .56rem; padding: .14rem .4rem; }
+
+  /* Ticker */
+  #ticker-text { font-size: .6rem; }
+
+  /* Intercept popup */
+  #intercept-popup { padding: 1rem 1.2rem; max-width: 92vw; }
+  #intercept-header { font-size: .58rem; }
+  #intercept-body { font-size: .7rem; }
+
+  /* Path */
+  #path-wrap { margin-top: .9rem; padding-top: .55rem; }
+  .path-node { font-size: .48rem; }
+  .path-arrow { font-size: .48rem; }
+
+  /* Toast */
+  #toast { bottom: .7rem; right: .65rem; left: .65rem; }
+  .toast-item { font-size: .64rem; padding: .42rem .65rem; max-width: 100%; }
+
+  /* Zone overlay */
+  #zone-title { font-size: clamp(1.5rem, 8vw, 2.6rem); letter-spacing: 6px; }
+  #zone-label { font-size: .58rem; }
+  #zone-divider { width: 70vw !important; }
+
+  /* Endings */
+  .ending-title { font-size: clamp(1.4rem, 7vw, 2.6rem); letter-spacing: 5px; }
+  .ending-sub { font-size: .62rem; }
+
+  /* Boot / pre-boot */
+  #phone { width: 185px; height: 355px; border-width: 6px; border-radius: 28px; }
+  #boot { padding: 1.4rem 1rem; font-size: .74rem; }
+}
+
+/* Small mobile (≤ 480px) */
+@media (max-width: 480px) {
+  #scene-area { padding: .85rem .75rem 3rem; }
+  .img-wrap { height: 130px; }
+  #hud { padding: .45rem .75rem .35rem; gap: .35rem; }
+  #stats-bar { padding: .3rem .75rem; gap: .4rem; }
+  .stat-label { font-size: .38rem; }
+  .choice-btn { padding: .8rem .75rem .8rem 2.75rem; font-size: .92rem; }
+  #cd { font-size: clamp(1.2rem, 8vw, 1.7rem) !important; letter-spacing: 4px; }
+  #scene-title { font-size: clamp(1.2rem, 7vw, 1.6rem); letter-spacing: 3px; }
+  #story-text { font-size: .91rem; line-height: 1.78; }
+  #phone { width: 158px; height: 308px; }
+  /* 2-col stats on tiny screen */
+  #stats-bar { flex-wrap: wrap; }
+  .stat { min-width: calc(50% - .4rem); flex: none; }
+  #rad-wrap { width: 100%; margin-left: 0; padding-left: 0; border-left: none; border-top: 1px solid rgba(255,26,26,.12); padding-top: .3rem; margin-top: .1rem; }
+}
+
+/* Touch interaction: replace hover with active */
+@media (hover: none) and (pointer: coarse) {
+  .choice-btn:hover { border-color: rgba(255,26,26,.2); color: var(--text); background: rgba(10,13,17,.4); box-shadow: none; }
+  .choice-btn:hover::before { transform: scaleY(0); }
+  .choice-btn:hover::after { transform: translateX(-100%); }
+  .choice-btn:active { border-color: var(--red); color: #fff; background: rgba(20,5,5,.6); transform: scale(.98); }
+  .choice-btn:active .key-hint { color: var(--red); background: rgba(255,26,26,.16); }
+  .restart-btn:hover { letter-spacing: 4px; background: transparent; }
+  .restart-btn:active { background: rgba(255,26,26,.07); }
+}
+
 </style>
 </head>
 <body>
@@ -562,6 +898,23 @@ body.scan-flicker{animation:scanFlicker .18s step-end;}
 <div id="scan-bar"></div>
 <div id="whiteout"></div>
 <div id="chromatic"></div>
+
+<!-- Zone entry overlay -->
+<div id="zone-overlay">
+  <div id="zone-label">◈ INNTREDEN SONE ◈</div>
+  <div id="zone-title"></div>
+  <div id="zone-divider"></div>
+  <div id="zone-sub"></div>
+</div>
+
+<!-- Screen edge damage (FPS-style) -->
+<div id="edge-t"></div>
+<div id="edge-b"></div>
+<div id="edge-l"></div>
+<div id="edge-r"></div>
+
+<!-- Impact label -->
+<div id="impact-label"></div>
 
 <!-- Intercepted transmission popup -->
 <div id="intercept-popup">
@@ -771,60 +1124,75 @@ body.scan-flicker{animation:scanFlicker .18s step-end;}
 </div>
 
 <!-- MAIN GAME -->
-<div id="game-wrap">
-  <div id="hud">
-    <div id="hud-left">SOLSTORMEN</div>
-    <div id="rad-wrap">
-      <div id="rad-label">RAD</div>
-      <div id="rad-bar-outer"><div id="rad-bar"></div></div>
+<div id="game-wrap" style="display:none;">
+
+  <!-- STICKY GAME CHROME -->
+  <div id="game-chrome">
+    <div id="hud">
+      <div id="hud-left">
+        <div class="hud-game-title">SOLSTORMEN</div>
+        <div id="scene-counter">SONE —</div>
+      </div>
+      <div id="cd-wrap">
+        <div id="cd-label">TID TIL NEDSLAG</div>
+        <div id="cd">00:00:00</div>
+      </div>
+      <div id="hud-right">
+        <div id="threat-hud">
+          <div id="threat-dot" class="lav"></div>
+          <span id="threat-label-txt">TRUSSEL</span>
+          <div id="threat-level" class="lav">LAV</div>
+        </div>
+        <div id="hud-status-row">
+          <div id="alert-dot"></div>
+          <span id="hud-status">NØDVARSEL AKTIV</span>
+        </div>
+      </div>
     </div>
-    <div id="hud-right">
-      <div id="alert-dot"></div>
-      <span id="hud-status">NØDVARSEL AKTIV</span>
+
+    <div id="stats-bar">
+      <div class="stat">
+        <div class="stat-label">FRYKT</div>
+        <div class="stat-bar-outer"><div class="stat-bar frykt" id="bar-frykt" style="width:20%"></div></div>
+        <div class="stat-val" id="val-frykt">20</div>
+      </div>
+      <div class="stat">
+        <div class="stat-label">MOT</div>
+        <div class="stat-bar-outer"><div class="stat-bar mot" id="bar-mot" style="width:50%"></div></div>
+        <div class="stat-val" id="val-mot">50</div>
+      </div>
+      <div class="stat">
+        <div class="stat-label">KUNNSKAP</div>
+        <div class="stat-bar-outer"><div class="stat-bar kunnskap" id="bar-kunnskap" style="width:10%"></div></div>
+        <div class="stat-val" id="val-kunnskap">10</div>
+      </div>
+      <div class="stat">
+        <div class="stat-label">STRÅLING</div>
+        <div class="stat-bar-outer"><div class="stat-bar rad" id="bar-rad" style="width:0%"></div></div>
+        <div class="stat-val" id="val-rad">0</div>
+      </div>
+      <div id="rad-wrap">
+        <div id="rad-label">RAD%</div>
+        <div id="rad-bar-outer"><div id="rad-bar"></div></div>
+      </div>
+    </div>
+
+    <div id="danger-outer"><div id="danger-bar" style="width:0%"></div></div>
+    <div id="ticker">
+      <div id="ticker-text">SOLSTORM X99 BEKREFTET ◈ 100% DØDELIG STRÅLING ◈ FJELLBUNKER ÅPEN — KAPASITET 50 000 ◈ EVAKUER UMIDDELBART ◈ MOBILNETT FALLER OM 18 TIMER ◈ PROSJEKT SOLNEDGANG — STATUS AKTIV ◈ DIN POSISJON KAN OVERVÅKES ◈ SOLSTORM X99 ◈</div>
+    </div>
+  </div><!-- /game-chrome -->
+
+  <!-- SCROLLABLE SCENE AREA -->
+  <div id="scene-area">
+    <div id="inv-bar"></div>
+    <div id="scene-container" class="fade-in"></div>
+    <div id="path-wrap">
+      <div id="path-label">◈ DIN RUTE</div>
+      <div id="path-nodes"></div>
     </div>
   </div>
 
-  <div id="danger-outer"><div id="danger-bar" style="width:0%"></div></div>
-
-  <div id="ticker">
-    <div id="ticker-text">SOLSTORM X99 BEKREFTET ◈ 100% DØDELIG STRÅLING ◈ FJELLBUNKER ÅPEN — KAPASITET 50 000 ◈ EVAKUER UMIDDELBART ◈ MOBILNETT FALLER OM 18 TIMER ◈ PROSJEKT SOLNEDGANG — STATUS AKTIV ◈ HOLD DEG UNNA METALLOBJEKTER OG ÅPNE PLASSER ◈ DIN POSISJON KAN OVERVÅKES ◈ STYR UNNA MILITÆRKJØRETØY ◈ SOLSTORM X99 ◈</div>
-  </div>
-
-  <div id="cd-wrap">
-    <div id="cd-label">TID TIL NEDSLAG</div>
-    <div id="cd">00:00:00</div>
-  </div>
-
-  <div id="stats-bar">
-    <div class="stat">
-      <div class="stat-label">FRYKT</div>
-      <div class="stat-bar-outer"><div class="stat-bar frykt" id="bar-frykt" style="width:20%"></div></div>
-      <div class="stat-val" id="val-frykt">20</div>
-    </div>
-    <div class="stat">
-      <div class="stat-label">MOT</div>
-      <div class="stat-bar-outer"><div class="stat-bar mot" id="bar-mot" style="width:50%"></div></div>
-      <div class="stat-val" id="val-mot">50</div>
-    </div>
-    <div class="stat">
-      <div class="stat-label">KUNNSKAP</div>
-      <div class="stat-bar-outer"><div class="stat-bar kunnskap" id="bar-kunnskap" style="width:10%"></div></div>
-      <div class="stat-val" id="val-kunnskap">10</div>
-    </div>
-    <div class="stat">
-      <div class="stat-label">STRÅLING</div>
-      <div class="stat-bar-outer"><div class="stat-bar rad" id="bar-rad" style="width:0%"></div></div>
-      <div class="stat-val" id="val-rad">0</div>
-    </div>
-  </div>
-
-  <div id="inv-bar"></div>
-  <div id="scene-container" class="fade-in"></div>
-
-  <div id="path-wrap">
-    <div id="path-label">◈ DIN RUTE</div>
-    <div id="path-nodes"></div>
-  </div>
 </div>
 
 <script>
@@ -841,7 +1209,7 @@ function initAudio(){
   }
   try{
     audioCtx=new(window.AudioContext||window.webkitAudioContext)();
-    masterGain=audioCtx.createGain(); masterGain.gain.value=0.32;
+    masterGain=audioCtx.createGain(); masterGain.gain.value=0.26;
     masterGain.connect(audioCtx.destination);
     // Resume async — start drone once context is actually running
     const go=()=>{ if(!droneStarted) startDrone(); };
@@ -887,7 +1255,7 @@ function startDrone(){
   const osc1=audioCtx.createOscillator(), osc2=audioCtx.createOscillator();
   const g=audioCtx.createGain(), lp=audioCtx.createBiquadFilter();
   g.gain.setValueAtTime(0,audioCtx.currentTime);
-  g.gain.linearRampToValueAtTime(0.08,audioCtx.currentTime+4);
+  g.gain.linearRampToValueAtTime(0.065,audioCtx.currentTime+4);
   lp.type='lowpass'; lp.frequency.value=180;
   osc1.type='sawtooth'; osc1.frequency.value=38;
   osc2.type='triangle'; osc2.frequency.value=52;
@@ -923,8 +1291,8 @@ function playAlarm(){
     const lp=audioCtx.createBiquadFilter(); lp.type='lowpass'; lp.frequency.value=2200;
     const t=audioCtx.currentTime+i*0.15;
     o.type='square'; o.frequency.value=f;
-    g.gain.setValueAtTime(0,t); g.gain.linearRampToValueAtTime(0.14,t+0.02);
-    g.gain.setValueAtTime(0.14,t+0.1); g.gain.exponentialRampToValueAtTime(0.001,t+0.14);
+    g.gain.setValueAtTime(0,t); g.gain.linearRampToValueAtTime(0.22,t+0.02);
+    g.gain.setValueAtTime(0.22,t+0.1); g.gain.exponentialRampToValueAtTime(0.001,t+0.14);
     o.connect(lp); lp.connect(g); g.connect(masterGain); o.start(t); o.stop(t+0.16);
   });
 }
@@ -968,7 +1336,7 @@ function playEmp(){
   const d=buf.getChannelData(0);
   for(let i=0;i<sz;i++) d[i]=(Math.random()*2-1)*Math.exp(-i/(sz*0.3))*0.5;
   const s=audioCtx.createBufferSource(), g=audioCtx.createGain(), f=audioCtx.createBiquadFilter();
-  f.type='highpass'; f.frequency.value=200; g.gain.value=0.35;
+  f.type='highpass'; f.frequency.value=200; g.gain.value=0.26;
   s.buffer=buf; s.connect(f); f.connect(g); g.connect(masterGain); s.start();
 }
 
@@ -1157,6 +1525,8 @@ function resetState(){
   const sv=document.getElementById('static-canvas'); if(sv) sv.style.opacity='0.03';
   document.getElementById('inv-bar').innerHTML='';
   document.getElementById('path-nodes').innerHTML='';
+  sceneCount=0;
+  document.getElementById('scene-counter').textContent='SONE —';
   ['frykt','mot','kunnskap','rad'].forEach(k=>{
     const v={frykt:20,mot:50,kunnskap:10,rad:0}[k];
     document.getElementById('bar-'+k).style.width=v+'%';
@@ -1250,6 +1620,26 @@ function applyStat(k,d,label){
   if(k==='rad') updateRadAmbience();
   if(label) showToast(`${d>0?'+':''}${d} ${label}`, d>0&&k!=='frykt'&&k!=='rad'?'good':'stat');
   if(k==='rad'&&d>0) checkRadMilestone(state.rad);
+
+  // Floating number
+  const colors={frykt:'#ff4444',mot:'#00ff88',kunnskap:'#00e5ff',rad:'#ff8800'};
+  const isGood=d>0&&k!=='frykt'&&k!=='rad';
+  const sign=d>0?'+':'';
+  spawnStatFloat(bar, `${sign}${d} ${label||k.toUpperCase()}`, isGood?'#00ff88':'#ff4444');
+
+  // Edge damage / healing flash
+  doEdgeDamage(isGood);
+
+  // Impact label for big swings
+  if(Math.abs(d)>=25){
+    const impColors={frykt:'#ff1a1a',mot:'#00ff88',kunnskap:'#00e5ff',rad:'#ff8800'};
+    showImpact(`${sign}${d} ${label||k.toUpperCase()}`, impColors[k]||'#ff1a1a');
+    if(!isGood) doMegaShake();
+  }
+
+  // Update threat level HUD
+  updateThreatLevel();
+
   // RADIATION DEATH
   if(k==='rad'&&state.rad>=100) setTimeout(()=>render('slutt_rad'),400);
 }
@@ -1451,6 +1841,110 @@ function updateRadAmbience(){
   if(sv) sv.style.opacity=(0.03+Math.min(r,100)*0.001).toFixed(4);
 }
 
+// ── SCENE COUNTER ────────────────────────────────────
+let sceneCount=0;
+function updateSceneCounter(){
+  sceneCount++;
+  const el=document.getElementById('scene-counter');
+  if(el) el.textContent=`SONE ${String(sceneCount).padStart(2,'0')}`;
+}
+
+// ── THREAT LEVEL — updates from frykt + rad ──────────
+function updateThreatLevel(){
+  const score=Math.max(state.frykt, state.rad, state.mot<20?60:0);
+  let cls='lav', lbl='LAV';
+  if(score>=80){cls='krit';lbl='KRITISK';}
+  else if(score>=55){cls='hoy';lbl='HØY';}
+  else if(score>=30){cls='medium';lbl='MEDIUM';}
+  const dot=document.getElementById('threat-dot');
+  const lvl=document.getElementById('threat-level');
+  if(dot){dot.className=cls;}
+  if(lvl){lvl.className=cls;lvl.textContent=lbl;}
+}
+
+// ── FLOATING STAT NUMBER ─────────────────────────────
+function spawnStatFloat(barEl, text, color){
+  if(!barEl) return;
+  const r=barEl.getBoundingClientRect();
+  const el=document.createElement('div');
+  el.className='stat-float';
+  el.textContent=text;
+  el.style.color=color;
+  el.style.left=(r.left+r.width/2)+'px';
+  el.style.top=(r.top-8)+'px';
+  document.body.appendChild(el);
+  setTimeout(()=>el.remove(), 1000);
+}
+
+// ── EDGE DAMAGE FLASH — FPS-style ────────────────────
+function doEdgeDamage(good=false){
+  const ids=good?['edge-t','edge-b']:['edge-t','edge-b','edge-l','edge-r'];
+  const greenIds=['edge-t','edge-b'];
+  const color=good?'rgba(0,255,136,.5)':'rgba(255,26,26,.6)';
+  if(good){
+    greenIds.forEach(id=>{
+      const el=document.getElementById(id);
+      if(!el)return;
+      const orig=el.style.background;
+      el.style.background=`linear-gradient(to ${id==='edge-t'?'bottom':'top'},${color},transparent)`;
+      el.style.opacity='.9';
+      setTimeout(()=>{el.style.transition='opacity .4s';el.style.opacity='0';setTimeout(()=>{el.style.transition='';el.style.background='';},450);},120);
+    });
+  } else {
+    ids.forEach(id=>{
+      const el=document.getElementById(id);
+      if(!el)return;
+      el.style.opacity='.9';
+      setTimeout(()=>{el.style.transition='opacity .5s';el.style.opacity='0';setTimeout(()=>el.style.transition='',550);},80);
+    });
+  }
+}
+
+// ── ZONE ENTRY OVERLAY ───────────────────────────────
+function showZoneEntry(title, sub=''){
+  const ov=document.getElementById('zone-overlay');
+  const zt=document.getElementById('zone-title');
+  const zs=document.getElementById('zone-sub');
+  const zd=document.getElementById('zone-divider');
+  if(!ov||!zt) return;
+  zt.textContent=title;
+  zs.textContent=sub;
+  zd.style.width='0';
+  ov.classList.remove('fire');
+  void ov.offsetWidth;
+  ov.classList.add('fire');
+  setTimeout(()=>ov.classList.remove('fire'), 1150);
+}
+
+// ── IMPACT LABEL (big brief overlay text) ────────────
+function showImpact(text, color='#ff1a1a'){
+  const el=document.getElementById('impact-label');
+  if(!el) return;
+  el.textContent=text;
+  el.style.color=color;
+  el.classList.remove('fire');
+  void el.offsetWidth;
+  el.classList.add('fire');
+  setTimeout(()=>el.classList.remove('fire'), 800);
+}
+
+// ── KEYBOARD SHORTCUTS for choices ───────────────────
+let kbChoices=[];
+function setupKeyboard(choices){
+  kbChoices=choices;
+}
+document.addEventListener('keydown', e=>{
+  const n=parseInt(e.key)-1;
+  if(isNaN(n)||n<0||n>=kbChoices.length) return;
+  const btn=kbChoices[n];
+  if(!btn||btn.classList.contains('locked')) return;
+  // visual feedback
+  btn.classList.add('kb-active');
+  setTimeout(()=>btn.classList.remove('kb-active'), 200);
+  setTimeout(()=>btn.click(), 180);
+});
+
+
 // ── WHITEOUT: vedvarende hvit blending ──────────────
 function doWhiteout(holdMs=120,fadeMs=350){
   const el=document.getElementById('whiteout');
@@ -1624,14 +2118,14 @@ const STORY={
   // ────────────────────────────────────────────────
   start:{
     shortName:'OPPVÅKNING',
-    img:I('https://images.unsplash.com/photo-1501139083538-0139583c060f?auto=format&fit=crop&w=760&q=80'),
+    img:I('https://images.unsplash.com/photo-1531058020387-3be344556be6?auto=format&fit=crop&w=760&q=80'),
     time:'23:59:59',rad:0,
     title:'SOLSTORMEN',isTitle:true,
     intercept:null,
-    text:`<p>Klokken er 02:17. Du rykkes brutalt ut av søvnen av et skingrende nasjonalt nødvarsel. Hele nattbordet lyser opp i blodrod.</p>
-<em>«KRISEVARSEL: Solstorm kategori X99 bekreftet av 14 internasjonale observatorier. Treffpunkt: 24 timer. Dødelig strålingsdose garantert i åpent terreng. Fjellbunkeren ved Gaustablikk er åpen. Kapasitet: 50 000. Førstemann til mølla gjelder.»</em>
-<p>Hjertet dunker mot ribbeina. Utenfor buldrer motorer til liv. En nabo skriker noe usammenhengende. Glassknusing fra to etasjer under. En lyskaster fra et ukjent kjøretøy feier gjennom persiennene og brenner seg inn i retningen.</p>
-<p>Du har ikke tid til å tenke. Du bare handler. <strong>Hva gjør du?</strong></p>`,
+    text:`<p>Klokken er 02:17. Søvnen knekker som glass. Et skingrende nødvarsel fyller rommet med blodrod lys — telefonen, nattbordet, taket.</p>
+<em>«KRISEVARSEL: Solstorm kategori X99 bekreftet av 14 internasjonale observatorier. Estimert treffpunkt: 24 timer. Dødelig strålingsdose garantert i åpent terreng. Fjellbunkeren ved Gaustablikk åpner umiddelbart. Kapasitet 50 000. Evakuer nå.»</em>
+<p>Utenfor vokter motorlyd til liv. En nabo skriker noe usammenhengende i trappeoppgangen. En lyskaster feier gjennom persiennene — ikke fra en tilfeldig bil, men fra noe som allerede ventet der nede.</p>
+<p>Én detalj slår deg: varselet kom tolv sekunder for tidlig. Klokken din hadde ikke rukket å vise 02:17 da lyden traff. <strong>Hva gjør du?</strong></p>`,
     stats:{frykt:{d:+22,label:'FRYKT'}},
     items:[],
     choices:[
@@ -1644,14 +2138,14 @@ const STORY={
 
   naboen:{
     shortName:'NABOEN',
-    img:I('https://images.unsplash.com/photo-1512314889357-e157c22f938d?auto=format&fit=crop&w=760&q=80'),
+    img:I('https://images.unsplash.com/photo-1586105251261-72a756497a11?auto=format&fit=crop&w=760&q=80'),
     time:'23:30:00',rad:0,
     title:'NABOENS HEMMELIGHET',
     intercept:'AVLYTTET SMS — «De er på vei. Ikke åpne for noen. Stol ikke på varselet. — H»',
-    text:`<p>Han svarer på tredje ring. Stemmen er hviskende og skjelven. <em>«Ikke dra til bunkeren. Gjør det ikke.»</em></p>
-<p>Før du rekker å spørre hva han mener, hører du et kraftig banking på hans dør i bakgrunnen. Rop på et fremmed språk. Et kort, kvalt skrik. Deretter: ingenting.</p>
-<em>Linjen er død. Naboens leilighet er stille.</em>
-<p>Du kjenner det kalde grunnleggende preget av noe veldig galt. Mobilnettet begynner allerede å bli ustabilt. Du har minutter på deg.</p>`,
+    text:`<p>Han svarer på tredje ring. Stemmen er pressholdt og hviskende, som om han snakker med hånden over munnen. <em>«Ikke dra til bunkeren. Hør på meg. Gjør det ikke.»</em></p>
+<p>Du rekker ikke å spørre. Bak stemmen hans: tre kraftige slag mot en dør, rop på et fremmed språk — ikke norsk, ikke engelsk. Et kort, kvalt lyd. Deretter fullstendig stillhet.</p>
+<em>Linjen blinker ut. Ingen opptattsignal, ingen tone. Bare ingenting.</em>
+<p>Gjennom veggen hører du ingenting fra leiligheten ved siden av — og naboen din er typen som alltid har TV på. Du har minutter på deg. Kanskje færre.</p>`,
     stats:{frykt:{d:+30,label:'FRYKT'},kunnskap:{d:+20,label:'KUNNSKAP'}},
     choices:[
       {text:'Den advarselen var nok. Hack Dark Web — finn ut hva som skjer.',target:'hacking_start'},
@@ -1665,14 +2159,14 @@ const STORY={
   // ────────────────────────────────────────────────
   motorvei_start:{
     shortName:'MOTORVEI',
-    img:I('https://images.unsplash.com/photo-1508003666014-41d327d7fb72?auto=format&fit=crop&w=760&q=80'),
+    img:I('https://images.unsplash.com/photo-1516414447565-b14be0adf13e?auto=format&fit=crop&w=760&q=80'),
     time:'20:00:00',rad:5,
     title:'TRAFIKKORKEN',
     intercept:null,
-    text:`<p>E18 er en grå, stillestående kirkegård. Biler fra horisont til horisont. Ingen beveger seg. Tre timer har gått.</p>
-<em>Radioen: «Hold dere i kjøretøyene. Militæret opprydder vei 47 og 18. Estimert klaring: ukjent.»</em>
-<p>Solen — selvom det er natt — kaster en unaturlig oransje glød langs horisonten. Folk er ute av bilene sine. Noen gråter. En mann setter fyr på bilen sin og bare går.</p>
-<p>Huden din begynner å svie svakt. Mobildekningen er borte.</p>`,
+    text:`<p>E18 er en stillestående grå streng av metall og panikk, bil mot bil mot horisont. Du har sittet her i to og en halv time. Motoren er slukket for lenge siden.</p>
+<em>«Hold dere i kjøretøyene. Militæret klargjør evakueringskorridor på vei 47 og 18. Klaring: ukjent tidshorisont.»</em>
+<p>Himmelen i nordøst har fått en farge som ikke finnes på noe kart — et dypt oransje som presser seg inn under skydekket som om solen er i ferd med å implodere. Folk vandrer mellom bilene. En mann tre rekker foran deg setter fyr på sin egen Volvo, ser på flammene i fem sekunder, og går.</p>
+<p>Det svir svakt i ansiktet. Huden. Mobilsignalet er helt borte. Og den militære helikopterstøyen fra sør har blitt tettere de siste tjue minuttene.</p>`,
     stats:{frykt:{d:+18,label:'FRYKT'},rad:{d:+8,label:'STRÅLING'}},
     choices:[
       {text:'Forlat bilen. Ta beina fatt og gå inn i skogen vest for veien.',target:'bensinstasjon'},
@@ -1684,23 +2178,23 @@ const STORY={
 
   veiskulder:{
     shortName:'VEISKULDER',
-    img:I('https://images.unsplash.com/photo-1449965408869-eaa3f722e40d?auto=format&fit=crop&w=760&q=80'),
+    img:I('https://images.unsplash.com/photo-1464464562-70c39f5e6d9c?auto=format&fit=crop&w=760&q=80'),
     time:'18:30:00',rad:9,
     title:'VEGKRIGEREN',
-    text:`<p>Du kjører på skulderen med to hjul over kantsteinen. Folk viker unna, noen roper etter deg. Et militærhelikopter følger deg fra oven med en skinnende lyskaster.</p>
-<em>Høyttaler fra helikopteret: «STOPP KJØRETØYET. DU BRYTER NØDREGULERING §17. STOPP.»</em>
-<p>Foran deg dukker en veisperring opp. Tre pansrede kjøretøy. Soldater. Lyskastere. Du har sekunder.</p>`,
+    text:`<p>Du trekker opp på veiskulderen og presser gassen ned. To hjul over kantsteinen, to på asfalten. Folk hopper unna — noen slår på taket av bilen din mens du passerer. Et militærhelikopter henger seg på over deg og låser et hvitt lysbelte rett ned i frontruten.</p>
+<em>Høyttaler fra helikopteret: «STOPP KJØRETØYET ØYEBLIKKELIG. NØDREGULERING §17 ER GJELDENDE. NESTE ADVARSEL ER IKKE VERBAL.»</em>
+<p>Rundingen i veien avslører veisperringen. Tre pansrede kjøretøy i vifteformasjon over begge felt og skulderen. Soldater med rifler i anleggsposisjon. Lyskastere som gjør natt til middag. Mellom deg og dem: femti meter asfalt.</p>`,
     stats:{mot:{d:+20,label:'MOT'},frykt:{d:+25,label:'FRYKT'}},
     choices:[
       {text:'Bråstopp. Hopp ut av bilen og løp inn i skogen til høyre.',target:'bensinstasjon'},
-      {text:'Ramme gjennom sperringa — kjøretøyet tåler det.',target:'sorte_van'},
+      {text:'Ram gjennom sperringa. På andre siden: en svart van venter allerede.',target:'sorte_van'},
       {text:'Stopp frivillig. Vis presse-ID og be om passasje.',target:'checkpoint', requires:{item:'presseID'}},
     ]
   },
 
   sorte_van:{
     shortName:'SORT VAN',
-    img:I('https://images.unsplash.com/photo-1537151608828-ea2b11777ee8?auto=format&fit=crop&w=760&q=80'),
+    img:I('https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&w=760&q=80'),
     time:'18:00:00',rad:8,
     title:'DEN SVARTE VANEN',
     intercept:'KLASSIFISERT LOGG — «Subjekt-gruppen Delta er sikret på motorveien. Fase 2 iverksettes. Ingen unntak.»',
@@ -1717,12 +2211,12 @@ const STORY={
 
   inne_vanen:{
     shortName:'INNE VAN',
-    img:I('https://images.unsplash.com/photo-1617897903246-719242758050?auto=format&fit=crop&w=760&q=80'),
+    img:I('https://images.unsplash.com/photo-1504639725590-34d0984388bd?auto=format&fit=crop&w=760&q=80'),
     time:'16:00:00',rad:5,
     title:'INNSIDEN',
-    text:`<p>Innsiden av vanen er utstyrt som et mobilt overvåkingsrom. Skjermer viser satellittbilder av byer over hele landet. Alle med blinkende røde prikker merket <strong>«SUBJEKT SIKRET»</strong>.</p>
-<em>På en av skjermene: et kart over fjellbunkeren. Inngangene merket grønt. Utgangene — stemplet LÅST — PERMANENT.</em>
-<p>En av mennene snur seg med ryggen til deg i noen sekunder for å taste inn en kode. På bordet mellom ham og deg: et laminert identitetskort og en USB-stikk merket <strong>SANNHETEN</strong>.</p>`,
+    text:`<p>Innsiden er et mobilt overvåkingsrom. Seks skjermer viser satellittbilder av norske byer: Oslo, Bergen, Trondheim, Tromsø. Over hvert bilde blinker en rød prikk og teksten <strong>«SUBJEKT SIKRET — SEKTOR [X]»</strong>. Hundrevis av dem.</p>
+<em>På den midterste skjermen: et detaljert kart over fjellbunkeren ved Gaustablikk. Alle fire inngangene er merket med grønn hake. Utgangene har en annen etikett — rød, med ett ord: PERMANENT.</em>
+<p>En av mennene vrir seg mot panelet og taster en kode med ryggen til deg. Syv sekunder. På bordet mellom dere: et laminert ID-kort med bilde av noen du ikke kjenner igjen, og en USB-stikk med en hvit etikett: <strong>SANNHETEN</strong>. Teksten er håndskrevet.</p>`,
     stats:{kunnskap:{d:+30,label:'KUNNSKAP'}},
     items:['hacktool'],
     choices:[
@@ -1750,12 +2244,13 @@ const STORY={
 
   etter_flukt:{
     shortName:'ETTER FLUKT',
-    img:I('https://images.unsplash.com/photo-1542282811-943ef1a977c3?auto=format&fit=crop&w=760&q=80'),
+    img:I('https://images.unsplash.com/photo-1568604934584-a43deba94eb8?auto=format&fit=crop&w=760&q=80'),
     time:'13:30:00',rad:6,
     title:'FORLATT STASJON',
-    text:`<p>Du tumler ut i grøftekanten og ruller. Vanen fortsetter uten å stoppe — de tror du er sikret. En forlatt bensinstasjon femti meter foran deg. En pickup med motoren i gang, nøklene i tenningen.</p>
-<em>Over diskens høyttaler: en halvt-støyet radiomelding — «...til alle frie journalister: vi overfører bevis fra Prosjekt Solnedgang live til server 7. Koordinater: 59.9°N 10.7°Ø...»</em>
-<p>Koordinatene peker mot et kjent redaksjonsbygg i Oslosentrum. Du hører sirener i det fjerne.</p>`,
+    text:`<p>Du slår skulderen mot asfalten og ruller tre meter inn i grøften. Vanen kjører rett forbi uten å bremse — de tror du er sikret inne, ikke ute. Du lar deg ligge et par sekunder og henter pust.</p>
+<p>Femti meter fremme: en forlatt bensinstasjon. Lyset over pumpen blinker ustabilt. En pickup med motoren i gang og dørene åpne — som om eieren løp fra den midt i en tankestøp.</p>
+<em>Over en gammel utendørs høyttaler på taket: «…til alle frie journalister: vi sender bevis fra Prosjekt Solnedgang live til server 7. Koordinater: 59.9°N 10.7°Ø. Kom nå.»</em>
+<p>Koordinatene. Et kjent redaksjonsbygg i Oslosentrum. Sirener i det fjerne — og de nærmer seg.</p>`,
     stats:{mot:{d:+12,label:'MOT'}},
     items:['adgangskort'],
     choices:[
@@ -1767,7 +2262,7 @@ const STORY={
 
   bensinstasjon_gjemt:{
     shortName:'GJEMT',
-    img:I('https://images.unsplash.com/photo-1542282811-943ef1a977c3?auto=format&fit=crop&w=760&q=80'),
+    img:I('https://images.unsplash.com/photo-1614064641938-3bbee52942c7?auto=format&fit=crop&w=760&q=80'),
     time:'12:00:00',rad:4,
     title:'LAGERET',
     text:`<p>I det bakre lageret finner du noe uventet: en åpen laptop koblet til et lokalt trådnett, og en eske med gasmasker stablet bak en vegg av tomme oljefat.</p>
@@ -1783,7 +2278,7 @@ const STORY={
 
   bensinstasjon:{
     shortName:'BENSINSTASJON',
-    img:I('https://images.unsplash.com/photo-1542282811-943ef1a977c3?auto=format&fit=crop&w=760&q=80'),
+    img:I('https://images.unsplash.com/photo-1525103504173-8dc1582c7430?auto=format&fit=crop&w=760&q=80'),
     time:'16:00:00',rad:5,
     title:'FORLATT STASJON',
     text:`<p>En forlatt bensinstasjon. En bil med motoren i gang og dørene åpne. En hund som løper i sirkler på parkeringsplassen.</p>
@@ -1804,7 +2299,7 @@ const STORY={
   // ────────────────────────────────────────────────
   hacking_start:{
     shortName:'HACKING',
-    img:I('https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?auto=format&fit=crop&w=760&q=80'),
+    img:I('https://images.unsplash.com/photo-1555952517-2e8e729e0b44?auto=format&fit=crop&w=760&q=80'),
     time:'21:30:00',rad:0,
     title:'PROSJEKT SOLNEDGANG',
     intercept:'SERVER-LOGG 03:14: «Uautorisert tilgang forsøkt — Brukerprofil: UKJENT — IP: MASKERT — HANDLING: OVERVÅKE»',
@@ -1825,7 +2320,7 @@ const STORY={
 
   presse_ring:{
     shortName:'PRESSE-RING',
-    img:I('https://images.unsplash.com/photo-1585829365295-ab7cd400c167?auto=format&fit=crop&w=760&q=80'),
+    img:I('https://images.unsplash.com/photo-1516455590571-18256e5bb9ff?auto=format&fit=crop&w=760&q=80'),
     time:'21:00:00',rad:0,
     title:'JOURNALISTEN',
     text:`<p>Journalisten svarer på første ring. Stemmen er hes og klar — hun er allerede våken. <em>«Vi vet. Vi har visst i to dager. Men vi trenger bevis som kan stå i retten. Alt vi publiserer uten dem, brukes mot oss som desinformasjon.»</em></p>
@@ -1841,7 +2336,7 @@ const STORY={
 
   informant_møte:{
     shortName:'INFORMANT',
-    img:I('https://images.unsplash.com/photo-1509114397022-ed747cca3f65?auto=format&fit=crop&w=760&q=80'),
+    img:I('https://images.unsplash.com/photo-1573400582672-5e45cc01b1c3?auto=format&fit=crop&w=760&q=80'),
     time:'17:00:00',rad:3,
     title:'SMUGET',
     intercept:'AVLYTTET: «Informantens posisjon bekreftet. Send team.»',
@@ -1863,7 +2358,7 @@ const STORY={
   // ────────────────────────────────────────────────
   tbane_start:{
     shortName:'T-BANE',
-    img:I('https://images.unsplash.com/photo-1603525547466-932b1a13b567?auto=format&fit=crop&w=760&q=80'),
+    img:I('https://images.unsplash.com/photo-1454414604154-7c7e8cc3cbea?auto=format&fit=crop&w=760&q=80'),
     time:'22:00:00',rad:2,
     title:'UNDER BAKKEN',
     intercept:null,
@@ -1883,7 +2378,7 @@ const STORY={
 
   politistasjon:{
     shortName:'POLITI',
-    img:I('https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?auto=format&fit=crop&w=760&q=80'),
+    img:I('https://images.unsplash.com/photo-1485575301924-6891ef935dcd?auto=format&fit=crop&w=760&q=80'),
     time:'20:00:00',rad:3,
     title:'FORLATT POLITISTASJON',
     text:`<p>Stasjonsbygningen er tom. Dørene stod åpne, skjermene svarte. Men radionettet er fortsatt aktivt — en nødfrekvens blinker grønt på panelet.</p>
@@ -1899,12 +2394,12 @@ const STORY={
 
   undergrunn_møte:{
     shortName:'UNDERGRUNNEN',
-    img:I('https://images.unsplash.com/photo-1510418386411-bd6b79f67a68?auto=format&fit=crop&w=760&q=80'),
+    img:I('https://images.unsplash.com/photo-1585366119957-f61e898a89e1?auto=format&fit=crop&w=760&q=80'),
     time:'19:00:00',rad:5,
     title:'MOTSTANDEN',
-    text:`<p>De er fem. En ingeniør fra Equinor. En tidligere etterretningsoffiser. En sykepleier. To studenter med laptoper. Alle med de samme hule øynene av søvnmangel og sjokk.</p>
-<em>Offiseren tar ordet: «Bunkerne er allerede i ferd med å bli forseglet. Vi har en plan, men vi mangler to ting: bevis som offentligheten tror på — og kraft til å kutte strøm til låsesystemene.»</em>
-<p>De ser på deg. Tre mulige handlinger. Og klokken teller ned.</p>`,
+    text:`<p>De er fem. En prosessoperatør fra Equinor med oljebeskittede hender. En tidligere PST-offiser med et kjeveparti som sier at han ikke har sovet på lenge. En sykepleier som fortsatt har hansker på. To studenter med laptoper som aldri slutter å prosessere data.</p>
+<em>Offiseren snakker lavt og presist: «Bunkerdørene forsegles om under fire timer. Vi kan bevise alt — men ingen tror på beviser de ikke kan se med egne øyne. Vi trenger enten et kringkastingssignal, eller vi kutter strøm til låsesystemene og åpner dem på vid gaffel.»</em>
+<p>De ser på deg som om du er det siste brikken i et puslespill de har holdt på med hele natten. Klokken er 04:22.</p>`,
     stats:{mot:{d:+22,label:'MOT'},kunnskap:{d:+18,label:'KUNNSKAP'}},
     choices:[
       {text:'Ta ansvaret for strømsabotasjen. Gå til sentralen.',target:'stromsentralen'},
@@ -1940,7 +2435,7 @@ const STORY={
   // ────────────────────────────────────────────────
   militaerbase:{
     shortName:'MILITÆRBASE',
-    img:I('https://images.unsplash.com/photo-1540575467063-178a50c2df87?auto=format&fit=crop&w=760&q=80'),
+    img:I('https://images.unsplash.com/photo-1532153975070-2e9ab71f1b14?auto=format&fit=crop&w=760&q=80'),
     time:'12:00:00',rad:6,
     title:'MILITÆRBASEN',
     intercept:'AVLYTTET RADIOSAMBAND: «Sektor 7 melder: sivil observert ved perimeteren. Sendes team.»',
@@ -1973,7 +2468,7 @@ const STORY={
 
   kontrollrom:{
     shortName:'KONTROLLROM',
-    img:I('https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=760&q=80'),
+    img:I('https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?auto=format&fit=crop&w=760&q=80'),
     time:'08:00:00',rad:7,
     title:'KONTROLLROMMET',
     text:`<p>Rommet er dunkelt og fullt av blinkende skjermer. Du har koblet deg til. Elstad gir deg instruksjoner over headsettet.</p>
@@ -1989,7 +2484,7 @@ const STORY={
 
   kontrollrom_eps:{
     shortName:'EPS-BOOST',
-    img:I('https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=760&q=80'),
+    img:I('https://images.unsplash.com/photo-1558618047-3c8c76ca7d13?auto=format&fit=crop&w=760&q=80'),
     time:'07:00:00',rad:8,
     title:'SISTE 30 SEKUNDER',
     text:`<p>Du utløser sprengkapselen i korridoren utenfor. Et lynraskt elektromagnetisk blink smelter låssystemene og stanser de inkommende vaktene i spor. Tretti sekunder.</p>
@@ -2006,12 +2501,12 @@ const STORY={
   // ────────────────────────────────────────────────
   kloakken:{
     shortName:'KLOAKK',
-    img:I('https://images.unsplash.com/photo-1518144591331-17a5dd71c477?auto=format&fit=crop&w=760&q=80'),
+    img:I('https://images.unsplash.com/photo-1544985361-b420d7a77043?auto=format&fit=crop&w=760&q=80'),
     time:'15:00:00',rad:12,
     title:'KLOAKKLABYRINTEN',
-    text:`<p>Kloakkvann til knærne. Lukten av råte, rust og noe kjemisk som du ikke klarer å identifisere. Pusten din lager spøkelsestykker i mørket foran deg.</p>
-<em>Spray-malt på veggen med selvlysende maling: piler inn mot det ukjente — og en pil ut mot en sirkel merket «HAVN — 2 KM».</em>
-<p>Strålingsnivåene er merkbart høyere her nede. Uten gasmaske er dette en kortsiktig strategi.</p>`,
+    text:`<p>Kloakkvann til knærne. Lukten av betongrust, råte og noe svakt kjemisk — som gammel strålingsskjerming. Pusten din lager hvite tykke skyer i lommelyktas stråle.</p>
+<em>Noen har vært her nylig. Spraymalt på veggen med selvlysende grønn maling: to piler. Én mot det ukjente — én mot en sirkel: «HAVN — 2 KM».</em>
+<p>Geigertelleren i jakkelomma tikker jevnt fortere. Strålingsnivåene er merkbart høyere her nede. Uten gasmaske har du én time, kanskje to, før det begynner å gjøre skade.</p>`,
     stats:{rad:{d:+15,label:'STRÅLING'},frykt:{d:+12,label:'FRYKT'}},
     choices:[
       {text:'Følg de grønne pilene. Finn de andre.',target:'undergrunn_møte'},
@@ -2023,7 +2518,7 @@ const STORY={
 
   bunker_nod:{
     shortName:'BUNKER-ØY',
-    img:I('https://images.unsplash.com/photo-1485628390555-1a7bd503f9fe?auto=format&fit=crop&w=760&q=80'),
+    img:I('https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?auto=format&fit=crop&w=760&q=80'),
     time:'10:00:00',rad:6,
     title:'BUNKERNS NØDUTGANG',
     intercept:'HEMMELIG KART-NOTAT: «Nødutgang NE-7 er ikke forseglet. Vedlikeholdsfeil 2022. Aldri fikset.»',
@@ -2042,7 +2537,7 @@ const STORY={
   // ────────────────────────────────────────────────
   havnen:{
     shortName:'HAVNEN',
-    img:I('https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=760&q=80'),
+    img:I('https://images.unsplash.com/photo-1504512485720-7d83a16ee930?auto=format&fit=crop&w=760&q=80'),
     time:'11:00:00',rad:8,
     title:'HAVNEN',
     text:`<p>Havnen er underlig tom og stille, bortsett fra bølgelyd og fjernlys fra en ankret oljeplattform-forsyningsbåt. Et kaiarbeiderrom med åpen dør. Kaffekanne fremdeles varm.</p>
@@ -2059,7 +2554,7 @@ const STORY={
 
   havn_radio:{
     shortName:'HAVNE-RADIO',
-    img:I('https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=760&q=80'),
+    img:I('https://images.unsplash.com/photo-1584824486509-112e4181ff6b?auto=format&fit=crop&w=760&q=80'),
     time:'09:00:00',rad:6,
     title:'MARINE VHF',
     text:`<p>Havneradioen er aktiv. VHF kanal 16 — internasjonal nødfrekvens. Du sender meldingen på engelsk, norsk og improvisert tysk: fullt navn på alle involverte, full beskrivelse av Prosjekt Solnedgang.</p>
@@ -2075,7 +2570,7 @@ const STORY={
 
   ubaten:{
     shortName:'UBÅTEN',
-    img:I('https://images.unsplash.com/photo-1480714378408-67cf0d13bc1b?auto=format&fit=crop&w=760&q=80'),
+    img:I('https://images.unsplash.com/photo-1516912481808-3406841bd33c?auto=format&fit=crop&w=760&q=80'),
     time:'08:00:00',rad:5,
     title:'KNM UREDD',
     intercept:'NAVAL KRYPTERT: «KNM Uredd avgår 06:00 uansett ordre. Kaptein Lie nekter å forsegle passasjerene.»',
@@ -2091,7 +2586,7 @@ const STORY={
 
   ubat_sender:{
     shortName:'SENDER',
-    img:I('https://images.unsplash.com/photo-1480714378408-67cf0d13bc1b?auto=format&fit=crop&w=760&q=80'),
+    img:I('https://images.unsplash.com/photo-1516912481808-3406841bd33c?auto=format&fit=crop&w=760&q=80'),
     time:'06:30:00',rad:3,
     title:'GLOBAL SENDING',
     text:`<p>Ubåtens kommunikasjonssystem rekker over hele kloden. Kapteinen setter deg opp direkte mot fem internasjonale pressebyråer, Interpol og tre uavhengige norske journalister på den krypterte listen.</p>
@@ -2158,9 +2653,9 @@ const STORY={
     img:I('https://images.unsplash.com/photo-1584984180436-b51f0f09b552?auto=format&fit=crop&w=760&q=80'),
     time:'04:00:00',rad:10,
     title:'90 SEKUNDER',
-    text:`<p>Fremdriftslinjen kryper. 30%. Dørene gir etter litt. 60%. Riflekolber mot stål. <strong>80%.</strong></p>
-<em>En arm gjennom et sprekket panel. Grep rundt skulderen din. 92%.</em>
-<p>Tre sekunder. En av dem er nok. <strong>Det er et valg igjen.</strong></p>`,
+    text:`<p>Fremdriftslinjen kryper. <strong>28%.</strong> En riflekolbe treffer ytterdøren med et smell som ryster veggen. <strong>55%.</strong> Et panel knekker. <strong>79%.</strong> Lyden av metall mot metall i korridoren.</p>
+<em>En arm tvinger seg gjennom det sprukne panelet. Greiper rundt skulderen din og drar. <strong>92%.</strong></em>
+<p>Tre sekunder til fullstendig overføring. Og én arm som holder deg fast. Du kan ikke gjøre begge deler. <strong>Det er ett valg igjen.</strong></p>`,
     stats:{mot:{d:+35,label:'MOT'},frykt:{d:+30,label:'FRYKT'}},
     choices:[
       {text:'HOLD. IKKE SLIPP. KJØP DE SISTE SEKUNDENE.',target:'slutt2'},
@@ -2173,7 +2668,7 @@ const STORY={
   // ────────────────────────────────────────────────
   nyhetshuset:{
     shortName:'NYHETER',
-    img:I('https://images.unsplash.com/photo-1585829365295-ab7cd400c167?auto=format&fit=crop&w=760&q=80'),
+    img:I('https://images.unsplash.com/photo-1495020689067-958852a7765e?auto=format&fit=crop&w=760&q=80'),
     time:'09:00:00',rad:4,
     title:'NYHETSREDAKSJONEN',
     text:`<p>Du er inne. VIP-kortet åpner sideinngang B uten alarm. Bygningen er halvtom — de fleste ansatte dro hjem da nødvarselet kom. Men noen ble. Journalister med bærbare, ansiktsmasker og kaffe.</p>
@@ -2190,7 +2685,7 @@ const STORY={
 
   sendestudio:{
     shortName:'STUDIO',
-    img:I('https://images.unsplash.com/photo-1587202372775-e229f172b9d7?auto=format&fit=crop&w=760&q=80'),
+    img:I('https://images.unsplash.com/photo-1598899134739-24c46f58b8c0?auto=format&fit=crop&w=760&q=80'),
     time:'06:00:00',rad:2,
     title:'DIREKTE SENDING',
     text:`<p>Du sparker inn studiodøren. Ankeren spretter til sides. Det røde kameraet blinker: <strong>PÅ LUFTA.</strong></p>
@@ -2205,7 +2700,7 @@ const STORY={
 
   sendestudio_double:{
     shortName:'DOBBEL',
-    img:I('https://images.unsplash.com/photo-1587202372775-e229f172b9d7?auto=format&fit=crop&w=760&q=80'),
+    img:I('https://images.unsplash.com/photo-1561736778-92e52a7769ef?auto=format&fit=crop&w=760&q=80'),
     time:'05:30:00',rad:2,
     title:'SIMULTANAKSJON',
     text:`<p>Elstad løper ned. Du løper opp. Dere deler alt på to fronter i samme øyeblikk.</p>
@@ -2235,7 +2730,7 @@ const STORY={
 
   server_uten_kort:{
     shortName:'RISIKO',
-    img:I('https://images.unsplash.com/photo-1558494949-ef010cbdcc31?auto=format&fit=crop&w=760&q=80'),
+    img:I('https://images.unsplash.com/photo-1563986768711-b3bde3dc821e?auto=format&fit=crop&w=760&q=80'),
     time:'05:00:00',rad:6,
     title:'UTEN ADGANGSKORT',
     text:`<p>Du overstyrer krypteringen manuelt. Det tar to minutters tid du ikke egentlig har. Dørene holder på å gi.</p>
@@ -2253,7 +2748,7 @@ const STORY={
   // ────────────────────────────────────────────────
   stromsentralen:{
     shortName:'STRØM',
-    img:I('https://images.unsplash.com/photo-1496247749665-49cf5b1022e9?auto=format&fit=crop&w=760&q=80'),
+    img:I('https://images.unsplash.com/photo-1508739773434-c26b3d09e071?auto=format&fit=crop&w=760&q=80'),
     time:'04:00:00',rad:10,
     title:'STRØMSENTRALEN',
     text:`<p>Dere stormer inn. Fire av dere. Tre politienheter i bakhold. Rød laserkorsfeste over brystet ditt.</p>
@@ -2269,7 +2764,7 @@ const STORY={
 
   stromsentralen_eps:{
     shortName:'EPS-BRYTEREN',
-    img:I('https://images.unsplash.com/photo-1496247749665-49cf5b1022e9?auto=format&fit=crop&w=760&q=80'),
+    img:I('https://images.unsplash.com/photo-1558618047-3c8c76ca7d13?auto=format&fit=crop&w=760&q=80'),
     time:'03:30:00',rad:10,
     title:'ELEKTROMAGNETISK PULS',
     text:`<p>Du løser ut kapselen. Et blendende hvitt blink. Alle lysene i rommet slukner i 1,4 sekunder. Laservåpnene slukner. Uniformene dimmer.</p>
@@ -2287,12 +2782,12 @@ const STORY={
 
   checkpoint:{
     shortName:'KONTROLLPOST',
-    img:I('https://images.unsplash.com/photo-1509264241942-e0f554893e92?auto=format&fit=crop&w=760&q=80'),
+    img:I('https://images.unsplash.com/photo-1536440136628-849c177e76a1?auto=format&fit=crop&w=760&q=80'),
     time:'17:00:00',rad:10,
     title:'VEIKONTROLLPOST',
     intercept:'RADIOSAMBAND AVLYTTET: «Kontrollpost Sierra rapporterer: sivil nekter å stoppe. Sender bil.»',
     text:`<p>Et improvisert veisperring av betongblokker og piggtråd tvers over E18. Seks soldater uten gjenkjennelige merker. En sivil ID-skanner som lyser grønt og rødt på bilister foran deg.</p>
-<em>En av soldatene plasserer hånden på skutteren din og møter blikket ditt: «Alle reiser til bunkeren må autoriseres. Stå i kø.»</em>
+<em>En av soldatene plasserer hånden på taket av kjøretøyet ditt og møter blikket ditt gjennom vinduet: «Alle reiser til bunkeren må autoriseres. Stå i kø.»</em>
 <p>Fra posisjonen din ser du en rød Volvo to biler foran bli eskortert av til siden. Sjåføren protesterer. Ingen lytter. Du har sekunder til å bestemme deg.</p>`,
     stats:{frykt:{d:+28,label:'FRYKT'},rad:{d:+5,label:'STRÅLING'}},
     choices:[
@@ -2304,7 +2799,7 @@ const STORY={
 
   checkpoint_passert:{
     shortName:'PASSERT',
-    img:I('https://images.unsplash.com/photo-1509264241942-e0f554893e92?auto=format&fit=crop&w=760&q=80'),
+    img:I('https://images.unsplash.com/photo-1536440136628-849c177e76a1?auto=format&fit=crop&w=760&q=80'),
     time:'15:30:00',rad:8,
     title:'GJENNOM LINJENE',
     text:`<p>Soldaten ser på kortet ditt. Ser på deg. To lange sekunder. Deretter vinker ham deg gjennom uten å si et ord — men han noterer nummerskiltregistreringen på en liten blokk.</p>
@@ -2320,7 +2815,7 @@ const STORY={
 
   bunker_ankomst:{
     shortName:'BUNKERDØREN',
-    img:I('https://images.unsplash.com/photo-1571771920705-f3a7f49271a9?auto=format&fit=crop&w=760&q=80'),
+    img:I('https://images.unsplash.com/photo-1559348349-86f1f65817fe?auto=format&fit=crop&w=760&q=80'),
     time:'14:00:00',rad:6,
     title:'INNGANGEN',
     intercept:'KLASSIFISERT — BUNKERADMIN: «Kapasitetsgrensen nådd. Sekundering: ingen avvikere. Portene stenger kl. 06:00. Underskrift: Prosjektleder Solnedgang»',
@@ -2336,7 +2831,7 @@ const STORY={
 
   bunker_innsiden:{
     shortName:'INNI BUNKER',
-    img:I('https://images.unsplash.com/photo-1581092795360-fd1ca04f0952?auto=format&fit=crop&w=760&q=80'),
+    img:I('https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?auto=format&fit=crop&w=760&q=80'),
     time:'12:00:00',rad:3,
     title:'BAK STÅLDØREN',
     text:`<p>Innsiden lukter betong og desinfeksjonsmiddel. Lange hvite ganger. Folk i uniformerte grå drakter. Ingen snakker høyt. Vakter ved hvert kryss.</p>
@@ -2352,7 +2847,7 @@ const STORY={
 
   bunker_opprør:{
     shortName:'OPPRØRET',
-    img:I('https://images.unsplash.com/photo-1571771920705-f3a7f49271a9?auto=format&fit=crop&w=760&q=80'),
+    img:I('https://images.unsplash.com/photo-1568992688065-536aad8a12f6?auto=format&fit=crop&w=760&q=80'),
     time:'08:00:00',rad:4,
     title:'MASSEUTGANG',
     text:`<p>Du finner seks andre som tenker som deg. En ex-advokat, en lege, to lærere og to unge menn med ingeniørbakgrunn. Ingen har gitt opp ennå.</p>
@@ -2367,7 +2862,7 @@ const STORY={
 
   hemmelig_møte:{
     shortName:'MØTEPUNKT',
-    img:I('https://images.unsplash.com/photo-1477959858617-67f85cf4f1df?auto=format&fit=crop&w=760&q=80'),
+    img:I('https://images.unsplash.com/photo-1519389950473-47ba0277781c?auto=format&fit=crop&w=760&q=80'),
     time:'16:00:00',rad:5,
     title:'BAKGATEN',
     text:`<p>En forlatt bar i bakgaten bak Grønland torg. Vinduene tapet med avispapir. Elleve bærbare datamaskiner på radikke bord. Journalisten — Kjetil, 56 år — tar deg i hånden som om han har ventet i årevis.</p>
@@ -2384,7 +2879,7 @@ const STORY={
 
   fyrtarnet:{
     shortName:'FYRTÅRNET',
-    img:I('https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=760&q=80'),
+    img:I('https://images.unsplash.com/photo-1505228395891-9a51e7e86bf6?auto=format&fit=crop&w=760&q=80'),
     time:'11:00:00',rad:8,
     title:'FYRTÅRNET',
     intercept:'SJØFART VHF CH16: «Alle fartøy: kystlinjen er stengt. Ingen sivil ferdsel tillatt. Avvik vil bli håndtert med makt.»',
@@ -2400,7 +2895,7 @@ const STORY={
 
   tunnelens_dyp:{
     shortName:'DYPET',
-    img:I('https://images.unsplash.com/photo-1585504198199-20277593b31f?auto=format&fit=crop&w=760&q=80'),
+    img:I('https://images.unsplash.com/photo-1485575301924-6891ef935dcd?auto=format&fit=crop&w=760&q=80'),
     time:'17:00:00',rad:14,
     title:'TUNNELENS HJERTE',
     text:`<p>Tre kilometer inn i T-banenettet er det en underjordisk stasjon som ikke er på noe kart. En dør merket VEDLIKEHOLD — men bak den: ren betong, brede korridorer og belysning som ikke er slukket.</p>
@@ -2433,7 +2928,7 @@ const STORY={
 
   ambassaden:{
     shortName:'AMBASSADEN',
-    img:I('https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=760&q=80'),
+    img:I('https://images.unsplash.com/photo-1496442226666-8d4d0e62e6e9?auto=format&fit=crop&w=760&q=80'),
     time:'13:00:00',rad:4,
     title:'SVEITSISK AMBASSADE',
     intercept:'DIPLOMATISK KRYPTERT — BERN: «Oslo-stasjonen bekrefter: Prosjekt Solnedgang involverer ikke sveitsiske interesser. Vi er nøytrale. Tilbyr beskyttelse til whistleblowere. — Ambassadør Frei»',
@@ -2466,7 +2961,7 @@ const STORY={
 
   trikken:{
     shortName:'TRIKKEN',
-    img:I('https://images.unsplash.com/photo-1527689368864-3a821dbccc34?auto=format&fit=crop&w=760&q=80'),
+    img:I('https://images.unsplash.com/photo-1474487548417-781cb6d646df?auto=format&fit=crop&w=760&q=80'),
     time:'21:00:00',rad:6,
     title:'DEN FORLATTE TRIKKEN',
     intercept:'AM-SIGNAL FANGET — 612 kHz: «...til alle som hører dette: elektrisiteten er ennå ikke kuttet. Dere har et vindu. Bruk det.»',
@@ -2483,7 +2978,7 @@ const STORY={
 
   trikken_hvil:{
     shortName:'HVILEN',
-    img:I('https://images.unsplash.com/photo-1527689368864-3a821dbccc34?auto=format&fit=crop&w=760&q=80'),
+    img:I('https://images.unsplash.com/photo-1474487548417-781cb6d646df?auto=format&fit=crop&w=760&q=80'),
     time:'19:30:00',rad:4,
     title:'ET ØYEBLIKK',
     text:`<p>Du sover i 47 minutter. Det er det. 47 minutter med virkelig søvn i et kaos-fylt univers. Noen dekker deg med en jakke. Noen holder vakt.</p>
@@ -2501,7 +2996,7 @@ const STORY={
 
   slutt_rad:{
     shortName:'STRÅLING',
-    img:I('https://images.unsplash.com/photo-1585858229735-cd08d8cb510d?auto=format&fit=crop&w=760&q=80'),
+    img:I('https://images.unsplash.com/photo-1446776858070-70c3d5ed6758?auto=format&fit=crop&w=760&q=80'),
     time:'00:00:00',rad:0,
     title:'STRÅLINGSDOSE',
     ending:'rad',
@@ -2515,38 +3010,38 @@ const STORY={
 
   slutt1:{
     shortName:'FANGET',
-    img:I('https://images.unsplash.com/photo-1513694203232-719a280e022f?auto=format&fit=crop&w=760&q=80'),
+    img:I('https://images.unsplash.com/photo-1509391366360-2e959784a276?auto=format&fit=crop&w=760&q=80'),
     time:'00:00:00',rad:0,
     title:'FASE TO',
     ending:'bad',
     endingLabel:'SLUTT 1 — SYSTEMETS FANGE',
     endingDesc:'Du ga opp, stolte på feil mennesker, eller handlet for seint.',
-    text:`<p>Klokken tikker til null. Ingen varmebølge. Ingen katastrofe. Stillhet — den verste sorten.</p>
-<p>Et stikk i nakken fra noe du aldri så. Verden dimmer som et gammelt TV-apparat. Du våkner fastspent til en metallstol i et hvitt rom uten vinduer, uten klokke, uten lyd.</p>
-<em>«Subjekt #4471 sikret. Fase To initieres. Permanent observasjon iverksettes umiddelbart.»</em>
-<p>Du stolte feil, ga opp for tidlig, eller manglet det ene avgjørende stykket. Nå er du del av eksperimentet. En data-punkt i et system bygget for å aldri slippe noen ut igjen.</p>`,
+    text:`<p>Klokken tikker til null. Ingen varmebølge. Ingen katastrofe. En stillhet som trekker ut i minutter, timer — du vet ikke lenger.</p>
+<p>Noe stikker i nakken. Raskt, presist, fra noe du ikke så. Verden dimmer som et TV-apparat som mister signalet. Du våkner fastspent til en metallstol. Hvite vegger uten vinduer. Intet ur. Ingen lyd bortsett fra klimaanlegget.</p>
+<em>En stemme fra et sted du ikke kan lokalisere: «Subjekt 4471 sikret og registrert. Fase To initieres. Permanent observasjonskategori A.»</em>
+<p>Du visste noe ingen andre visste. Men du handlet for sent, stolte feil, eller slapp taket i det avgjørende øyeblikket. Nå er du en datapunkt. Prosjekt Solnedgang fortsetter med deg som en del av det.</p>`,
     choices:[]
   },
 
   slutt2:{
     shortName:'HELTEN',
-    img:I('https://images.unsplash.com/photo-1506501139174-099022df5260?auto=format&fit=crop&w=760&q=80'),
+    img:I('https://images.unsplash.com/photo-1501854140801-50d01698950b?auto=format&fit=crop&w=760&q=80'),
     time:'00:00:00',rad:0,
     title:'AVSLØRT',
     ending:'good',
     endingLabel:'SLUTT 2 — BYENS HELT',
     endingDesc:'Du ofret alt og holdt ut til siste sekund.',
     intercept:'SISTE AVLYTTEDE MELDING — PROSJEKTLEDER: «Det er over. Trekk alle team ut. Prosjekt Solnedgang er kompromittert. Gjenta: kompromittert.»',
-    text:`<p>Signalet sprer seg som ild gjennom tørt gress. Innen tre minutter er varselet i alle aviser, alle radio-kanaler, alle telefoner i hele Norden. Innen seks minutter er bunkerdørene i teknisk trøbbel. Innen ti: åpne.</p>
-<p>Folkemassene snur sin kollektive panikk mot en ny retning. Innen soloppgang er bakmennene arrestert på bestilling fra fem ulike internasjonale domstoler.</p>
-<em>«En ukjent person — eller kanskje flere, sier etterforskningsmyndigheter — reddet 50 000 liv i en natt.»</em>
-<p>De fant deg aldri. Du forsvant stille. Men du vet hva du gjorde. Og det er mer enn nok.</p>`,
+    text:`<p>Signalet sprer seg. Innen tre minutter er det på alle radiokanaler og i alle norske telefoner. Innen seks er bunkerdørene i teknisk trøbbel — låssystemene kjenner ikke koden lenger. Innen ti minutter er tre av dem åpne på vidt gap.</p>
+<p>Folkemassene snur sin kollektive panikk mot en annen retning. Mot bunkerdørene. Mot sannheten. Mot menneskene som planla dette. Innen soloppgang er seks prosjektledere pågrepet på bestilling fra fire uavhengige internasjonale domstoler.</p>
+<em>«En ukjent person — anslagsvis alene, sier en kilde i PST — handlet i en smal tidsluke og reddet 50 000 mennesker fra permanent internering.»</em>
+<p>De fant deg aldri. Du forsvant rolig inn i den første lyse morgenen på lenge. Ingen vet hvem du er. Det er mer enn nok.</p>`,
     choices:[]
   },
 
   slutt3:{
     shortName:'ALENE',
-    img:I('https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=760&q=80'),
+    img:I('https://images.unsplash.com/photo-1469474968028-56623f02e42e?auto=format&fit=crop&w=760&q=80'),
     time:'00:00:00',rad:0,
     title:'HORISONTEN',
     ending:'solo',
@@ -2617,6 +3112,10 @@ function render(passageId){
     const con=document.getElementById('scene-container');
     con.className='fade-in'; void con.offsetWidth;
 
+    // Zone entry overlay
+    updateSceneCounter();
+    showZoneEntry(p.title, p.shortName||'');
+
     // Check requires for choices (support item2)
     function choiceLocked(c){
       const r=c.requires; if(!r) return{locked:false};
@@ -2629,13 +3128,16 @@ function render(passageId){
     }
 
     let choicesHtml='';
+    const unlockedChoices=[];
     if(p.choices&&p.choices.length){
-      p.choices.forEach(c=>{
+      p.choices.forEach((c,i)=>{
         const{locked,reason}=choiceLocked(c);
         const lc=locked?' locked':'';
         const oc=locked?'':` onclick="handleChoice('${c.target}')"`;
         const badge=reason?`<span class="req-badge">🔒 ${reason}</span>`:'';
-        choicesHtml+=`<button class="choice-btn${lc}"${oc}><span>${c.text}${badge}</span></button>`;
+        const keyNum=locked?'·':`${i+1}`;
+        choicesHtml+=`<button class="choice-btn${lc}"${oc} data-choice="${i}"><span class="key-hint">${keyNum}</span><span class="choice-text">${c.text}${badge}</span></button>`;
+        if(!locked) unlockedChoices.push(i);
       });
     } else {
       choicesHtml=`<button class="restart-btn" onclick="startOver()">↺ &nbsp;START PÅ NYTT</button>`;
@@ -2663,7 +3165,11 @@ function render(passageId){
     `;
 
     typewrite(document.getElementById('story-text'),p.text,9,()=>{
-      document.getElementById('choices').style.opacity='1';
+      const choicesEl=document.getElementById('choices');
+      choicesEl.style.opacity='1';
+      // Wire keyboard shortcuts to actual rendered buttons
+      const btns=Array.from(choicesEl.querySelectorAll('.choice-btn:not(.locked)'));
+      setupKeyboard(btns);
     });
     // Every scene transition gets a scan bar sweep + whoosh
     doScanBar();
@@ -2676,40 +3182,40 @@ function render(passageId){
       kontrollrom_eps:    ()=>{
         doEmp(); doScreenTear(8); doWhiteout(80,300);
         doChromaticBleed(400); doZoomPulse();
-        doFlash('#00e5ff','.65'); playDeepRumble(1.4,0.4); playSubBoom(0.4);
+        doFlash('#00e5ff','.65'); playDeepRumble(1.4,0.24); playSubBoom(0.18);
       },
       stromsentralen_eps: ()=>{
         doEmp(); doScreenTear(10); doWhiteout(120,400); doMegaShake();
         doChromaticBleed(500); doNegative(80); doZoomPulse();
-        doFlash('#ffffff','1.0'); playDeepRumble(1.8,0.5); playSubBoom(0.5);
+        doFlash('#ffffff','1.0'); playDeepRumble(1.8,0.26); playSubBoom(0.22);
         setTimeout(()=>doFlash('#00e5ff','.3'),400);
       },
 
       // ── Høy spenning — tension stinger ───────────────────────────────
       kontrollrom:      ()=>{
-        playTension(); playAlarm(); playSubBoom(0.28);
+        playTension(); playAlarm(); playSubBoom(0.14);
         doFlash('#ff1a1a','.35'); doZoomPulse(); doChromaticBleed(200);
       },
       radiomasten:      ()=>{
-        playTension(); playStaticBurst(0.22);
+        playTension(); playStaticBurst(0.11);
         doFlash('#ff0000','.28'); doChromaticBleed(180);
       },
       radiomasten_hard: ()=>{
-        playTension(); playSiren(2,0.12); playDeepRumble(1.0,0.32); playSubBoom(0.35);
+        playTension(); playSiren(2,0.12); playDeepRumble(1.0,0.20); playSubBoom(0.16);
         doShake(); doFlash('#ff0000','.55'); doChromaticBleed(350); doZoomPulse();
         doScreenTear(5);
       },
       stromsentralen:   ()=>{
-        playTension(); playAlarm(); playDeepRumble(1.2,0.38);
+        playTension(); playAlarm(); playDeepRumble(1.2,0.22);
         doMegaShake(); doFlash('#ff1a1a','.45'); doChromaticBleed(300);
         doScreenTear(6); doZoomPulse(); playSubBoom(0.3);
       },
       server_uten_kort: ()=>{
-        playTension(); playStaticBurst(0.28); playAlarm();
+        playTension(); playStaticBurst(0.13); playAlarm();
         doShake(); doChromaticBleed(200); doScreenTear(3);
       },
       sendestudio:      ()=>{
-        playAlarm(); playStaticBurst(0.2);
+        playAlarm(); playStaticBurst(0.11);
         doFlash('#ff0000','.22'); doChromaticBleed(160);
       },
 
@@ -2730,7 +3236,7 @@ function render(passageId){
       vanen_dypere:   ()=>{
         doGlitch(); setTimeout(doGlitch,120); doScreenTear(4);
         doChromaticBleed(280); playIntercept(); doZoomPulse();
-        playStaticBurst(0.18);
+        playStaticBurst(0.10);
       },
       bunker_nod:     ()=>{
         doGlitch(); setTimeout(doGlitch,100); doScreenTear(4);
@@ -2744,7 +3250,7 @@ function render(passageId){
       hacking_start:  ()=>{
         doGlitch(); setTimeout(doGlitch,100); setTimeout(doGlitch,240);
         playIntercept(); doScreenTear(5); doChromaticBleed(350);
-        doZoomPulse(); playStaticBurst(0.25); doNegative(60);
+        doZoomPulse(); playStaticBurst(0.12); doNegative(60);
       },
       ambassaden:     ()=>{
         doFlash('#ffffff','.18'); doChromaticBleed(140); playStaticBurst(0.12);
@@ -2754,14 +3260,14 @@ function render(passageId){
       slutt1: ()=>{
         doEmp(); doScreenTear(10); doMegaShake();
         doWhiteout(100,400); doChromaticBleed(500); doNegative(120);
-        playDeepRumble(2.0,0.5); playSubBoom(0.55); playStaticBurst(0.38);
+        playDeepRumble(2.0,0.26); playSubBoom(0.24); playStaticBurst(0.16);
         doZoomPulse(); doPixelBreak(35); doScanBar();
       },
       slutt2: ()=>{
         doFlash('#ffbe00','.32'); doChromaticBleed(200); doZoomPulse();
         setTimeout(()=>{ doFlash('#ffffff','.22'); playSubBoom(0.28); },700);
         setTimeout(()=>{ doFlash('#ffbe00','.18'); doChromaticBleed(160); },1400);
-        setTimeout(()=>{ doWhiteout(80,500); doFlash('#ffbe00','.12'); playResonance(220,2.0,0.1); },2100);
+        setTimeout(()=>{ doWhiteout(80,500); doFlash('#ffbe00','.12'); playResonance(220,2.0,0.11); },2100);
         setTimeout(()=>{ doScanBar(); doZoomPulse(); },2500);
       },
       slutt3: ()=>{
@@ -2769,9 +3275,9 @@ function render(passageId){
         setTimeout(()=>doFlash('#223344','.2'),600);
       },
       slutt_rad: ()=>{
-        doRadHaze(.55); startGeiger(3); playDeepRumble(2.0,0.44);
+        doRadHaze(.55); startGeiger(3); playDeepRumble(2.0,0.26);
         doScreenTear(6); doChromaticBleed(400); doNegative(80);
-        doZoomPulse(); playIonScream(2.2,0.16); doScanBar();
+        doZoomPulse(); playIonScream(2.2, 0.18); doScanBar();
         setTimeout(()=>{ stopGeiger(); doFlash('#00ff88','.25'); doWhiteout(60,300); },3200);
       },
       slutt_hemmelig: ()=>{
@@ -2787,14 +3293,14 @@ function render(passageId){
 }
 
 function handleChoice(target){
-  window.scrollTo({top:0,behavior:'smooth'});
+  window.scrollTo({top:0,behavior:'instant'});
   render(target);
 }
 
 function startOver(){
   resetState();
   stopGeiger();
-  window.scrollTo({top:0,behavior:'smooth'});
+  window.scrollTo({top:0,behavior:'instant'});
   render('start');
 }
 
@@ -2891,6 +3397,11 @@ function finishBoot(){
   setTimeout(()=>{
     document.getElementById('boot').classList.remove('active');
     document.getElementById('boot').classList.add('hidden');
+    const gw=document.getElementById('game-wrap');
+    gw.style.display=''; gw.style.opacity='0';
+    gw.style.transition='opacity .6s ease';
+    setTimeout(()=>gw.style.opacity='1', 50);
+    window.scrollTo({top:0,behavior:'instant'});
     render('start');
   },800);
 }
@@ -2899,6 +3410,11 @@ function skipBoot(){
   if(bootIv) clearTimeout(bootIv);
   document.getElementById('boot').classList.remove('active');
   document.getElementById('boot').classList.add('hidden');
+  const gw=document.getElementById('game-wrap');
+  gw.style.display=''; gw.style.opacity='0';
+  gw.style.transition='opacity .4s ease';
+  setTimeout(()=>gw.style.opacity='1',30);
+  window.scrollTo({top:0,behavior:'instant'});
   render('start');
 }
 
@@ -2938,8 +3454,8 @@ function playBuzzer(){
     const o=audioCtx.createOscillator(),g=audioCtx.createGain();
     o.type='square'; o.frequency.value=870;
     const st=audioCtx.currentTime+t;
-    g.gain.setValueAtTime(0,st); g.gain.linearRampToValueAtTime(0.22,st+0.025);
-    g.gain.setValueAtTime(0.22,st+0.22); g.gain.linearRampToValueAtTime(0,st+0.28);
+    g.gain.setValueAtTime(0,st); g.gain.linearRampToValueAtTime(0.16,st+0.025);
+    g.gain.setValueAtTime(0.16,st+0.22); g.gain.linearRampToValueAtTime(0,st+0.28);
     o.connect(g); g.connect(masterGain); o.start(st); o.stop(st+0.3);
   });
 }
@@ -2949,15 +3465,15 @@ function playEbsTone(){
     const o=audioCtx.createOscillator(),g=audioCtx.createGain();
     o.type='sine'; o.frequency.value=freq;
     g.gain.setValueAtTime(0,audioCtx.currentTime);
-    g.gain.linearRampToValueAtTime(0.18,audioCtx.currentTime+0.1);
-    g.gain.setValueAtTime(0.18,audioCtx.currentTime+3.5);
+    g.gain.linearRampToValueAtTime(0.14,audioCtx.currentTime+0.1);
+    g.gain.setValueAtTime(0.14,audioCtx.currentTime+3.5);
     g.gain.linearRampToValueAtTime(0,audioCtx.currentTime+4);
     o.connect(g); g.connect(masterGain); o.start(); o.stop(audioCtx.currentTime+4.1);
   });
 }
 
 // ── SIREN: stiger og faller, repetering ────────────
-function playSiren(reps=2,vol=0.22){
+function playSiren(reps=2,vol=0.20){
   if(!audioReady())return;
   for(let i=0;i<reps;i++){
     const o=audioCtx.createOscillator(), g=audioCtx.createGain();
@@ -2974,7 +3490,7 @@ function playSiren(reps=2,vol=0.22){
 }
 
 // ── STATIC CRACKLE: TV-statisk lyd ─────────────────
-function playStaticCrackle(dur=0.8,vol=0.28){
+function playStaticCrackle(dur=0.8,vol=0.20){
   if(!audioReady())return;
   const sz=Math.floor(audioCtx.sampleRate*dur);
   const buf=audioCtx.createBuffer(1,sz,audioCtx.sampleRate);
@@ -2987,7 +3503,7 @@ function playStaticCrackle(dur=0.8,vol=0.28){
 }
 
 // ── EXPLOSION: lav boom for dramatiske øyeblikk ─────
-function playExplosion(vol=0.45){
+function playExplosion(vol=0.26){
   if(!audioReady())return;
   const sz=Math.floor(audioCtx.sampleRate*1.2);
   const buf=audioCtx.createBuffer(1,sz,audioCtx.sampleRate);
@@ -3004,7 +3520,7 @@ function playHover(){
   if(!audioReady())return;
   const o=audioCtx.createOscillator(), g=audioCtx.createGain();
   o.type='sine'; o.frequency.value=620;
-  g.gain.setValueAtTime(0.055,audioCtx.currentTime);
+  g.gain.setValueAtTime(0.07,audioCtx.currentTime);
   g.gain.exponentialRampToValueAtTime(0.001,audioCtx.currentTime+0.06);
   o.connect(g); g.connect(masterGain); o.start(); o.stop(audioCtx.currentTime+0.07);
 }
@@ -3016,7 +3532,7 @@ function playIntercept(){
     const o=audioCtx.createOscillator(), g=audioCtx.createGain();
     const t=audioCtx.currentTime+i*0.09;
     o.type='square'; o.frequency.value=f;
-    g.gain.setValueAtTime(0.09,t); g.gain.exponentialRampToValueAtTime(0.001,t+0.07);
+    g.gain.setValueAtTime(0.13,t); g.gain.exponentialRampToValueAtTime(0.001,t+0.07);
     o.connect(g); g.connect(masterGain); o.start(t); o.stop(t+0.08);
   });
 }
@@ -3051,14 +3567,14 @@ function playWhoosh(){
   for(let i=0;i<sz;i++) d[i]=(Math.random()*2-1)*(i/sz)*(1-i/sz)*4;
   const s=audioCtx.createBufferSource(), g=audioCtx.createGain();
   const bp=audioCtx.createBiquadFilter(); bp.type='bandpass'; bp.frequency.value=700; bp.Q.value=0.7;
-  g.gain.value=0.20; s.buffer=buf;
+  g.gain.value=0.14; s.buffer=buf;
   s.connect(bp); bp.connect(g); g.connect(masterGain); s.start();
   // Sub bass thump
   const ob=audioCtx.createOscillator(), gb=audioCtx.createGain();
   const lp=audioCtx.createBiquadFilter(); lp.type='lowpass'; lp.frequency.value=90;
   ob.type='sine'; ob.frequency.setValueAtTime(65,audioCtx.currentTime);
   ob.frequency.exponentialRampToValueAtTime(30,audioCtx.currentTime+0.22);
-  gb.gain.setValueAtTime(0.14,audioCtx.currentTime); gb.gain.exponentialRampToValueAtTime(0.001,audioCtx.currentTime+0.25);
+  gb.gain.setValueAtTime(0.09,audioCtx.currentTime); gb.gain.exponentialRampToValueAtTime(0.001,audioCtx.currentTime+0.25);
   ob.connect(lp); lp.connect(gb); gb.connect(masterGain); ob.start(); ob.stop(audioCtx.currentTime+0.26);
 }
 
@@ -3128,8 +3644,8 @@ function playTension(){
     o.frequency.setValueAtTime(f,audioCtx.currentTime);
     o.frequency.linearRampToValueAtTime(f*1.9,audioCtx.currentTime+1.8);
     g.gain.setValueAtTime(0,audioCtx.currentTime);
-    g.gain.linearRampToValueAtTime(0.07,audioCtx.currentTime+0.3);
-    g.gain.setValueAtTime(0.07,audioCtx.currentTime+1.4);
+    g.gain.linearRampToValueAtTime(0.13,audioCtx.currentTime+0.3);
+    g.gain.setValueAtTime(0.13,audioCtx.currentTime+1.4);
     g.gain.linearRampToValueAtTime(0,audioCtx.currentTime+2.0);
     o.connect(lp); lp.connect(g); g.connect(masterGain);
     o.start(); o.stop(audioCtx.currentTime+2.1);
@@ -3153,7 +3669,7 @@ function playRadioChatter(){
   const s=audioCtx.createBufferSource();
   const bp=audioCtx.createBiquadFilter(); bp.type='bandpass'; bp.frequency.value=1050; bp.Q.value=2.8;
   const hp=audioCtx.createBiquadFilter(); hp.type='highpass'; hp.frequency.value=550;
-  const g=audioCtx.createGain(); g.gain.value=0.11;
+  const g=audioCtx.createGain(); g.gain.value=0.09;
   s.buffer=buf; s.connect(bp); bp.connect(hp); hp.connect(g); g.connect(masterGain); s.start();
   }catch(e){}
 }
@@ -3166,7 +3682,7 @@ function playRadPulse(){
     const lp=audioCtx.createBiquadFilter(); lp.type='lowpass'; lp.frequency.value=150;
     const t=audioCtx.currentTime+i*0.6;
     o.type='sine'; o.frequency.value=f;
-    g.gain.setValueAtTime(0.28,t); g.gain.exponentialRampToValueAtTime(0.001,t+0.55);
+    g.gain.setValueAtTime(0.20,t); g.gain.exponentialRampToValueAtTime(0.001,t+0.55);
     o.connect(lp); lp.connect(g); g.connect(masterGain); o.start(t); o.stop(t+0.6);
   });
 }
@@ -3250,7 +3766,7 @@ function playThunder(){
   const s=audioCtx.createBufferSource(), g=audioCtx.createGain();
   const lp=audioCtx.createBiquadFilter(); lp.type='lowpass'; lp.frequency.value=260;
   const lp2=audioCtx.createBiquadFilter(); lp2.type='lowpass'; lp2.frequency.value=180;
-  g.gain.value=0.45;
+  g.gain.value=0.28;
   s.buffer=buf; s.connect(lp); lp.connect(lp2); lp2.connect(g); g.connect(masterGain); s.start();
 }
 
@@ -3260,13 +3776,13 @@ function playDistantBoom(){
   const o=audioCtx.createOscillator(), g=audioCtx.createGain();
   o.type='sine'; o.frequency.value=55;
   const t=audioCtx.currentTime;
-  g.gain.setValueAtTime(0,t); g.gain.linearRampToValueAtTime(0.18,t+0.3);
-  g.gain.setValueAtTime(0.18,t+0.6); g.gain.exponentialRampToValueAtTime(0.001,t+2.2);
+  g.gain.setValueAtTime(0,t); g.gain.linearRampToValueAtTime(0.13,t+0.3);
+  g.gain.setValueAtTime(0.13,t+0.6); g.gain.exponentialRampToValueAtTime(0.001,t+2.2);
   o.connect(g); g.connect(masterGain); o.start(t); o.stop(t+2.5);
 }
 
 // ── ION SCREAM: ionosfærisk stigende hvin ──────────
-function playIonScream(dur=2.8,vol=0.19){
+function playIonScream(dur=2.8,vol=0.22){
   if(!audioReady())return;
   try{
   const o=audioCtx.createOscillator(), g=audioCtx.createGain();
@@ -3290,7 +3806,7 @@ function playIonScream(dur=2.8,vol=0.19){
 }
 
 // ── DEEP RUMBLE: jordskjelvende lav-frekvensstøy ───
-function playDeepRumble(dur=1.4,vol=0.38){
+function playDeepRumble(dur=1.4,vol=0.22){
   if(!audioReady())return;
   try{
   const sz=Math.floor(audioCtx.sampleRate*dur);
@@ -3322,7 +3838,7 @@ function playMetalStress(){
     mod.type='sine'; mod.frequency.value=3.5+Math.random()*4;
     modG.gain.value=f*0.28;
     mod.connect(modG); modG.connect(o.frequency);
-    g.gain.setValueAtTime(0,t); g.gain.linearRampToValueAtTime(0.07,t+0.04);
+    g.gain.setValueAtTime(0,t); g.gain.linearRampToValueAtTime(0.10,t+0.04);
     g.gain.exponentialRampToValueAtTime(0.001,t+0.32+Math.random()*0.2);
     const bp=audioCtx.createBiquadFilter(); bp.type='bandpass'; bp.frequency.value=f*1.8; bp.Q.value=4;
     o.connect(bp); bp.connect(g); g.connect(masterGain);
@@ -3332,7 +3848,7 @@ function playMetalStress(){
 }
 
 // ── STATIC BURST: skarp bred støysmell ─────────────
-function playStaticBurst(vol=0.32){
+function playStaticBurst(vol=0.18){
   if(!audioReady())return;
   try{
   const sz=Math.floor(audioCtx.sampleRate*0.12);
@@ -3347,7 +3863,7 @@ function playStaticBurst(vol=0.32){
 }
 
 // ── SUB BOOM: enkelt massivt sub-slag ──────────────
-function playSubBoom(vol=0.55){
+function playSubBoom(vol=0.22){
   if(!audioReady())return;
   try{
   const o=audioCtx.createOscillator(), g=audioCtx.createGain();
@@ -3362,7 +3878,7 @@ function playSubBoom(vol=0.55){
 }
 
 // ── RESONANCE: svevende resonant bølge ─────────────
-function playResonance(freq=220,dur=1.8,vol=0.12){
+function playResonance(freq=220,dur=1.8,vol=0.16){
   if(!audioReady())return;
   try{
   [freq, freq*1.498, freq*1.999].forEach((f,i)=>{
@@ -3410,8 +3926,8 @@ function startPreBoot(){
     const pl=document.getElementById('prelude');
     pl.classList.add('show');
     // Første lyd: ionosfærisk hvin starter med en gang
-    playIonScream(3.2, 0.22);
-    playDeepRumble(2.2, 0.42);
+    playIonScream(3.2, 0.20);
+    playDeepRumble(2.2,0.24);
     doScreenTear(10);
     doScanBar();
     // Progressbar
@@ -3451,11 +3967,11 @@ function startPreBoot(){
   },800);
 
   // Første sub boom + scan flicker
-  pbT(()=>{ playSubBoom(0.38); doScanFlicker(4); },1200);
+  pbT(()=>{ playSubBoom(0.18); doScanFlicker(4); },1200);
   pbT(()=>{ doScreenTear(4); playStaticBurst(0.22); doChromaticBleed(120); },1650);
 
   // Negative flash + resonanse
-  pbT(()=>{ doNegative(75); playResonance(110,1.4,0.14); playSubBoom(0.28); },2100);
+  pbT(()=>{ doNegative(75); playResonance(110,1.4,0.13); playSubBoom(0.28); },2100);
 
   // ══ STOR GLITCH-STORM #1 ════════════════════════════════════════
   pbT(()=>{
@@ -3478,18 +3994,18 @@ function startPreBoot(){
     },45);
   },2800);
 
-  pbT(()=>{ playDeepRumble(1.6,0.44); doZoomPulse(); doScanBar(); },3200);
+  pbT(()=>{ playDeepRumble(1.6,0.26); doZoomPulse(); doScanBar(); },3200);
   pbT(()=>{ doScreenTear(7); playSiren(1,0.16); doChromaticBleed(200); doNegative(60); },3600);
   pbT(()=>{ playMetalStress(); doPixelBreak(22); },4000);
 
   // ══ FASE 1: PRE-KOLLAPS — MAKSIMAL KAOS ═════════════════════════
   pbT(()=>{
     doMegaShake();
-    doEmp(); playDeepRumble(1.8,0.48);
+    doEmp(); playDeepRumble(1.8,0.26);
     doScreenTear(14); doZoomPulse();
     doChromaticBleed(400); doNegative(100);
     doScanBar(); doScanFlicker(6);
-    playStaticBurst(0.38); playMetalStress();
+    playStaticBurst(0.15); playMetalStress();
     doFlash('#ff1a1a','.42');
     doGlitch(); setTimeout(doGlitch,60); setTimeout(doGlitch,130);
     setTimeout(doGlitch,220); setTimeout(doGlitch,340); setTimeout(doGlitch,480);
@@ -3497,18 +4013,18 @@ function startPreBoot(){
   },4200);
 
   // Pixel dissolution
-  pbT(()=>{ doPixelBreak(45); doChromaticBleed(180); playSubBoom(0.45); },4480);
+  pbT(()=>{ doPixelBreak(45); doChromaticBleed(180); playSubBoom(0.20); },4480);
 
   // ══ HVITBLENDING + EKSPLOSJON ════════════════════════════════════
   pbT(()=>{
     doWhiteout(180, 500);
-    playExplosion(0.65); playIonScream(1.8,0.18);
+    playExplosion(0.24); playIonScream(1.8, 0.18);
     doShake(); doScanBar();
     doFlash('#ffffff','1.0');
   },4700);
 
-  pbT(()=>{ doScanBar(); playSubBoom(0.4); doScreenTear(7); doPixelBreak(18); },5000);
-  pbT(()=>{ doFlash('#ff0000','.35'); playStaticCrackle(0.2,0.18); doChromaticBleed(160); },5100);
+  pbT(()=>{ doScanBar(); playSubBoom(0.17); doScreenTear(7); doPixelBreak(18); },5000);
+  pbT(()=>{ doFlash('#ff0000','.35'); playStaticCrackle(0.2,0.13); doChromaticBleed(160); },5100);
   pbT(()=>{ doScanFlicker(4); doNegative(55); doZoomPulse(); },5380);
 
   // ══ FASE 2: Telefonen glir inn ═══════════════════════════════════
@@ -3523,7 +4039,7 @@ function startPreBoot(){
 
   pbT(()=>{ doScreenTear(4); playMetalStress(); doChromaticBleed(140); },6150);
   pbT(()=>{ doScanBar(); playStaticBurst(0.18); },6550);
-  pbT(()=>{ playDeepRumble(0.9,0.28); doNegative(50); },6950);
+  pbT(()=>{ playDeepRumble(0.9,0.18); doNegative(50); },6950);
 
   // ══ FASE 3: VIBRASJON + NØDVARSELLYD ═════════════════════════════
   pbT(()=>{
@@ -3534,7 +4050,7 @@ function startPreBoot(){
     document.getElementById('prelude-center').style.background='rgba(40,0,0,.55)';
     doScreenTear(9); doNegative(65); doChromaticBleed(280);
     doFlash('#ff0000','.4');
-    playSubBoom(0.35); playStaticBurst(0.26);
+    playSubBoom(0.16); playStaticBurst(0.12);
   },7200);
 
   pbT(()=>{ doScanBar(); playStaticBurst(0.22); doScanFlicker(3); },7500);
@@ -3554,41 +4070,41 @@ function startPreBoot(){
 
   pbT(()=>{ playMetalStress(); doScreenTear(3); doChromaticBleed(120); },8500);
   pbT(()=>{ playStaticBurst(0.2); doScanBar(); doNegative(45); },9500);
-  pbT(()=>{ playDeepRumble(1.2,0.32); doPixelBreak(14); },10200);
+  pbT(()=>{ playDeepRumble(1.2,0.20); doPixelBreak(14); },10200);
   pbT(()=>{ doScreenTear(5); doChromaticBleed(180); playMetalStress(); },10800);
 
   // ══ FASE 5: BUZZ RUNDE #2 — HARDERE ═════════════════════════════
   pbT(()=>{
-    playBuzzer(); playDeepRumble(1.4,0.4);
+    playBuzzer(); playDeepRumble(1.4,0.22);
     doShake(); doFlash('#ff0000','.38');
     doScreenTear(6); doScanBar();
     doGlitch(); setTimeout(doGlitch,80); setTimeout(doGlitch,180); setTimeout(doGlitch,300);
     doChromaticBleed(220); doZoomPulse();
-    playStaticBurst(0.3);
+    playStaticBurst(0.14);
   },11500);
 
-  pbT(()=>{ playIonScream(1.4,0.14); doNegative(80); doChromaticBleed(160); },12000);
-  pbT(()=>{ doScanBar(); playStaticBurst(0.24); doScanFlicker(3); doPixelBreak(16); },12500);
+  pbT(()=>{ playIonScream(1.4, 0.16); doNegative(80); doChromaticBleed(160); },12000);
+  pbT(()=>{ doScanBar(); playStaticBurst(0.11); doScanFlicker(3); doPixelBreak(16); },12500);
 
   // ══ FASE 6: BUZZ RUNDE #3 — KRITISK ═════════════════════════════
   pbT(()=>{
     playBuzzer();
     document.getElementById('prelude-center').style.background='rgba(70,0,0,.75)';
     doFlash('#cc0000','.5');
-    playSiren(2, 0.14); playResonance(82, 2.2, 0.16);
+    playSiren(2, 0.14); playResonance(82, 2.2, 0.14);
     doScanBar(); doZoomPulse();
     doMegaShake(); doScreenTear(8);
     doChromaticBleed(350); doNegative(90);
-    playSubBoom(0.5);
+    playSubBoom(0.20);
   },13000);
 
-  pbT(()=>{ playDeepRumble(1.6,0.45); doScreenTear(7); doScanBar(); },13500);
+  pbT(()=>{ playDeepRumble(1.6,0.26); doScreenTear(7); doScanBar(); },13500);
   pbT(()=>{ playMetalStress(); doPixelBreak(25); doNegative(60); },14000);
   pbT(()=>{ doScanFlicker(5); doChromaticBleed(200); doZoomPulse(); },14400);
 
   // ══ FASE 7: ABSOLUTT KAOS — OPPBYGGING TIL FINALE ════════════════
   pbT(()=>{
-    playBuzzer(); playExplosion(0.45); playDeepRumble(1.2,0.5);
+    playBuzzer(); playExplosion(0.26); playDeepRumble(1.2,0.28);
     doMegaShake(); doEmp(); doZoomPulse();
     doWhiteout(60, 250);
     doChromaticBleed(500); doNegative(110);
@@ -3596,11 +4112,11 @@ function startPreBoot(){
     // 10 glitcher spread over 800ms
     [0,55,120,195,285,390,510,650,790,960].forEach(d=>setTimeout(doGlitch,d));
     doFlash('#ff1a1a','0.7');
-    playStaticBurst(0.42); playMetalStress(); playIonScream(1.2,0.16);
+    playStaticBurst(0.17); playMetalStress(); playIonScream(1.2, 0.16);
   },14700);
 
-  pbT(()=>{ doScanBar(); doScanFlicker(5); playSubBoom(0.55); doChromaticBleed(220); },15200);
-  pbT(()=>{ doWhiteout(180,320); doChromaticBleed(280); playStaticBurst(0.35); },15500);
+  pbT(()=>{ doScanBar(); doScanFlicker(5); playSubBoom(0.22); doChromaticBleed(220); },15200);
+  pbT(()=>{ doWhiteout(180,320); doChromaticBleed(280); playStaticBurst(0.15); },15500);
   pbT(()=>{ doScreenTear(9); playMetalStress(); doNegative(70); },16000);
   pbT(()=>{ doScanFlicker(4); doZoomPulse(); doChromaticBleed(180); },16350);
 
@@ -3614,8 +4130,8 @@ function startPreBoot(){
     // MEGA finale SFX
     doWhiteout(280, 600);
     doEmp(); doMegaShake(); doZoomPulse();
-    playExplosion(0.85); playIonScream(2.0,0.22); playDeepRumble(2.0,0.55);
-    playSubBoom(0.6); playStaticBurst(0.45); playStaticCrackle(0.5,0.24);
+    playExplosion(0.28); playIonScream(2.0, 0.20); playDeepRumble(2.0,0.30);
+    playSubBoom(0.26); playStaticBurst(0.18); playStaticCrackle(0.5,0.16);
 
     // VFX bombardement
     doFlash('#ff2200','1.0');
