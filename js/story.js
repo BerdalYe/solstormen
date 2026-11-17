@@ -481,7 +481,7 @@ const STORY={
 
   ubat_sender:{
     shortName:'SENDER',
-    img:'ubaten',
+    img:'ubat_sender',
     time:'06:30:00',rad:3,
     title:'GLOBAL SENDING',
     text:`<p>Ubåtens kommunikasjonssystem rekker over hele kloden. Kapteinen setter deg opp direkte mot fem internasjonale pressebyråer, Interpol og tre uavhengige norske journalister på den krypterte listen.</p>
@@ -545,7 +545,7 @@ const STORY={
 
   radiomasten_hard:{
     shortName:'90 SEK',
-    img:'radiomasten',
+    img:'radiomasten_hard',
     time:'04:00:00',rad:10,
     title:'90 SEKUNDER',
     text:`<p>Fremdriftslinjen kryper. <strong>28%.</strong> En riflekolbe treffer ytterdøren med et smell som ryster veggen. <strong>55%.</strong> Et panel knekker. <strong>79%.</strong> Lyden av metall mot metall i korridoren.</p>
@@ -609,7 +609,7 @@ const STORY={
 
   serverrommet:{
     shortName:'SERVER',
-    img:'base_intern',
+    img:'serverrommet',
     time:'06:00:00',rad:5,
     title:'SERVERROMMET',
     text:`<p>Kjølerommet suser. Grønne lamper overalt. Du finner riktig rack. Kobler inn. Skjermen blinker: <strong>MANUELL OVERSTYRING PÅKREVD.</strong></p>
@@ -659,7 +659,7 @@ const STORY={
 
   stromsentralen_eps:{
     shortName:'EMP-BRYTEREN',
-    img:'kontrollrom_eps',
+    img:'stromsentralen_eps',
     time:'03:30:00',rad:10,
     title:'ELEKTROMAGNETISK PULS',
     text:`<p>Du løser ut kapselen. Et blendende hvitt blink. Alle lysene i rommet slukner i 1,4 sekunder. Laservåpnene slukner. Uniformene dimmer.</p>
@@ -694,7 +694,7 @@ const STORY={
 
   checkpoint_passert:{
     shortName:'PASSERT',
-    img:'checkpoint',
+    img:'checkpoint_passert',
     time:'15:30:00',rad:8,
     title:'GJENNOM LINJENE',
     text:`<p>Soldaten ser på kortet ditt. Ser på deg. To lange sekunder. Deretter vinker han deg gjennom uten å si et ord — men han noterer registreringsnummeret ditt på en liten blokk.</p>
@@ -726,7 +726,7 @@ const STORY={
 
   bunker_innsiden:{
     shortName:'INNI BUNKER',
-    img:'bunker_nod',
+    img:'bunker_innsiden',
     time:'12:00:00',rad:3,
     title:'BAK STÅLDØREN',
     text:`<p>Innsiden lukter betong og desinfeksjonsmiddel. Lange hvite ganger. Folk i like, grå drakter. Ingen snakker høyt. Vakter ved hvert kryss.</p>
@@ -790,7 +790,7 @@ const STORY={
 
   tunnelens_dyp:{
     shortName:'DYPET',
-    img:'politistasjon',
+    img:'tunnelens_dyp',
     time:'17:00:00',rad:14,
     title:'TUNNELENS HJERTE',
     text:`<p>Tre kilometer inn i T-banenettet er det en underjordisk stasjon som ikke er på noe kart. En dør merket VEDLIKEHOLD — men bak den: ren betong, brede korridorer og belysning som ikke er slukket.</p>
@@ -873,7 +873,7 @@ const STORY={
 
   trikken_hvil:{
     shortName:'HVILEN',
-    img:'trikken',
+    img:'trikken_hvil',
     time:'19:30:00',rad:4,
     title:'ET ØYEBLIKK',
     text:`<p>Du sover i 47 minutter. Det er det. 47 minutter med virkelig søvn i et kaos-fylt univers. Noen dekker deg med en jakke. Noen holder vakt.</p>

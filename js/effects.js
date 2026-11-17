@@ -427,9 +427,17 @@ function typewrite(container,html,speed,onDone){
 //  SCENE PHOTO + CREDIT
 // ══════════════════════════════════════════════════
 function esc(t){ return String(t).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
+// Load the photos of the scenes the player can go to next, so they appear instantly
+const preloaded=new Set();
+function preloadNext(p){
+  (p.choices||[]).forEach(c=>{
+    const ph=PHOTOS[(STORY[c.target]||{}).img];
+    if(ph&&ph.src&&!preloaded.has(ph.src)){ preloaded.add(ph.src); const im=new Image(); im.src=ph.src; }
+  });
+}
 function sceneHero(p,zone){
   const ph=PHOTOS[p.img]||{};
-  const img=ph.src?`<img src="${ph.src}" alt="${esc(ph.alt||'')}" decoding="async" onerror="this.remove()"${ph.pos?` style="object-position:${ph.pos}"`:''}>`:'';
+  const img=ph.src?`<img src="${ph.src}" alt="${esc(ph.alt||'')}" decoding="async"${ph.lift?' class="lift"':''} onerror="this.remove()"${ph.pos?` style="object-position:${ph.pos}"`:''}>`:'';
   const credit=ph.by?`<figcaption class="photo-credit">Foto: ${ph.url?`<a href="${ph.url}" target="_blank" rel="noopener">${esc(ph.by)}</a>`:esc(ph.by)}${ph.license?' · '+esc(ph.license):''}</figcaption>`:'';
   const remaining=p.time==='00:00:00'?'NEDSLAG':`T − ${p.time}`;
   return `<figure class="scene-hero${p.ending?' is-ending end-'+p.ending:''}">

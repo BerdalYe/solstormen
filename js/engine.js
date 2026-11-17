@@ -122,6 +122,7 @@ function render(passageId){
       <div id="choices" class="waiting" style="opacity:0;transition:opacity .65s ease;">${choicesHtml}</div>
     `;
 
+    preloadNext(p);
     typewrite(document.getElementById('story-text'),p.text,9,()=>{
       if(token!==renderToken) return;
       const choicesEl=document.getElementById('choices');

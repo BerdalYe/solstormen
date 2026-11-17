@@ -1144,7 +1144,7 @@ body.reduced-fx #lightning-canvas{display:none;}
 .path-arrow{font-size:.6rem;}
 
 /* ── START GATE: readable text, photo backdrop ── */
-#start-gate{background:#000 var(--gate-photo,none) center/cover no-repeat;}
+#start-gate{background:#000 url('../img/scenes/aurora.jpg') center/cover no-repeat;}
 #start-gate::after{background:radial-gradient(ellipse at 50% 50%,rgba(0,0,0,.45) 0%,rgba(0,0,0,.72) 55%,#000 100%);}
 #sg-top,#sg-bottom{font-size:clamp(.5rem,1.3vw,.62rem);color:rgba(255,90,90,.55);}
 #sg-eyebrow{font-size:clamp(.55rem,1.5vw,.72rem);color:rgba(255,90,90,.75);}
@@ -1201,3 +1201,6 @@ body.reduced-fx #scene-title::before,body.reduced-fx #scene-title::after{display
 #credits-list li{display:flex;flex-wrap:wrap;justify-content:space-between;gap:.2rem 1rem;font-family:'Share Tech Mono',monospace;font-size:.68rem;color:var(--ink);border-bottom:1px solid rgba(255,255,255,.06);padding-bottom:.4rem;}
 #credits-list .cr-who{color:var(--muted);}
 #credits-list a{color:var(--amber);}
+
+/* very dark photos get less darkening so they still read */
+.scene-hero .img-wrap img.lift{filter:grayscale(.15) saturate(.85) contrast(1.06) brightness(1.12);}

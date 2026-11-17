@@ -1,149 +1,63 @@
 'use strict';
-// Scene photos: file + credit. Scenes refer to these by name (img:'name').
+// Scene photos. Scenes refer to these by name (img:'name' in js/story.js).
+// Each photo is openly licensed; `by`, `license` and `url` are shown as the credit.
 
 const PHOTOS={
- "start": {
-  "src": "https://images.unsplash.com/photo-1531058020387-3be344556be6?auto=format&fit=crop&w=760&q=80"
- },
- "naboen": {
-  "src": "https://images.unsplash.com/photo-1586105251261-72a756497a11?auto=format&fit=crop&w=760&q=80"
- },
- "motorvei_start": {
-  "src": "https://images.unsplash.com/photo-1516414447565-b14be0adf13e?auto=format&fit=crop&w=760&q=80"
- },
- "veiskulder": {
-  "src": "https://images.unsplash.com/photo-1464464562-70c39f5e6d9c?auto=format&fit=crop&w=760&q=80"
- },
- "sorte_van": {
-  "src": "https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&w=760&q=80"
- },
- "inne_vanen": {
-  "src": "https://images.unsplash.com/photo-1504639725590-34d0984388bd?auto=format&fit=crop&w=760&q=80"
- },
- "vanen_dypere": {
-  "src": "https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?auto=format&fit=crop&w=760&q=80"
- },
- "etter_flukt": {
-  "src": "https://images.unsplash.com/photo-1568604934584-a43deba94eb8?auto=format&fit=crop&w=760&q=80"
- },
- "bensinstasjon_gjemt": {
-  "src": "https://images.unsplash.com/photo-1614064641938-3bbee52942c7?auto=format&fit=crop&w=760&q=80"
- },
- "bensinstasjon": {
-  "src": "https://images.unsplash.com/photo-1525103504173-8dc1582c7430?auto=format&fit=crop&w=760&q=80"
- },
- "hacking_start": {
-  "src": "https://images.unsplash.com/photo-1555952517-2e8e729e0b44?auto=format&fit=crop&w=760&q=80"
- },
- "presse_ring": {
-  "src": "https://images.unsplash.com/photo-1516455590571-18256e5bb9ff?auto=format&fit=crop&w=760&q=80"
- },
- "informant_møte": {
-  "src": "https://images.unsplash.com/photo-1573400582672-5e45cc01b1c3?auto=format&fit=crop&w=760&q=80"
- },
- "tbane_start": {
-  "src": "https://images.unsplash.com/photo-1454414604154-7c7e8cc3cbea?auto=format&fit=crop&w=760&q=80"
- },
- "politistasjon": {
-  "src": "https://images.unsplash.com/photo-1485575301924-6891ef935dcd?auto=format&fit=crop&w=760&q=80"
- },
- "undergrunn_møte": {
-  "src": "https://images.unsplash.com/photo-1585366119957-f61e898a89e1?auto=format&fit=crop&w=760&q=80"
- },
- "sykehuset": {
-  "src": "https://images.unsplash.com/photo-1538108149393-fbbd81895907?auto=format&fit=crop&w=760&q=80"
- },
- "militaerbase": {
-  "src": "https://images.unsplash.com/photo-1532153975070-2e9ab71f1b14?auto=format&fit=crop&w=760&q=80"
- },
- "base_intern": {
-  "src": "https://images.unsplash.com/photo-1558494949-ef010cbdcc31?auto=format&fit=crop&w=760&q=80"
- },
- "kontrollrom": {
-  "src": "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?auto=format&fit=crop&w=760&q=80"
- },
- "kontrollrom_eps": {
-  "src": "https://images.unsplash.com/photo-1558618047-3c8c76ca7d13?auto=format&fit=crop&w=760&q=80"
- },
- "kloakken": {
-  "src": "https://images.unsplash.com/photo-1544985361-b420d7a77043?auto=format&fit=crop&w=760&q=80"
- },
- "bunker_nod": {
-  "src": "https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?auto=format&fit=crop&w=760&q=80"
- },
- "havnen": {
-  "src": "https://images.unsplash.com/photo-1504512485720-7d83a16ee930?auto=format&fit=crop&w=760&q=80"
- },
- "havn_radio": {
-  "src": "https://images.unsplash.com/photo-1584824486509-112e4181ff6b?auto=format&fit=crop&w=760&q=80"
- },
- "ubaten": {
-  "src": "https://images.unsplash.com/photo-1516912481808-3406841bd33c?auto=format&fit=crop&w=760&q=80"
- },
- "skogens_inngang": {
-  "src": "https://images.unsplash.com/photo-1448375240586-882707db8855?auto=format&fit=crop&w=760&q=80"
- },
- "hytten": {
-  "src": "https://images.unsplash.com/photo-1518780664697-55e3ad937233?auto=format&fit=crop&w=760&q=80"
- },
- "radiomasten": {
-  "src": "https://images.unsplash.com/photo-1584984180436-b51f0f09b552?auto=format&fit=crop&w=760&q=80"
- },
- "nyhetshuset": {
-  "src": "https://images.unsplash.com/photo-1495020689067-958852a7765e?auto=format&fit=crop&w=760&q=80"
- },
- "sendestudio": {
-  "src": "https://images.unsplash.com/photo-1598899134739-24c46f58b8c0?auto=format&fit=crop&w=760&q=80"
- },
- "sendestudio_double": {
-  "src": "https://images.unsplash.com/photo-1561736778-92e52a7769ef?auto=format&fit=crop&w=760&q=80"
- },
- "server_uten_kort": {
-  "src": "https://images.unsplash.com/photo-1563986768711-b3bde3dc821e?auto=format&fit=crop&w=760&q=80"
- },
- "stromsentralen": {
-  "src": "https://images.unsplash.com/photo-1508739773434-c26b3d09e071?auto=format&fit=crop&w=760&q=80"
- },
- "checkpoint": {
-  "src": "https://images.unsplash.com/photo-1536440136628-849c177e76a1?auto=format&fit=crop&w=760&q=80"
- },
- "bunker_ankomst": {
-  "src": "https://images.unsplash.com/photo-1559348349-86f1f65817fe?auto=format&fit=crop&w=760&q=80"
- },
- "bunker_opprør": {
-  "src": "https://images.unsplash.com/photo-1568992688065-536aad8a12f6?auto=format&fit=crop&w=760&q=80"
- },
- "hemmelig_møte": {
-  "src": "https://images.unsplash.com/photo-1519389950473-47ba0277781c?auto=format&fit=crop&w=760&q=80"
- },
- "fyrtarnet": {
-  "src": "https://images.unsplash.com/photo-1505228395891-9a51e7e86bf6?auto=format&fit=crop&w=760&q=80"
- },
- "apoteket": {
-  "src": "https://images.unsplash.com/photo-1587854692152-cbe660dbde88?auto=format&fit=crop&w=760&q=80"
- },
- "ambassaden": {
-  "src": "https://images.unsplash.com/photo-1496442226666-8d4d0e62e6e9?auto=format&fit=crop&w=760&q=80"
- },
- "garasjen": {
-  "src": "https://images.unsplash.com/photo-1506521781263-d8422e82f27a?auto=format&fit=crop&w=760&q=80"
- },
- "trikken": {
-  "src": "https://images.unsplash.com/photo-1474487548417-781cb6d646df?auto=format&fit=crop&w=760&q=80"
- },
- "slutt_rad": {
-  "src": "https://images.unsplash.com/photo-1446776858070-70c3d5ed6758?auto=format&fit=crop&w=760&q=80"
- },
- "slutt1": {
-  "src": "https://images.unsplash.com/photo-1509391366360-2e959784a276?auto=format&fit=crop&w=760&q=80"
- },
- "slutt2": {
-  "src": "https://images.unsplash.com/photo-1501854140801-50d01698950b?auto=format&fit=crop&w=760&q=80"
- },
- "slutt3": {
-  "src": "https://images.unsplash.com/photo-1469474968028-56623f02e42e?auto=format&fit=crop&w=760&q=80"
- },
- "slutt_hemmelig": {
-  "src": "https://images.unsplash.com/photo-1462331940025-496dfbfc7564?auto=format&fit=crop&w=760&q=80"
- }
+  "start":{"src": "img/scenes/start.jpg", "alt": "Snødekt Oslo om natten under oransje himmel", "by": "PhotoHenning", "license": "CC BY 2.0", "url": "https://www.flickr.com/photos/31467556@N00/2371412238"},
+  "naboen":{"src": "img/scenes/naboen.jpg", "alt": "Boligblokk med opplyste vinduer om natten", "by": "kohlmann.sascha", "license": "CC BY-SA 2.0", "url": "https://www.flickr.com/photos/96323831@N06/11259357275"},
+  "motorvei_start":{"src": "img/scenes/motorvei_start.jpg", "alt": "Bilkø på motorveien", "by": "russellstreet", "license": "CC BY-SA 2.0", "url": "https://www.flickr.com/photos/27345927@N07/6810814107"},
+  "veiskulder":{"src": "img/scenes/veiskulder.jpg", "alt": "Mørk vei med gatelys og gjerder om natten", "by": "kishjar?", "license": "CC BY 2.0", "url": "https://www.flickr.com/photos/62146734@N08/43047314385"},
+  "sorte_van":{"src": "img/scenes/sorte_van.jpg", "alt": "Silhuetter av menn mot en opplyst vegg", "by": "josef.stuefer", "license": "CC BY 2.0", "url": "https://www.flickr.com/photos/20375052@N00/57293163"},
+  "inne_vanen":{"src": "img/scenes/inne_vanen.jpg", "alt": "Kontrollrom fullt av skjermer", "by": "DSmous", "license": "CC BY 2.0", "url": "https://www.flickr.com/photos/94436653@N00/275375865"},
+  "vanen_dypere":{"src": "img/scenes/vanen_dypere.jpg", "alt": "Silhuett foran dataskjermer i mørket", "by": "orsorama", "license": "CC BY 2.0", "url": "https://www.flickr.com/photos/97928958@N00/8707125232"},
+  "etter_flukt":{"src": "img/scenes/etter_flukt.jpg", "alt": "Bensinstasjon i skumringen", "by": "Tony Fischer Photography", "license": "CC BY 2.0", "url": "https://www.flickr.com/photos/22714323@N06/3446121378"},
+  "bensinstasjon_gjemt":{"src": "img/scenes/bensinstasjon_gjemt.jpg", "alt": "Forlatt rom fullt av gamle gassmasker", "by": "Wendelin Jacober", "license": "CC0", "url": "https://www.flickr.com/photos/91619724@N04/29831575903"},
+  "bensinstasjon":{"src": "img/scenes/bensinstasjon.jpg", "alt": "Forlatt bensinstasjon", "by": "Mark Spearman", "license": "CC BY 2.0", "url": "https://www.flickr.com/photos/44221039@N04/14516638688"},
+  "hacking_start":{"lift":true, "src": "img/scenes/hacking_start.jpg", "alt": "Ansikt lyst opp av en laptop i mørket", "by": "Johan.V.", "license": "CC BY 2.0", "url": "https://www.flickr.com/photos/26519208@N04/2498157861"},
+  "presse_ring":{"src": "img/scenes/presse_ring.jpg", "alt": "Person i en trang trappeoppgang", "by": "benjaflynn", "license": "CC BY 2.0", "url": "https://www.flickr.com/photos/8687249@N03/5736075306"},
+  "informant_møte":{"src": "img/scenes/informant_møte.jpg", "alt": "Mathallen på Vulkan om natten", "by": "Bex.Walton", "license": "CC BY 2.0", "url": "https://www.flickr.com/photos/7831824@N04/37057758546"},
+  "tbane_start":{"src": "img/scenes/tbane_start.jpg", "alt": "Tom underjordisk gang i Oslo", "by": "V31S70", "license": "CC BY 2.0", "url": "https://www.flickr.com/photos/54177777@N00/8159370972"},
+  "politistasjon":{"src": "img/scenes/politistasjon.jpg", "alt": "Forlatt stasjonsrom under bakken i Oslo", "by": "V31S70", "license": "CC BY 2.0", "url": "https://www.flickr.com/photos/54177777@N00/8159339985"},
+  "undergrunn_møte":{"src": "img/scenes/undergrunn_møte.jpg", "alt": "Tilfluktsrom-tunnel under bakken", "by": "baekken", "license": "CC BY 2.0", "url": "https://www.flickr.com/photos/28907073@N07/2914724535"},
+  "sykehuset":{"src": "img/scenes/sykehuset.jpg", "alt": "Mørk sykehuskorridor", "by": "Fake Truth", "license": "CC BY 2.0", "url": "https://www.flickr.com/photos/53309366@N06/6181304095"},
+  "militaerbase":{"src": "img/scenes/militaerbase.jpg", "alt": "Satellittkupler i snøen på Svalbard", "by": "Bernt Rostad", "license": "CC BY 2.0", "url": "https://www.flickr.com/photos/67975030@N00/16945182158"},
+  "base_intern":{"src": "img/scenes/base_intern.jpg", "alt": "Røde nettverkskabler i et rack", "by": "twicepix", "license": "CC BY-SA 2.0", "url": "https://www.flickr.com/photos/30713600@N00/4333178624"},
+  "kontrollrom":{"src": "img/scenes/kontrollrom.jpg", "alt": "Operasjonssentral med skjermer", "by": "NASA Goddard Space Flight Center", "license": "CC BY 2.0", "url": "https://www.flickr.com/photos/35278629@N08/9556810894"},
+  "kontrollrom_eps":{"src": "img/scenes/kontrollrom_eps.jpg", "alt": "Lynnedslag", "by": "Axel Rouvin", "license": "CC BY 2.0", "url": "https://www.flickr.com/photos/39404234@N00/79050918"},
+  "kloakken":{"src": "img/scenes/kloakken.jpg", "alt": "Våt, mørk betongtunnel", "by": "intrepidexplorer82", "license": "CC BY 2.0", "url": "https://www.flickr.com/photos/147447263@N02/52237728649"},
+  "bunker_nod":{"src": "img/scenes/bunker_nod.jpg", "alt": "Tunnel med tung bunkerdør", "by": "Kecko", "license": "CC BY 2.0", "url": "https://www.flickr.com/photos/70981241@N00/9264256748"},
+  "havnen":{"src": "img/scenes/havnen.jpg", "alt": "Oslo havn i skumringen", "by": "Bochum1805", "license": "CC BY-SA 2.0", "url": "https://www.flickr.com/photos/63457884@N04/6393758137"},
+  "havn_radio":{"src": "img/scenes/havn_radio.jpg", "alt": "Rådhusbrygga om natten", "by": "braerik", "license": "CC BY-SA 2.0", "url": "https://www.flickr.com/photos/65275150@N08/25022507611"},
+  "ubaten":{"src": "img/scenes/ubaten.jpg", "alt": "Norsk ubåt i grov sjø", "by": "Redningsselskapet", "license": "CC BY 2.0", "url": "https://www.flickr.com/photos/73730267@N06/7446941478"},
+  "ubat_sender":{"src": "img/scenes/ubat_sender.jpg", "alt": "Inne i en ubåt, rødt lys", "by": "JC Merriman", "license": "CC BY-SA 2.0", "url": "https://www.flickr.com/photos/8822983@N08/6698466737"},
+  "skogens_inngang":{"src": "img/scenes/skogens_inngang.jpg", "alt": "Frostdekket granskog", "by": "Øyvind Holmstad", "license": "CC BY-SA 2.0", "url": "https://www.flickr.com/photos/78304219@N06/52703454843"},
+  "hytten":{"src": "img/scenes/hytten.jpg", "alt": "Gammel hytte i skogen", "by": "aasenhistorie.no", "license": "CC BY 2.0", "url": "https://www.flickr.com/photos/93220794@N03/14276565134"},
+  "radiomasten":{"lift":true, "src": "img/scenes/radiomasten.jpg", "alt": "Master og ledninger i silhuett mot rødlig himmel", "by": "jssz", "license": "CC BY-SA 2.0", "url": "https://www.flickr.com/photos/54533793@N05/6865168239"},
+  "radiomasten_hard":{"src": "img/scenes/radiomasten_hard.jpg", "alt": "Rom fullt av militært radioutstyr", "by": "Elsie esq.", "license": "CC BY 2.0", "url": "https://www.flickr.com/photos/61132483@N00/2583596998"},
+  "nyhetshuset":{"src": "img/scenes/nyhetshuset.jpg", "alt": "Stor nyhetsredaksjon", "by": "antony_mayfield", "license": "CC BY 2.0", "url": "https://www.flickr.com/photos/31433424@N00/486348761"},
+  "sendestudio":{"src": "img/scenes/sendestudio.jpg", "alt": "TV-nyhetsstudio", "by": "caribb", "license": "CC BY-SA 2.0", "url": "https://www.flickr.com/photos/87857621@N00/2045073038"},
+  "sendestudio_double":{"src": "img/scenes/sendestudio_double.jpg", "alt": "TV-kontrollrom med skjermvegg", "by": "roland", "license": "CC0", "url": "https://www.flickr.com/photos/35034347371@N01/110120144"},
+  "serverrommet":{"src": "img/scenes/serverrommet.jpg", "alt": "Lang gang mellom serverrack", "by": "torkildr", "license": "CC BY-SA 2.0", "url": "https://www.flickr.com/photos/8718930@N07/3462606643"},
+  "server_uten_kort":{"src": "img/scenes/server_uten_kort.jpg", "alt": "Serverrack med blinkende lys i mørket", "by": "kewl", "license": "CC BY 2.0", "url": "https://www.flickr.com/photos/58411470@N00/8475764430"},
+  "stromsentralen":{"src": "img/scenes/stromsentralen.jpg", "alt": "Transformatorstasjon om natten", "by": "Ausgrid photos", "license": "CC BY 2.0", "url": "https://www.flickr.com/photos/93546667@N04/9677084284"},
+  "stromsentralen_eps":{"lift":true, "src": "img/scenes/stromsentralen_eps.jpg", "alt": "Lyn over en by om natten", "by": "Tree Leaf Clover", "license": "CC BY 2.0", "url": "https://www.flickr.com/photos/50744999@N02/7180173163"},
+  "checkpoint":{"src": "img/scenes/checkpoint.jpg", "alt": "Kontrollpost i flomlys om natten", "by": "dichohecho", "license": "CC BY 2.0", "url": "https://www.flickr.com/photos/8978957@N07/2821732813"},
+  "checkpoint_passert":{"lift":true, "src": "img/scenes/checkpoint_passert.jpg", "alt": "Bil med lysene på i mørket", "by": "L.C.Nøttaasen", "license": "CC BY 2.0", "url": "https://www.flickr.com/photos/35166455@N00/4644247888"},
+  "bunker_ankomst":{"src": "img/scenes/bunker_ankomst.jpg", "alt": "Gaustatoppen", "by": "Norges vassdrags- og energidirektorat", "license": "CC BY-SA 2.0", "url": "https://www.flickr.com/photos/44301712@N02/21810404605"},
+  "bunker_innsiden":{"src": "img/scenes/bunker_innsiden.jpg", "alt": "Korridor i en hemmelig bunker", "by": "Cargo Cult", "license": "CC BY 2.0", "url": "https://www.flickr.com/photos/27119837@N06/6919820533"},
+  "bunker_opprør":{"src": "img/scenes/bunker_opprør.jpg", "alt": "Lang betongtunnel", "by": "darkday.", "license": "CC BY 2.0", "url": "https://www.flickr.com/photos/99649389@N02/13778124214"},
+  "hemmelig_møte":{"src": "img/scenes/hemmelig_møte.jpg", "alt": "Mørk bar med levende lys", "by": "pavlinajane", "license": "CC BY-SA 2.0", "url": "https://www.flickr.com/photos/60291025@N05/11038847483"},
+  "fyrtarnet":{"src": "img/scenes/fyrtarnet.jpg", "alt": "Kanon på Oscarsborg festning", "by": "Quistnix!", "license": "CC BY-SA 2.0", "url": "https://www.flickr.com/photos/33932522@N07/4738470638"},
+  "tunnelens_dyp":{"src": "img/scenes/tunnelens_dyp.jpg", "alt": "Spøkelsesstasjon med tog i fart", "by": "Matthias Rhomberg", "license": "CC BY 2.0", "url": "https://www.flickr.com/photos/33772123@N03/4905262313"},
+  "apoteket":{"src": "img/scenes/apoteket.jpg", "alt": "Gamle apotekhyller", "by": "berniedup", "license": "CC BY-SA 2.0", "url": "https://www.flickr.com/photos/65695019@N07/32190639097"},
+  "ambassaden":{"src": "img/scenes/ambassaden.jpg", "alt": "Bygning i Bygdøy allé", "by": "Kjetil Ree", "license": "CC BY-SA 3.0", "url": "https://commons.wikimedia.org/w/index.php?curid=6999835"},
+  "garasjen":{"src": "img/scenes/garasjen.jpg", "alt": "Underjordisk parkeringshus", "by": "*_*", "license": "CC BY 2.0", "url": "https://www.flickr.com/photos/22539273@N00/50570805182"},
+  "trikken":{"src": "img/scenes/trikken.jpg", "alt": "Trikk ved Nationaltheatret", "by": "Bahnfrend", "license": "CC BY-SA 4.0", "url": "https://commons.wikimedia.org/w/index.php?curid=89658666"},
+  "trikken_hvil":{"src": "img/scenes/trikken_hvil.jpg", "alt": "Tom, gammel trikk", "by": "Newcastle Libraries", "license": "Public domain", "url": "https://www.flickr.com/photos/39821974@N06/4080726613"},
+  "slutt_rad":{"src": "img/scenes/slutt_rad.jpg", "alt": "Nordlys over snødekte fjell", "by": "Lenny K Photography", "license": "CC BY 2.0", "url": "https://www.flickr.com/photos/57527070@N06/24641937989"},
+  "slutt1":{"lift":true, "src": "img/scenes/slutt1.jpg", "alt": "Mørk fengselscelle med et lite vindu", "by": "decade_null", "license": "CC BY 2.0", "url": "https://www.flickr.com/photos/39952962@N00/1397903264"},
+  "slutt2":{"src": "img/scenes/slutt2.jpg", "alt": "Soloppgang over Oslofjorden", "by": "jimg944", "license": "CC BY 2.0", "url": "https://www.flickr.com/photos/21203533@N00/303813612"},
+  "slutt3":{"src": "img/scenes/slutt3.jpg", "alt": "Soloppgang over en norsk fjord", "by": "Øyvind Holmstad", "license": "CC BY-SA 2.0", "url": "https://www.flickr.com/photos/78304219@N06/52960812385"},
+  "slutt_hemmelig":{"src": "img/scenes/slutt_hemmelig.jpg", "alt": "Radioteleskop om natten", "by": "jiuguangw", "license": "CC BY-SA 2.0", "url": "https://www.flickr.com/photos/32366606@N00/8129557462"},
+  "aurora":{"src": "img/scenes/aurora.jpg", "alt": "Nordlys over Malangen", "by": "Alfred Weidinger", "license": "CC BY 2.0", "url": "https://www.flickr.com/photos/28523661@N07/23404843863"},
 };
