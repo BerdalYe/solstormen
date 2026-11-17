@@ -4,6 +4,12 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>SOLSTORMEN — KLASSIFISERT</title>
+<meta name="description" content="Solstormen — en interaktiv norsk thriller. 24 timer til nedslag. Alle valg har konsekvenser. Fem slutter, én er hemmelig.">
+<meta name="theme-color" content="#040608">
+<meta property="og:title" content="SOLSTORMEN">
+<meta property="og:description" content="Interaktiv norsk thriller. 24 timer til nedslag. Fem slutter — én er hemmelig.">
+<meta property="og:type" content="website">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%23040608'/%3E%3Ccircle cx='16' cy='16' r='7' fill='%23ff1a1a'/%3E%3Cg stroke='%23ff5500' stroke-width='2' stroke-linecap='round'%3E%3Cpath d='M16 2v5M16 25v5M2 16h5M25 16h5M6 6l3.5 3.5M22.5 22.5L26 26M26 6l-3.5 3.5M9.5 22.5L6 26'/%3E%3C/g%3E%3C/svg%3E">
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Share+Tech+Mono&family=Crimson+Pro:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
 <style>
 :root{
@@ -126,8 +132,9 @@ body{background:var(--bg);color:var(--text);font-family:'Crimson Pro',Georgia,se
 @keyframes plBlink{0%,100%{opacity:.4}48%{opacity:.9}52%{opacity:.2}}
 #prelude-logo{
   font-family:'Bebas Neue',sans-serif;
-  font-size:clamp(4rem,16vw,10rem);
-  color:#fff;letter-spacing:12px;line-height:1;
+  font-size:clamp(3rem,14vw,10rem);
+  color:#fff;letter-spacing:clamp(4px,1.4vw,12px);line-height:1;
+  max-width:100%;text-align:center;
   opacity:0;transition:opacity .2s;
   text-shadow:0 0 120px rgba(255,26,26,.22),0 0 40px rgba(255,26,26,.08);
   position:relative;z-index:2;
@@ -417,6 +424,11 @@ body.cd-s4 #danger-bar{animation:dangerShimmer .9s linear infinite;}
   overflow:hidden;border-radius:3px;
   border:1px solid rgba(255,26,26,.12);
   box-shadow:0 8px 32px rgba(0,0,0,.6);
+  /* shown if the photo fails to load */
+  background:
+    radial-gradient(ellipse 70% 90% at 50% 120%,rgba(255,85,0,.45),rgba(255,26,26,.12) 45%,transparent 70%),
+    repeating-linear-gradient(0deg,rgba(255,26,26,.05) 0 2px,transparent 2px 4px),
+    #07090c;
 }
 .img-wrap::before{
   content:'';position:absolute;inset:0;
@@ -479,6 +491,7 @@ body.cd-s4 #danger-bar{animation:dangerShimmer .9s linear infinite;}
 
 /* ── CHOICES ── */
 #choices{display:flex;flex-direction:column;gap:.7rem;}
+#choices.waiting{pointer-events:none;}
 .choice-btn{
   background:rgba(10,13,17,.4);
   border:1px solid rgba(255,26,26,.2);
@@ -864,6 +877,67 @@ body.scan-flicker{animation:scanFlicker .18s step-end;}
   .restart-btn:active { background: rgba(255,26,26,.07); }
 }
 
+/* ── KEYBOARD FOCUS ── */
+.choice-btn:focus-visible,.restart-btn:focus-visible,.hud-btn:focus-visible,.sg-btn:focus-visible,
+#pre-skip:focus-visible,#boot-skip:focus-visible{outline:2px solid var(--amber);outline-offset:2px;}
+
+/* ── HUD CONTROLS (sound / effects) ── */
+#hud-controls{display:flex;gap:.35rem;margin-top:.1rem;}
+.hud-btn{
+  font-family:'Share Tech Mono',monospace;font-size:.5rem;letter-spacing:1.5px;
+  color:rgba(255,255,255,.45);background:rgba(255,255,255,.03);
+  border:1px solid rgba(255,255,255,.12);border-radius:2px;
+  padding:.18rem .4rem;cursor:pointer;transition:color .15s,border-color .15s;
+  white-space:nowrap;
+}
+@media (max-width:480px){
+  #hud-controls{gap:.25rem;}
+  .hud-btn{font-size:.42rem;letter-spacing:1px;padding:.14rem .28rem;}
+}
+.hud-btn:hover{color:#fff;border-color:rgba(255,26,26,.5);}
+.hud-btn.off{color:rgba(255,190,0,.75);border-color:rgba(255,190,0,.3);}
+
+/* ── START GATE EXTRAS ── */
+#sg-extra{display:flex;flex-direction:column;align-items:center;gap:.8rem;margin-top:.4rem;max-width:min(92vw,520px);}
+.sg-row{display:flex;gap:.6rem;flex-wrap:wrap;justify-content:center;}
+.sg-btn{
+  font-family:'Share Tech Mono',monospace;font-size:clamp(.55rem,1.6vw,.68rem);letter-spacing:3px;
+  color:rgba(255,255,255,.7);background:rgba(255,26,26,.06);
+  border:1px solid rgba(255,26,26,.35);border-radius:2px;padding:.55rem .9rem;cursor:pointer;
+  transition:background .15s,color .15s,border-color .15s;
+}
+.sg-btn:hover{background:rgba(255,26,26,.16);color:#fff;border-color:var(--red);}
+.sg-btn.primary{color:#fff;border-color:var(--amber);background:rgba(255,190,0,.08);}
+.sg-btn.primary:hover{background:rgba(255,190,0,.18);}
+.sg-btn.small{font-size:clamp(.5rem,1.4vw,.6rem);letter-spacing:2px;padding:.4rem .7rem;color:rgba(255,255,255,.5);border-color:rgba(255,255,255,.15);background:transparent;}
+.sg-btn.small.off{color:rgba(255,190,0,.85);border-color:rgba(255,190,0,.35);}
+#sg-warning{
+  font-family:'Share Tech Mono',monospace;font-size:clamp(.5rem,1.4vw,.6rem);letter-spacing:1.5px;line-height:1.7;
+  color:rgba(255,190,0,.6);text-align:center;
+}
+
+/* ── ENDINGS FOUND ── */
+.endings-found{margin:1.1rem auto 0;max-width:420px;font-family:'Share Tech Mono',monospace;}
+.endings-found-label{font-size:.62rem;letter-spacing:4px;color:rgba(255,255,255,.4);margin-bottom:.5rem;}
+.endings-found ul{list-style:none;display:flex;flex-direction:column;gap:.25rem;}
+.endings-found li{font-size:.62rem;letter-spacing:2px;color:rgba(255,255,255,.18);}
+.endings-found li.got{color:rgba(255,255,255,.7);}
+.endings-found li.now{color:var(--amber);}
+
+/* ── CALMER EFFECTS (for light-sensitive players) ── */
+body.reduced-fx .img-glitch,
+body.reduced-fx #scene-title::before,body.reduced-fx #scene-title::after,
+body.reduced-fx #game-wrap.hb-fast,
+body.reduced-fx #phone.vibrate,
+body.reduced-fx .ending-title,
+body.reduced-fx #threat-dot.krit,body.reduced-fx #threat-level.krit,
+body.reduced-fx #cd.s4,body.reduced-fx #cd-wrap.s4 #cd-label,
+body.reduced-fx #prelude-top-txt,body.reduced-fx .prelude-top-icon,
+body.reduced-fx #vignette-pulse{animation:none !important;}
+body.reduced-fx #lightning-canvas{display:none;}
+@media (prefers-reduced-motion: reduce){
+  #crt::before{animation:none;}
+}
 </style>
 </head>
 <body>
@@ -930,7 +1004,7 @@ body.scan-flicker{animation:scanFlicker .18s step-end;}
 <div id="toast"></div>
 
 <!-- CLICK TO START -->
-<div id="start-gate" onclick="beginExperience()">
+<div id="start-gate" onclick="beginExperience()" role="button" tabindex="0" aria-label="Start Solstormen">
   <style>
     #start-gate{
       position:fixed;inset:0;z-index:999999;background:#000;
@@ -984,8 +1058,9 @@ body.scan-flicker{animation:scanFlicker .18s step-end;}
     @keyframes sgEyeB{0%,100%{opacity:.4}50%{opacity:.75}}
     #sg-title{
       font-family:'Bebas Neue',sans-serif;
-      font-size:clamp(4.5rem,18vw,12rem);
-      color:#fff;letter-spacing:14px;line-height:.95;
+      font-size:clamp(3rem,15vw,12rem);
+      color:#fff;letter-spacing:clamp(4px,1.6vw,14px);line-height:.95;
+      max-width:100%;text-align:center;
       text-shadow:0 0 120px rgba(255,26,26,.18),0 0 60px rgba(255,26,26,.08);
       animation:sgTitle 4s ease-in-out infinite;
     }
@@ -1042,8 +1117,19 @@ body.scan-flicker{animation:scanFlicker .18s step-end;}
     <div id="sg-cta">▶ &nbsp; KLIKK FOR Å STARTE &nbsp; ◀</div>
     <div id="sg-status">
       <div class="sg-stat"><div class="sg-dot"></div>SIGNAL AKTIVT</div>
-      <div class="sg-stat"><div class="sg-dot"></div>5 SLUTTER</div>
+      <div class="sg-stat"><div class="sg-dot"></div><span id="sg-endings">5 SLUTTER</span></div>
       <div class="sg-stat"><div class="sg-dot"></div>LYD ANBEFALT</div>
+    </div>
+    <div id="sg-extra" onclick="event.stopPropagation()">
+      <div class="sg-row" id="sg-continue-row" style="display:none;">
+        <button class="sg-btn primary" id="sg-continue" type="button" onclick="resumeGame()">▶ FORTSETT</button>
+        <button class="sg-btn" type="button" onclick="beginExperience()">NYTT SPILL</button>
+      </div>
+      <div id="sg-warning">⚠ INNEHOLDER KRAFTIGE BLINK OG FLIMMER.<br>ER DU LYSØMFINTLIG, SLÅ PÅ ROLIGE EFFEKTER.</div>
+      <div class="sg-row">
+        <button class="sg-btn small" id="sg-fx" type="button" onclick="toggleFX()">EFFEKTER: FULLE</button>
+        <button class="sg-btn small" id="sg-sound" type="button" onclick="toggleMute()">LYD: PÅ</button>
+      </div>
     </div>
   </div>
   <div id="sg-bottom">
@@ -1147,6 +1233,10 @@ body.scan-flicker{animation:scanFlicker .18s step-end;}
           <div id="alert-dot"></div>
           <span id="hud-status">NØDVARSEL AKTIV</span>
         </div>
+        <div id="hud-controls">
+          <button class="hud-btn" id="btn-sound" type="button" onclick="toggleMute()" title="Lyd av/på (M)">LYD PÅ</button>
+          <button class="hud-btn" id="btn-fx" type="button" onclick="toggleFX()" title="Rolige effekter: færre blink og rystelser">FX FULLE</button>
+        </div>
       </div>
     </div>
 
@@ -1198,6 +1288,37 @@ body.scan-flicker{animation:scanFlicker .18s step-end;}
 <script>
 'use strict';
 // ══════════════════════════════════════════════════
+//  SETTINGS + SAVE DATA (stored in this browser only)
+// ══════════════════════════════════════════════════
+const SAVE_KEY='solstormen.save.v1', ENDINGS_KEY='solstormen.endings.v1', PREFS_KEY='solstormen.prefs.v1';
+const ENDING_ORDER=['slutt1','slutt2','slutt3','slutt_rad','slutt_hemmelig'];
+function lsGet(k,fallback){ try{ const v=localStorage.getItem(k); return v?JSON.parse(v):fallback; }catch(e){ return fallback; } }
+function lsSet(k,v){ try{ localStorage.setItem(k,JSON.stringify(v)); }catch(e){} }
+function lsDel(k){ try{ localStorage.removeItem(k); }catch(e){} }
+let systemReduced=false;
+try{ systemReduced=window.matchMedia('(prefers-reduced-motion: reduce)').matches; }catch(e){}
+const prefs=Object.assign({reducedFX:systemReduced,muted:false},lsGet(PREFS_KEY,{}));
+function fxOff(){ return prefs.reducedFX; }
+function refreshSettingsUI(){
+  document.body.classList.toggle('reduced-fx',prefs.reducedFX);
+  const set=(id,txt,off)=>{ const el=document.getElementById(id); if(el){ el.textContent=txt; el.classList.toggle('off',off); } };
+  set('btn-sound',prefs.muted?'LYD AV':'LYD PÅ',prefs.muted);
+  set('sg-sound',prefs.muted?'LYD: AV':'LYD: PÅ',prefs.muted);
+  set('btn-fx',prefs.reducedFX?'FX ROLIGE':'FX FULLE',prefs.reducedFX);
+  set('sg-fx',prefs.reducedFX?'EFFEKTER: ROLIGE':'EFFEKTER: FULLE',prefs.reducedFX);
+}
+function toggleMute(){
+  prefs.muted=!prefs.muted; lsSet(PREFS_KEY,prefs);
+  applyVolume(); refreshSettingsUI();
+}
+function toggleFX(){
+  prefs.reducedFX=!prefs.reducedFX; lsSet(PREFS_KEY,prefs);
+  refreshSettingsUI();
+}
+function applyVolume(){
+  if(masterGain&&audioCtx) masterGain.gain.setTargetAtTime(prefs.muted?0:0.26,audioCtx.currentTime,0.05);
+}
+// ══════════════════════════════════════════════════
 //  AUDIO ENGINE
 // ══════════════════════════════════════════════════
 let audioCtx=null, masterGain=null;
@@ -1209,7 +1330,7 @@ function initAudio(){
   }
   try{
     audioCtx=new(window.AudioContext||window.webkitAudioContext)();
-    masterGain=audioCtx.createGain(); masterGain.gain.value=0.26;
+    masterGain=audioCtx.createGain(); masterGain.gain.value=prefs.muted?0:0.26;
     masterGain.connect(audioCtx.destination);
     // Resume async — start drone once context is actually running
     const go=()=>{ if(!droneStarted) startDrone(); };
@@ -1580,7 +1701,8 @@ function updateCD(){
   if(cdSecs<600 && cdSecs>0) playSecondTick();
   else if(cdSecs<3600 && cdSecs%60===0) playSecondTick(true);
 
-  // Milestone events — fire once each
+  // Milestone events — fire once each (not at 00:00, which is an ending screen)
+  if(cdSecs>0){
   if(cdSecs<36000&&!cdMilestones.has(36000)){
     cdMilestones.add(36000); playCountdownMilestone('amber');
   }
@@ -1593,11 +1715,12 @@ function updateCD(){
     doFlash('#ff0000','.35'); doScanBar();
     showToast('☠ UNDER 10 MINUTTER IGJEN','warn');
   }
+  }
 
   // Heartbeat mode management
   document.getElementById('game-wrap').classList.remove('hb-fast');
-  if(cdSecs<600) document.getElementById('game-wrap').classList.add('hb-fast');
-  const newMode=cdSecs<600?2:cdSecs<3600?1:0;
+  if(cdSecs<600&&cdSecs>0) document.getElementById('game-wrap').classList.add('hb-fast');
+  const newMode=cdSecs===0?0:cdSecs<600?2:cdSecs<3600?1:0;
   if(newMode!==heartbeatMode){
     heartbeatMode=newMode;
     if(newMode===0) stopHeartbeat();
@@ -1640,8 +1763,20 @@ function applyStat(k,d,label){
   // Update threat level HUD
   updateThreatLevel();
 
-  // RADIATION DEATH
-  if(k==='rad'&&state.rad>=100) setTimeout(()=>render('slutt_rad'),400);
+  // RADIATION DEATH — the antidote (serum) saves you once
+  if(k==='rad'&&state.rad>=100&&!state.dying){
+    if(has('serum')){
+      removeItem('serum');
+      state.rad=70;
+      if(bar) bar.style.width='70%';
+      if(val) val.textContent='70';
+      radBar.style.width='70%';
+      updateRadAmbience(); updateThreatLevel();
+      setTimeout(()=>showToast('💉 MOTGIFT BRUKT — STRÅLING SENKET TIL 70','good'),600);
+    } else {
+      state.dying=true;
+    }
+  }
 }
 function applyStats(obj){
   if(!obj) return;
@@ -1665,12 +1800,24 @@ function addItem(id){
   if(state.inventory.includes(id)) return;
   state.inventory.push(id);
   const bar=document.getElementById('inv-bar');
-  const el=document.createElement('div'); el.className='inv-item';
+  const el=document.createElement('div'); el.className='inv-item'; el.dataset.id=id;
   el.textContent=ITEMS[id]?.label||id; bar.appendChild(el);
   showToast('FANT: '+(ITEMS[id]?.label||id),'item');
   playItemGet();
 }
 function has(id){return state.inventory.includes(id);}
+function removeItem(id){
+  state.inventory=state.inventory.filter(x=>x!==id);
+  const el=document.querySelector(`#inv-bar .inv-item[data-id="${id}"]`);
+  if(el) el.remove();
+}
+function drawInventory(){
+  const bar=document.getElementById('inv-bar'); bar.innerHTML='';
+  state.inventory.forEach(id=>{
+    const el=document.createElement('div'); el.className='inv-item'; el.dataset.id=id;
+    el.textContent=ITEMS[id]?.label||id; bar.appendChild(el);
+  });
+}
 
 // ══════════════════════════════════════════════════
 //  TOAST
@@ -1687,6 +1834,9 @@ function showToast(msg,type='info'){
 // ══════════════════════════════════════════════════
 function updatePath(id){
   state.path.push(id);
+  drawPath();
+}
+function drawPath(){
   const wrap=document.getElementById('path-nodes');
   wrap.innerHTML=state.path.map((p,i)=>{
     const lbl=STORY[p]?.shortName||p;
@@ -1699,12 +1849,14 @@ function updatePath(id){
 //  SCREEN FX
 // ══════════════════════════════════════════════════
 function doShake(){
+  if(fxOff()) return;
   const w=document.getElementById('game-wrap');
   if(!w) return;
   w.classList.remove('shake'); void w.offsetWidth; w.classList.add('shake');
   setTimeout(()=>w.classList.remove('shake'),520);
 }
 function doFlash(color='#ff1a1a',strength='.4'){
+  if(fxOff()) return;
   const f=document.getElementById('flash');
   if(!f) return;
   f.style.background=color; f.style.opacity=strength;
@@ -1713,6 +1865,7 @@ function doFlash(color='#ff1a1a',strength='.4'){
 function doEmp(){
   const e=document.getElementById('emp-flash');
   if(!e) return;
+  if(fxOff()){ playEmp(); return; }
   e.style.opacity='.75'; playEmp();
   doShake(); doScreenTear(3);
   setTimeout(()=>{e.style.transition='opacity .7s';e.style.opacity='0';setTimeout(()=>e.style.transition='',750);},55);
@@ -1721,6 +1874,7 @@ function doGlitch(){
   const gr=document.getElementById('glitch-r'), gb=document.getElementById('glitch-b');
   if(!gr||!gb) return;
   playGlitch();
+  if(fxOff()) return;
   // Frame 1 — full split
   const rx=(Math.random()-.5)*22, bx=(Math.random()-.5)*18;
   const ry=(Math.random()-.5)*3;
@@ -1748,6 +1902,7 @@ function doGlitch(){
   },105);
 }
 function doShockwave(){
+  if(fxOff()) return;
   const s=document.getElementById('shockwave');
   if(!s)return;
   s.style.transition='none'; s.style.transform='scale(0)';
@@ -1765,6 +1920,7 @@ function doVignette(){
 function doLightning(){
   const lc=document.getElementById('lightning-canvas');
   if(!lc)return;
+  if(fxOff()){ setTimeout(playThunder,600+Math.random()*2200); return; }
   lc.width=window.innerWidth; lc.height=window.innerHeight;
   const ctx=lc.getContext('2d');
   lc.style.opacity='1';
@@ -1798,6 +1954,7 @@ function doLightning(){
 
 // ── SCREEN TEAR: horisontale svarte striper ──────────
 function doScreenTear(n=4){
+  if(fxOff()) return;
   for(let i=0;i<n;i++){
     const el=document.createElement('div');
     const y=5+Math.random()*90;
@@ -1934,10 +2091,12 @@ function setupKeyboard(choices){
   kbChoices=choices;
 }
 document.addEventListener('keydown', e=>{
-  const n=parseInt(e.key)-1;
+  if(e.ctrlKey||e.metaKey||e.altKey) return;
+  if(e.key==='m'||e.key==='M'){ toggleMute(); return; }
+  const n=parseInt(e.key,10)-1;
   if(isNaN(n)||n<0||n>=kbChoices.length) return;
   const btn=kbChoices[n];
-  if(!btn||btn.classList.contains('locked')) return;
+  if(!btn||!btn.isConnected||btn.classList.contains('locked')) return;
   // visual feedback
   btn.classList.add('kb-active');
   setTimeout(()=>btn.classList.remove('kb-active'), 200);
@@ -1947,6 +2106,7 @@ document.addEventListener('keydown', e=>{
 
 // ── WHITEOUT: vedvarende hvit blending ──────────────
 function doWhiteout(holdMs=120,fadeMs=350){
+  if(fxOff()) return;
   const el=document.getElementById('whiteout');
   if(!el) return;
   el.style.transition='none'; el.style.opacity='1';
@@ -1958,12 +2118,14 @@ function doWhiteout(holdMs=120,fadeMs=350){
 
 // ── NEGATIVE: inverterer farger momentant ───────────
 function doNegative(dur=90){
+  if(fxOff()) return;
   document.body.classList.add('negative');
   setTimeout(()=>document.body.classList.remove('negative'), dur);
 }
 
 // ── CHROMATIC BLEED: RGB-kanal separasjon ───────────
 function doChromaticBleed(dur=140){
+  if(fxOff()) return;
   const el=document.getElementById('chromatic');
   if(!el) return;
   el.className=''; el.style.opacity='0.85';
@@ -1979,6 +2141,7 @@ function doChromaticBleed(dur=140){
 
 // ── ZOOM PULSE: kamera-sjokk zoom ───────────────────
 function doZoomPulse(){
+  if(fxOff()) return;
   document.body.classList.remove('zoom-pulse');
   void document.body.offsetWidth;
   document.body.classList.add('zoom-pulse');
@@ -1987,6 +2150,7 @@ function doZoomPulse(){
 
 // ── PIXEL BREAK: skjermen sprekker i piksler ────────
 function doPixelBreak(n=30){
+  if(fxOff()) return;
   const colors=['#ff1a1a','#ffffff','#ff8800','#ff0000','#000000'];
   for(let i=0;i<n;i++){
     const el=document.createElement('div');
@@ -2002,6 +2166,7 @@ function doPixelBreak(n=30){
 
 // ── SCAN FLICKER: rask opasitets-flimring ───────────
 function doScanFlicker(n=3){
+  if(fxOff()) return;
   let count=0;
   const pb=document.getElementById('pre-boot') || document.body;
   function flick(){
@@ -2015,6 +2180,7 @@ function doScanFlicker(n=3){
 
 // ── MEGA SHAKE: voldsomt 8-retnings rystelse ────────
 function doMegaShake(){
+  if(fxOff()) return;
   const el=document.getElementById('pre-boot')||document.getElementById('game-wrap');
   if(!el) return;
   el.classList.remove('pb-shake','mega-shake'); void el.offsetWidth;
@@ -2105,7 +2271,7 @@ function typewrite(container,html,speed,onDone){
 //  IMAGE HELPER
 // ══════════════════════════════════════════════════
 function I(url){
-  return`<img src="${url}" alt="" onerror="this.src='https://placehold.co/760x220/0a0d11/ff1a1a?text=◈'">`;
+  return`<img src="${url}" alt="" decoding="async" onerror="this.remove()">`;
 }
 
 // ══════════════════════════════════════════════════
@@ -2122,9 +2288,9 @@ const STORY={
     time:'23:59:59',rad:0,
     title:'SOLSTORMEN',isTitle:true,
     intercept:null,
-    text:`<p>Klokken er 02:17. Søvnen knekker som glass. Et skingrende nødvarsel fyller rommet med blodrod lys — telefonen, nattbordet, taket.</p>
+    text:`<p>Klokken er 02:17. Søvnen knekker som glass. Et skingrende nødvarsel fyller rommet med blodrødt lys — telefonen, nattbordet, taket.</p>
 <em>«KRISEVARSEL: Solstorm kategori X99 bekreftet av 14 internasjonale observatorier. Estimert treffpunkt: 24 timer. Dødelig strålingsdose garantert i åpent terreng. Fjellbunkeren ved Gaustablikk åpner umiddelbart. Kapasitet 50 000. Evakuer nå.»</em>
-<p>Utenfor vokter motorlyd til liv. En nabo skriker noe usammenhengende i trappeoppgangen. En lyskaster feier gjennom persiennene — ikke fra en tilfeldig bil, men fra noe som allerede ventet der nede.</p>
+<p>Utenfor våkner motorer til liv. En nabo skriker noe usammenhengende i trappeoppgangen. En lyskaster feier gjennom persiennene — ikke fra en tilfeldig bil, men fra noe som allerede ventet der nede.</p>
 <p>Én detalj slår deg: varselet kom tolv sekunder for tidlig. Klokken din hadde ikke rukket å vise 02:17 da lyden traff. <strong>Hva gjør du?</strong></p>`,
     stats:{frykt:{d:+22,label:'FRYKT'}},
     items:[],
@@ -2142,8 +2308,8 @@ const STORY={
     time:'23:30:00',rad:0,
     title:'NABOENS HEMMELIGHET',
     intercept:'AVLYTTET SMS — «De er på vei. Ikke åpne for noen. Stol ikke på varselet. — H»',
-    text:`<p>Han svarer på tredje ring. Stemmen er pressholdt og hviskende, som om han snakker med hånden over munnen. <em>«Ikke dra til bunkeren. Hør på meg. Gjør det ikke.»</em></p>
-<p>Du rekker ikke å spørre. Bak stemmen hans: tre kraftige slag mot en dør, rop på et fremmed språk — ikke norsk, ikke engelsk. Et kort, kvalt lyd. Deretter fullstendig stillhet.</p>
+    text:`<p>Han svarer på tredje ring. Stemmen er anspent og hviskende, som om han snakker med hånden over munnen. <em>«Ikke dra til bunkeren. Hør på meg. Gjør det ikke.»</em></p>
+<p>Du rekker ikke å spørre. Bak stemmen hans: tre kraftige slag mot en dør, rop på et fremmed språk — ikke norsk, ikke engelsk. En kort, kvalt lyd. Deretter fullstendig stillhet.</p>
 <em>Linjen blinker ut. Ingen opptattsignal, ingen tone. Bare ingenting.</em>
 <p>Gjennom veggen hører du ingenting fra leiligheten ved siden av — og naboen din er typen som alltid har TV på. Du har minutter på deg. Kanskje færre.</p>`,
     stats:{frykt:{d:+30,label:'FRYKT'},kunnskap:{d:+20,label:'KUNNSKAP'}},
@@ -2248,9 +2414,9 @@ const STORY={
     time:'13:30:00',rad:6,
     title:'FORLATT STASJON',
     text:`<p>Du slår skulderen mot asfalten og ruller tre meter inn i grøften. Vanen kjører rett forbi uten å bremse — de tror du er sikret inne, ikke ute. Du lar deg ligge et par sekunder og henter pust.</p>
-<p>Femti meter fremme: en forlatt bensinstasjon. Lyset over pumpen blinker ustabilt. En pickup med motoren i gang og dørene åpne — som om eieren løp fra den midt i en tankestøp.</p>
+<p>Femti meter fremme: en forlatt bensinstasjon. Lyset over pumpen blinker ustabilt. En pickup med motoren i gang og dørene åpne — som om eieren løp fra den midt i tankingen.</p>
 <em>Over en gammel utendørs høyttaler på taket: «…til alle frie journalister: vi sender bevis fra Prosjekt Solnedgang live til server 7. Koordinater: 59.9°N 10.7°Ø. Kom nå.»</em>
-<p>Koordinatene. Et kjent redaksjonsbygg i Oslosentrum. Sirener i det fjerne — og de nærmer seg.</p>`,
+<p>Koordinatene. Et kjent redaksjonsbygg i Oslo sentrum. Sirener i det fjerne — og de nærmer seg.</p>`,
     stats:{mot:{d:+12,label:'MOT'}},
     items:['adgangskort'],
     choices:[
@@ -2265,7 +2431,7 @@ const STORY={
     img:I('https://images.unsplash.com/photo-1614064641938-3bbee52942c7?auto=format&fit=crop&w=760&q=80'),
     time:'12:00:00',rad:4,
     title:'LAGERET',
-    text:`<p>I det bakre lageret finner du noe uventet: en åpen laptop koblet til et lokalt trådnett, og en eske med gasmasker stablet bak en vegg av tomme oljefat.</p>
+    text:`<p>I det bakre lageret finner du noe uventet: en åpen laptop koblet til et lokalt nettverk, og en eske med gasmasker stablet bak en vegg av tomme oljefat.</p>
 <em>Laptopen viser en åpen chatkanal: «Er noen der? Vi er fire i sykehuskjelleren. Har en forsker med oss som vet alt. Trenger hjelp til å sende signal.»</em>
 <p>Sykehuset er to kilometer nord. Du ser helikopterlys sirkulere over byens sentrum.</p>`,
     stats:{kunnskap:{d:+15,label:'KUNNSKAP'}},
@@ -2340,8 +2506,8 @@ const STORY={
     time:'17:00:00',rad:3,
     title:'SMUGET',
     intercept:'AVLYTTET: «Informantens posisjon bekreftet. Send team.»',
-    text:`<p>Et parkert smug ved nedre Grünerløkka. Mørkt og fuktig. En smal mann i hettegenser stopper deg med tre rappe bevegelser og presser noe hardt inn i hånden din.</p>
-<em>«Alt er her. Navn. Kontoer. Ordre. Det er nok til å stoppe alt — men bare om det når riktig kanal.» Han hvisker det som var den viktigste setningen han noen sinne har sagt.</em>
+    text:`<p>Et trangt smug ved nedre Grünerløkka. Mørkt og fuktig. En smal mann i hettegenser stopper deg med tre rappe bevegelser og presser noe hardt inn i hånden din.</p>
+<em>«Alt er her. Navn. Kontoer. Ordre. Det er nok til å stoppe alt — men bare om det når riktig kanal.» Han hvisker det som om det er den viktigste setningen han noen gang har sagt.</em>
 <p>Blendende hvite lys. Laserprikker danser over brystet hans. Over ditt. Uniformerte menn uten tegn eller ID.</p>
 <p>Han skriker: <strong>«LØØØP!»</strong></p>`,
     stats:{frykt:{d:+28,label:'FRYKT'},mot:{d:+18,label:'MOT'},kunnskap:{d:+22,label:'KUNNSKAP'}},
@@ -2350,6 +2516,7 @@ const STORY={
       {text:'Spurt mot nyhetsbygget. Bevisene må ut.',target:'nyhetshuset'},
       {text:'Ned i det nærmeste kumlokket. Kloakken.',target:'kloakken'},
       {text:'Informanten nevnte en forsker — sykehuset.',target:'sykehuset', requires:{statMin:{kunnskap:50}}},
+      {text:'«P4, garasjen ved Stortinget» — det siste han rakk å si. Løp dit.',target:'garasjen'},
     ]
   },
 
@@ -2364,11 +2531,11 @@ const STORY={
     intercept:null,
     text:`<p>Tunnelens mørke er ikke stillhet — det er en annen type kaos. Du hører løping, hulking og merkelig stillhet et sted langt bak deg. Ekkoer fra gammel betong.</p>
 <em>Langs nordveggen: en forlatt nødhjelps-koffert merket «SERUM TYPE B — STRÅLINGSVERN MIDLERTIDIG».</em>
-<p>En rød lyktelysstråle leter systematisk gjennom tunnelen tjue meter unna. Noen gjennomsøker dette nettet etasje for etasje. De er grundige.</p>`,
+<p>En rød lyktestråle leter systematisk gjennom tunnelen tjue meter unna. Noen gjennomsøker dette nettet etasje for etasje. De er grundige.</p>`,
     stats:{frykt:{d:+12,label:'FRYKT'},mot:{d:+6,label:'MOT'}},
     items:['serum'],
     choices:[
-      {text:'Gå mot lykten. Kanskje det er overlevere som skjuler seg her.',target:'undergrunn_møte'},
+      {text:'Gå mot lykten. Kanskje det er overlevende som skjuler seg her.',target:'undergrunn_møte'},
       {text:'Gjøm deg dypere. Kloakksjaktene.',target:'kloakken'},
       {text:'Du så en nødutgang mot nord. Ta med serumet og løp.',target:'skogens_inngang'},
       {text:'Det er en forlatt politistasjon på denne linjen. Gå dit.',target:'politistasjon', requires:{statMin:{mot:40}}},
@@ -2389,6 +2556,7 @@ const STORY={
     choices:[
       {text:'Bruk radionettet. Søk kontakt med andre frie enheter.',target:'undergrunn_møte'},
       {text:'Ta EMP-ladningen og nødpapirene. Gå til sykehuset.',target:'sykehuset'},
+      {text:'En sivil stemme bryter inn på politiradioen: «Nettverket samles i P4 ved Stortinget.» Gå dit.',target:'garasjen'},
     ]
   },
 
@@ -2397,9 +2565,9 @@ const STORY={
     img:I('https://images.unsplash.com/photo-1585366119957-f61e898a89e1?auto=format&fit=crop&w=760&q=80'),
     time:'19:00:00',rad:5,
     title:'MOTSTANDEN',
-    text:`<p>De er fem. En prosessoperatør fra Equinor med oljebeskittede hender. En tidligere PST-offiser med et kjeveparti som sier at han ikke har sovet på lenge. En sykepleier som fortsatt har hansker på. To studenter med laptoper som aldri slutter å prosessere data.</p>
+    text:`<p>De er fem. En prosessoperatør fra Equinor med oljetilsølte hender. En tidligere PST-offiser med et kjeveparti som sier at han ikke har sovet på lenge. En sykepleier som fortsatt har hansker på. To studenter med laptoper som aldri slutter å prosessere data.</p>
 <em>Offiseren snakker lavt og presist: «Bunkerdørene forsegles om under fire timer. Vi kan bevise alt — men ingen tror på beviser de ikke kan se med egne øyne. Vi trenger enten et kringkastingssignal, eller vi kutter strøm til låsesystemene og åpner dem på vid gaffel.»</em>
-<p>De ser på deg som om du er det siste brikken i et puslespill de har holdt på med hele natten. Klokken er 04:22.</p>`,
+<p>De ser på deg som om du er den siste brikken i et puslespill de har holdt på med hele natten. Klokken er 04:22.</p>`,
     stats:{mot:{d:+22,label:'MOT'},kunnskap:{d:+18,label:'KUNNSKAP'}},
     choices:[
       {text:'Ta ansvaret for strømsabotasjen. Gå til sentralen.',target:'stromsentralen'},
@@ -2418,8 +2586,8 @@ const STORY={
     time:'15:00:00',rad:4,
     title:'DET FORLATTE SYKEHUSET',
     intercept:'KRYPTERT SIGNAL OPPDAGET: «Dr. Elstad er i kjelleren. Frisk. Har alt vi trenger. Finn ham.»',
-    text:`<p>Nødlys i limegrønt. Tom akuttmottak. Rullestoler skudd til side. Et kateter som drypper i et rom ingen er i. Noe veldig voldsomt har skjedd her for en times tid siden.</p>
-<em>Fra kjellertrapps-retning: et svakt blått lys og lyden av en gammel skriver som printer uavbrutt.</em>
+    text:`<p>Nødlys i limegrønt. Tomt akuttmottak. Rullestoler skjøvet til side. Et kateter som drypper i et rom ingen er i. Noe veldig voldsomt har skjedd her for en times tid siden.</p>
+<em>Fra kjellertrappa: et svakt blått lys og lyden av en gammel skriver som printer uavbrutt.</em>
 <p>Dr. Elstad er 63 år, tidligere WHO-forsker og nå tilsynelatende den eneste personen på jorda som har vært klar over Prosjekt Solnedgang siden 2021. Han har en harddisk full av bevismateriale — og han vet nøyaktig hva som skal til for å stoppe det.</p>`,
     stats:{kunnskap:{d:+30,label:'KUNNSKAP'},mot:{d:+15,label:'MOT'}},
     items:['minnepenn'],
@@ -2438,14 +2606,14 @@ const STORY={
     img:I('https://images.unsplash.com/photo-1532153975070-2e9ab71f1b14?auto=format&fit=crop&w=760&q=80'),
     time:'12:00:00',rad:6,
     title:'MILITÆRBASEN',
-    intercept:'AVLYTTET RADIOSAMBAND: «Sektor 7 melder: sivil observert ved perimeteren. Sendes team.»',
+    intercept:'AVLYTTET RADIOSAMBAND: «Sektor 7 melder: sivil observert ved perimeteren. Sender team.»',
     text:`<p>Elstad guider deg gjennom en uoffisiell inngang bak et nedfalt gjerde. Basen er delvis operativ — halvparten av personellet er sendt til bunkerprosjektet. De som er igjen, virker desorienterte og usikre.</p>
-<em>I kommunikasjonsbygget: et fullskala satellitt-uplink-system. Kapabel til å sende kryptert data til samtlige norske mobiltelefoner samtidig. En nasjonal varselbeskjed. Fra innsiden.</em>
+<em>I kommunikasjonsbygget: et fullskala satellitt-uplink-system. I stand til å sende kryptert data til samtlige norske mobiltelefoner samtidig. En nasjonal varselbeskjed. Fra innsiden.</em>
 <p>Vakten foran kontrollrommet ser på klokken. Han ser bort. Ser på deg. Han er ung og virker trett.</p>`,
     stats:{mot:{d:+20,label:'MOT'},frykt:{d:+22,label:'FRYKT'}},
     choices:[
       {text:'Gå rett mot kontrollrommet. Vakten er ung og usikker.',target:'kontrollrom'},
-      {text:'Finn en annen inngang. Sabotasjen av strøm er mer pålitelig.',target:'stromsentralen', requires:{item:'sprengkap'}},
+      {text:'Finn en annen inngang. Strømsabotasje er mer pålitelig.',target:'stromsentralen', requires:{item:'sprengkap'}},
       {text:'Spre Elstads data via baseens interne nett. Lavrisiko.',target:'base_intern', requires:{item:'hacktool'}},
     ]
   },
@@ -2456,7 +2624,7 @@ const STORY={
     time:'10:00:00',rad:5,
     title:'INTERNT NETT',
     text:`<p>Du kobler hack-toolet inn i en nettverksplugg i en tom kantine. Elstad styrer dataoverføringen. Seks minutter. Alt går sømløst.</p>
-<em>Men det er noe galt — interne nettverk er lukket. Dataen når basemannskapet, men ikke omverdenen. Ikke nok.</em>
+<em>Men det er noe galt — interne nettverk er lukket. Dataene når basemannskapet, men ikke omverdenen. Ikke nok.</em>
 <p>Du trenger en ekstern antenne. Enten kontrollrommet på taket — eller satellittmasten utenfor.</p>`,
     stats:{kunnskap:{d:+20,label:'KUNNSKAP'}},
     items:['radiokode'],
@@ -2483,11 +2651,11 @@ const STORY={
   },
 
   kontrollrom_eps:{
-    shortName:'EPS-BOOST',
+    shortName:'EMP-BOOST',
     img:I('https://images.unsplash.com/photo-1558618047-3c8c76ca7d13?auto=format&fit=crop&w=760&q=80'),
     time:'07:00:00',rad:8,
     title:'SISTE 30 SEKUNDER',
-    text:`<p>Du utløser sprengkapselen i korridoren utenfor. Et lynraskt elektromagnetisk blink smelter låssystemene og stanser de inkommende vaktene i spor. Tretti sekunder.</p>
+    text:`<p>Du utløser sprengkapselen i korridoren utenfor. Et lynraskt elektromagnetisk blink smelter låssystemene og stanser de innkommende vaktene i spor. Tretti sekunder.</p>
 <em>Elstad sier rolig, nesten stille: «Det er klart. Trykk.»</em>
 <p>Meldingen er klar. 14 millioner telefoner. Bevisene. Videoene. Koordinatene til nødutgangene i alle bunkere. Alt.</p>`,
     stats:{mot:{d:+30,label:'MOT'}},
@@ -2541,7 +2709,7 @@ const STORY={
     time:'11:00:00',rad:8,
     title:'HAVNEN',
     text:`<p>Havnen er underlig tom og stille, bortsett fra bølgelyd og fjernlys fra en ankret oljeplattform-forsyningsbåt. Et kaiarbeiderrom med åpen dør. Kaffekanne fremdeles varm.</p>
-<em>En håndskrevet melding på tavlen inne i rommet: «UBÅT KNM UREDD — KAIPLASS 7 — AVGÅR 06:00 UANSETT HVAD.»</em>
+<em>En håndskrevet melding på tavlen inne i rommet: «UBÅT KNM UREDD — KAIPLASS 7 — AVGÅR 06:00 UANSETT HVA.»</em>
 <p>KNM Uredd er en norsk ubåt. Den er ikke registrert i noen offisiell base-oversikt du noen gang har sett. Kaiplass 7 er to hundre meter herfra.</p>`,
     stats:{kunnskap:{d:+20,label:'KUNNSKAP'},frykt:{d:+15,label:'FRYKT'}},
     items:['ubatkode'],
@@ -2654,7 +2822,7 @@ const STORY={
     time:'04:00:00',rad:10,
     title:'90 SEKUNDER',
     text:`<p>Fremdriftslinjen kryper. <strong>28%.</strong> En riflekolbe treffer ytterdøren med et smell som ryster veggen. <strong>55%.</strong> Et panel knekker. <strong>79%.</strong> Lyden av metall mot metall i korridoren.</p>
-<em>En arm tvinger seg gjennom det sprukne panelet. Greiper rundt skulderen din og drar. <strong>92%.</strong></em>
+<em>En arm tvinger seg gjennom det sprukne panelet. Griper rundt skulderen din og drar. <strong>92%.</strong></em>
 <p>Tre sekunder til fullstendig overføring. Og én arm som holder deg fast. Du kan ikke gjøre begge deler. <strong>Det er ett valg igjen.</strong></p>`,
     stats:{mot:{d:+35,label:'MOT'},frykt:{d:+30,label:'FRYKT'}},
     choices:[
@@ -2688,7 +2856,7 @@ const STORY={
     img:I('https://images.unsplash.com/photo-1598899134739-24c46f58b8c0?auto=format&fit=crop&w=760&q=80'),
     time:'06:00:00',rad:2,
     title:'DIREKTE SENDING',
-    text:`<p>Du sparker inn studiodøren. Ankeren spretter til sides. Det røde kameraet blinker: <strong>PÅ LUFTA.</strong></p>
+    text:`<p>Du sparker inn studiodøren. Nyhetsankeret spretter til side. Det røde kameraet blinker: <strong>PÅ LUFTA.</strong></p>
 <em>Millioner av seere. Noen i bilen. Noen i kø foran bunkeren. Noen allerede innenfor — med sine telefoner.</em>
 <p>Fingrene rister. Kameraet venter. Hele landet venter.</p>`,
     stats:{frykt:{d:+35,label:'FRYKT'},mot:{d:+30,label:'MOT'}},
@@ -2704,7 +2872,7 @@ const STORY={
     time:'05:30:00',rad:2,
     title:'SIMULTANAKSJON',
     text:`<p>Elstad løper ned. Du løper opp. Dere deler alt på to fronter i samme øyeblikk.</p>
-<em>TV-sendingens røde lys blinker. Serveropplastet bekreftes med en grønn pling på telefonen din.</em>
+<em>TV-sendingens røde lys blinker. Serveropplastingen bekreftes med en grønn pling på telefonen din.</em>
 <p>Det digitale og det analoge. Samtidig. Det er ikke ett hull å plugge — det er to flammer å slukke.</p>`,
     stats:{mot:{d:+35,label:'MOT'},kunnskap:{d:+20,label:'KUNNSKAP'}},
     choices:[
@@ -2735,7 +2903,7 @@ const STORY={
     title:'UTEN ADGANGSKORT',
     text:`<p>Du overstyrer krypteringen manuelt. Det tar to minutters tid du ikke egentlig har. Dørene holder på å gi.</p>
 <em>Opplasting: 45%... 67%... 89%...</em>
-<p>Vakten er gjennom sprekken i dørkarmen. Greiper etter deg.</p>`,
+<p>Vakten er gjennom sprekken i dørkarmen. Griper etter deg.</p>`,
     stats:{frykt:{d:+30,label:'FRYKT'},mot:{d:+25,label:'MOT'}},
     choices:[
       {text:'HOLD INNE. IKKE GI DEG NÅ.',target:'slutt2'},
@@ -2751,7 +2919,7 @@ const STORY={
     img:I('https://images.unsplash.com/photo-1508739773434-c26b3d09e071?auto=format&fit=crop&w=760&q=80'),
     time:'04:00:00',rad:10,
     title:'STRØMSENTRALEN',
-    text:`<p>Dere stormer inn. Fire av dere. Tre politienheter i bakhold. Rød laserkorsfeste over brystet ditt.</p>
+    text:`<p>Dere stormer inn. Fire av dere. Tre politienheter i bakhold. Røde laserprikker over brystet ditt.</p>
 <em>Hovedbryteren er 1,8 meter foran deg. Én ting skiller deg fra den: vilje.</em>
 <p>Politioffiseren roper: «Legg dere ned! LEGG DEG NED!»</p>`,
     stats:{frykt:{d:+38,label:'FRYKT'},mot:{d:+28,label:'MOT'}},
@@ -2763,7 +2931,7 @@ const STORY={
   },
 
   stromsentralen_eps:{
-    shortName:'EPS-BRYTEREN',
+    shortName:'EMP-BRYTEREN',
     img:I('https://images.unsplash.com/photo-1558618047-3c8c76ca7d13?auto=format&fit=crop&w=760&q=80'),
     time:'03:30:00',rad:10,
     title:'ELEKTROMAGNETISK PULS',
@@ -2786,9 +2954,9 @@ const STORY={
     time:'17:00:00',rad:10,
     title:'VEIKONTROLLPOST',
     intercept:'RADIOSAMBAND AVLYTTET: «Kontrollpost Sierra rapporterer: sivil nekter å stoppe. Sender bil.»',
-    text:`<p>Et improvisert veisperring av betongblokker og piggtråd tvers over E18. Seks soldater uten gjenkjennelige merker. En sivil ID-skanner som lyser grønt og rødt på bilister foran deg.</p>
+    text:`<p>En improvisert veisperring av betongblokker og piggtråd tvers over E18. Seks soldater uten gjenkjennelige merker. En sivil ID-skanner som lyser grønt og rødt på bilister foran deg.</p>
 <em>En av soldatene plasserer hånden på taket av kjøretøyet ditt og møter blikket ditt gjennom vinduet: «Alle reiser til bunkeren må autoriseres. Stå i kø.»</em>
-<p>Fra posisjonen din ser du en rød Volvo to biler foran bli eskortert av til siden. Sjåføren protesterer. Ingen lytter. Du har sekunder til å bestemme deg.</p>`,
+<p>Fra posisjonen din ser du en rød Volvo to biler foran bli eskortert ut til siden. Sjåføren protesterer. Ingen lytter. Du har sekunder til å bestemme deg.</p>`,
     stats:{frykt:{d:+28,label:'FRYKT'},rad:{d:+5,label:'STRÅLING'}},
     choices:[
       {text:'Bruk presse-ID. Krev pressefrihet og passasje.',target:'checkpoint_passert', requires:{item:'presseID'}},
@@ -2802,9 +2970,9 @@ const STORY={
     img:I('https://images.unsplash.com/photo-1536440136628-849c177e76a1?auto=format&fit=crop&w=760&q=80'),
     time:'15:30:00',rad:8,
     title:'GJENNOM LINJENE',
-    text:`<p>Soldaten ser på kortet ditt. Ser på deg. To lange sekunder. Deretter vinker ham deg gjennom uten å si et ord — men han noterer nummerskiltregistreringen på en liten blokk.</p>
+    text:`<p>Soldaten ser på kortet ditt. Ser på deg. To lange sekunder. Deretter vinker han deg gjennom uten å si et ord — men han noterer registreringsnummeret ditt på en liten blokk.</p>
 <em>Du er gjennom. For nå.</em>
-<p>Fra bilradioen: et svakt signal fra en piratfrekvens. En stemme du kjenner igjen — en journalist som jobbet for NRK frem til 2022, da han ble «frivillig» pensjonert. Han gir koordinater til et møtepunkt i Oslosentrum.</p>`,
+<p>Fra bilradioen: et svakt signal fra en piratfrekvens. En stemme du kjenner igjen — en journalist som jobbet for NRK frem til 2022, da han ble «frivillig» pensjonert. Han gir koordinater til et møtepunkt i Oslo sentrum.</p>`,
     stats:{mot:{d:+18,label:'MOT'},kunnskap:{d:+12,label:'KUNNSKAP'}},
     items:['radiokode'],
     choices:[
@@ -2820,7 +2988,7 @@ const STORY={
     title:'INNGANGEN',
     intercept:'KLASSIFISERT — BUNKERADMIN: «Kapasitetsgrensen nådd. Sekundering: ingen avvikere. Portene stenger kl. 06:00. Underskrift: Prosjektleder Solnedgang»',
     text:`<p>Bunkerporten er gigantisk — en stålskive på tre meter med hydraulisk åpningsmekanisme. Køen av folk strekker seg tre kilometer. Mange kjenner på den truende frykten for at porten stenger før de kommer frem.</p>
-<em>Men noe er galt: folk som kommer ut igjen fra innsiden, ser ikke lettet ut. De ser forvirret ut. Disorienterte.</em>
+<em>Men noe er galt: folk som kommer ut igjen fra innsiden, ser ikke lettet ut. De ser forvirret ut. Desorienterte.</em>
 <p>En eldre kvinne griper armen din: «De tar telefonene. Alle telefonene. Inni der er man avskåret fra alt.»</p>`,
     stats:{frykt:{d:+22,label:'FRYKT'},kunnskap:{d:+25,label:'KUNNSKAP'}},
     choices:[
@@ -2834,8 +3002,8 @@ const STORY={
     img:I('https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?auto=format&fit=crop&w=760&q=80'),
     time:'12:00:00',rad:3,
     title:'BAK STÅLDØREN',
-    text:`<p>Innsiden lukter betong og desinfeksjonsmiddel. Lange hvite ganger. Folk i uniformerte grå drakter. Ingen snakker høyt. Vakter ved hvert kryss.</p>
-<em>Du skjønner det umiddelbart: dette er ikke en bunker. Det er et fengsel uten barer. En styrt karantene der ingen kommer ut igjen frivillig.</em>
+    text:`<p>Innsiden lukter betong og desinfeksjonsmiddel. Lange hvite ganger. Folk i like, grå drakter. Ingen snakker høyt. Vakter ved hvert kryss.</p>
+<em>Du skjønner det umiddelbart: dette er ikke en bunker. Det er et fengsel uten sprinkler. En styrt karantene der ingen kommer ut igjen frivillig.</em>
 <p>Det er ett faktum som er viktigere enn alle andre: du fant bunkerkart-enheten som lå ved inngangen — uoffisielt, ment for personell. Den viser nødutganger som <strong>ikke er på det offisielle kartet</strong>.</p>`,
     stats:{kunnskap:{d:+40,label:'KUNNSKAP'},frykt:{d:+20,label:'FRYKT'}},
     items:['bunkerkart'],
@@ -2850,9 +3018,9 @@ const STORY={
     img:I('https://images.unsplash.com/photo-1568992688065-536aad8a12f6?auto=format&fit=crop&w=760&q=80'),
     time:'08:00:00',rad:4,
     title:'MASSEUTGANG',
-    text:`<p>Du finner seks andre som tenker som deg. En ex-advokat, en lege, to lærere og to unge menn med ingeniørbakgrunn. Ingen har gitt opp ennå.</p>
+    text:`<p>Du finner seks andre som tenker som deg. En tidligere advokat, en lege, to lærere og to unge menn med ingeniørbakgrunn. Ingen har gitt opp ennå.</p>
 <em>Legen hvisker: «NE-7-utgangen leder ut i en tunnel som ender 400 meter nord for perimeteren. Hvis bunkerkartenheten er ekte, kan vi gå. Men vi trenger noen til å holde vakten opptatt.»</em>
-<p>Syv mennesker. Én sjanse. Mørket er din beste allierte — bunkeren slukker lyset i fem minutter kl. 03:00 for å spare strøm.</p>`,
+<p>Syv mennesker. Én sjanse. Mørket er din beste alliert — bunkeren slukker lyset i fem minutter kl. 03:00 for å spare strøm.</p>`,
     stats:{mot:{d:+35,label:'MOT'},kunnskap:{d:+15,label:'KUNNSKAP'}},
     choices:[
       {text:'Kl. 03:00 — ALLE LØPER. Mot NE-7.',target:'slutt2', requires:{item:'bunkerkart'}},
@@ -2865,7 +3033,7 @@ const STORY={
     img:I('https://images.unsplash.com/photo-1519389950473-47ba0277781c?auto=format&fit=crop&w=760&q=80'),
     time:'16:00:00',rad:5,
     title:'BAKGATEN',
-    text:`<p>En forlatt bar i bakgaten bak Grønland torg. Vinduene tapet med avispapir. Elleve bærbare datamaskiner på radikke bord. Journalisten — Kjetil, 56 år — tar deg i hånden som om han har ventet i årevis.</p>
+    text:`<p>En forlatt bar i bakgaten bak Grønland torg. Vinduene tapet med avispapir. Elleve bærbare datamaskiner på vaklevorne bord. Journalisten — Kjetil, 56 år — tar deg i hånden som om han har ventet i årevis.</p>
 <em>«Jeg har prøvd å publisere dette siden 2021. Ingen trodde meg. Nå tror alle meg — men nå er de alle redde for livet.»</em>
 <p>Han har et fungerende direktesendings-oppsett. Nok båndbredde til å sende til fire internasjonale kanaler. Men det er kortvarig — nettforbindelsen vil bli kuttet innen en time.</p>`,
     stats:{kunnskap:{d:+30,label:'KUNNSKAP'},mot:{d:+20,label:'MOT'}},
@@ -2873,7 +3041,7 @@ const STORY={
     choices:[
       {text:'Send alt du har via hans oppsett — nå.',target:'slutt2', requires:{item:'minnepenn'}},
       {text:'Hans bevis alene er ikke nok. Dra til nyhetsbygget med ham.',target:'nyhetshuset'},
-      {text:'Del det via hans satelittkanal — ingen trenger å vite hvem du er.',target:'slutt_hemmelig', requires:{item:'minnepenn',statMin:{kunnskap:65}}},
+      {text:'Del det via hans satellittkanal — ingen trenger å vite hvem du er.',target:'slutt_hemmelig', requires:{item:'minnepenn',statMin:{kunnskap:65}}},
     ]
   },
 
@@ -2899,13 +3067,13 @@ const STORY={
     time:'17:00:00',rad:14,
     title:'TUNNELENS HJERTE',
     text:`<p>Tre kilometer inn i T-banenettet er det en underjordisk stasjon som ikke er på noe kart. En dør merket VEDLIKEHOLD — men bak den: ren betong, brede korridorer og belysning som ikke er slukket.</p>
-<em>En metallskilt: «SIVILT KRISESENTER — OSLO KNS-2 — KAPASITET: 12 000 — BEREDSKAP: AKTIV»</em>
+<em>Et metallskilt: «SIVILT KRISESENTER — OSLO KNS-2 — KAPASITET: 12 000 — BEREDSKAP: AKTIV»</em>
 <p>Dette er det andre bunkersystemet. Det offisielle, ikke-klassifiserte. Ingen har blitt fortalt om det — fordi myndighetene ønsket at alle skulle samles i de klassifiserte. Kontroll krever konsentrasjon.</p>`,
     stats:{kunnskap:{d:+45,label:'KUNNSKAP'},rad:{d:+8,label:'STRÅLING'}},
     choices:[
       {text:'Hent folk fra den lange køen til det offisielle systemet hit.',target:'slutt2', requires:{statMin:{mot:60}}},
       {text:'Bruk bunkerens kommunikasjonssystem til å kringkaste sannheten.',target:'slutt2'},
-      {text:'Du er alene og radstrålingen er for høy. Løp ut.',target:'skogens_inngang'},
+      {text:'Du er alene og strålingen er for høy. Løp ut.',target:'skogens_inngang'},
     ]
   },
 
@@ -2914,8 +3082,8 @@ const STORY={
     img:I('https://images.unsplash.com/photo-1587854692152-cbe660dbde88?auto=format&fit=crop&w=760&q=80'),
     time:'20:00:00',rad:15,
     title:'PLYNDRET APOTEK',
-    text:`<p>Vinduet er slått inn. Halvparten av hylle er tømt, men de visste ikke hva de så etter. Bak skranken, i kjølerommet: forseglet kasse merket <strong>«STRÅLINGSVERN — TIL MEDISINSK PERSONELL»</strong>. Inneholder tre ampuller Serum Type A — sterkere variant enn B.</p>
-<em>En grønn lys blinker fra et batteri-TV bak kassen. En nyhetsanker leser med hvit ansikt: «...Norsk meteorologisk institutt nekter å kommentere ryktene om at strålingsdosene er overvurdert med faktor ti...»</em>
+    text:`<p>Vinduet er slått inn. Halvparten av hyllene er tømt, men de visste ikke hva de så etter. Bak skranken, i kjølerommet: forseglet kasse merket <strong>«STRÅLINGSVERN — TIL MEDISINSK PERSONELL»</strong>. Inneholder tre ampuller Serum Type A — sterkere variant enn B.</p>
+<em>Et grønt lys blinker fra en batteri-TV bak disken. Et nyhetsanker leser opp, likblek: «...Norsk meteorologisk institutt nekter å kommentere ryktene om at strålingsdosene er overvurdert med faktor ti...»</em>
 <p>Ti ganger overdrevet. Hvis det er sant, er solstormen farlig — men ikke dødelig. I dager, ikke timer.</p>`,
     stats:{kunnskap:{d:+35,label:'KUNNSKAP'},rad:{d:-25,label:'STRÅLING BEHANDLET'}},
     items:['serum'],
@@ -2936,7 +3104,7 @@ const STORY={
 <p>Ambassaden er nøytral grunn. Her kan du ikke arresteres. Her finnes en sikker kommunikasjonslinje direkte til internasjonale medier og FN-etater.</p>`,
     stats:{mot:{d:+25,label:'MOT'},kunnskap:{d:+15,label:'KUNNSKAP'}},
     choices:[
-      {text:'Overfør alt via ambassadens sikre linje. Ber dem spre det internasjonalt.',target:'slutt2', requires:{item:'minnepenn'}},
+      {text:'Overfør alt via ambassadens sikre linje. Be dem spre det internasjonalt.',target:'slutt2', requires:{item:'minnepenn'}},
       {text:'Be om diplomatisk eskorte til nyhetsbygget — bevisene trenger norsk publikum.',target:'nyhetshuset'},
       {text:'Be ambassaden huse deg mens du koordinerer med motstanden.',target:'undergrunn_møte'},
     ]
@@ -2966,7 +3134,7 @@ const STORY={
     title:'DEN FORLATTE TRIKKEN',
     intercept:'AM-SIGNAL FANGET — 612 kHz: «...til alle som hører dette: elektrisiteten er ennå ikke kuttet. Dere har et vindu. Bruk det.»',
     text:`<p>En gammel trikk står stille på skinnene ved Nationaltheatret. Dørene åpne. Motoren av. Men inni: sju mennesker som valgte den tredje muligheten — verken bunker eller flukt. Bare her.</p>
-<em>En eldre ingeniørpensjonist har koblet opp et gammeldags AM-radiosystem via trikken strømskinne. Han sier rolig: «Den når alle bilradioer i en radius på ti kilometer. Gammel teknologi. Ingen kan blokkere den raskt nok.»</em>
+<em>En eldre ingeniørpensjonist har koblet opp et gammeldags AM-radiosystem via trikkens strømskinne. Han sier rolig: «Den når alle bilradioer i en radius på ti kilometer. Gammel teknologi. Ingen kan blokkere den raskt nok.»</em>
 <p>Det er noe uventet beroligende med dette rommet. Noen mennesker som bare nekter å la seg styre av frykt.</p>`,
     stats:{mot:{d:+28,label:'MOT'},frykt:{d:-15,label:'FRYKT REDUSERT'}},
     choices:[
@@ -3019,7 +3187,7 @@ const STORY={
     text:`<p>Klokken tikker til null. Ingen varmebølge. Ingen katastrofe. En stillhet som trekker ut i minutter, timer — du vet ikke lenger.</p>
 <p>Noe stikker i nakken. Raskt, presist, fra noe du ikke så. Verden dimmer som et TV-apparat som mister signalet. Du våkner fastspent til en metallstol. Hvite vegger uten vinduer. Intet ur. Ingen lyd bortsett fra klimaanlegget.</p>
 <em>En stemme fra et sted du ikke kan lokalisere: «Subjekt 4471 sikret og registrert. Fase To initieres. Permanent observasjonskategori A.»</em>
-<p>Du visste noe ingen andre visste. Men du handlet for sent, stolte feil, eller slapp taket i det avgjørende øyeblikket. Nå er du en datapunkt. Prosjekt Solnedgang fortsetter med deg som en del av det.</p>`,
+<p>Du visste noe ingen andre visste. Men du handlet for sent, stolte feil, eller slapp taket i det avgjørende øyeblikket. Nå er du et datapunkt. Prosjekt Solnedgang fortsetter med deg som en del av det.</p>`,
     choices:[]
   },
 
@@ -3033,7 +3201,7 @@ const STORY={
     endingDesc:'Du ofret alt og holdt ut til siste sekund.',
     intercept:'SISTE AVLYTTEDE MELDING — PROSJEKTLEDER: «Det er over. Trekk alle team ut. Prosjekt Solnedgang er kompromittert. Gjenta: kompromittert.»',
     text:`<p>Signalet sprer seg. Innen tre minutter er det på alle radiokanaler og i alle norske telefoner. Innen seks er bunkerdørene i teknisk trøbbel — låssystemene kjenner ikke koden lenger. Innen ti minutter er tre av dem åpne på vidt gap.</p>
-<p>Folkemassene snur sin kollektive panikk mot en annen retning. Mot bunkerdørene. Mot sannheten. Mot menneskene som planla dette. Innen soloppgang er seks prosjektledere pågrepet på bestilling fra fire uavhengige internasjonale domstoler.</p>
+<p>Folkemassene snur sin kollektive panikk mot en annen retning. Mot bunkerdørene. Mot sannheten. Mot menneskene som planla dette. Innen soloppgang er seks prosjektledere pågrepet etter ordre fra fire uavhengige internasjonale domstoler.</p>
 <em>«En ukjent person — anslagsvis alene, sier en kilde i PST — handlet i en smal tidsluke og reddet 50 000 mennesker fra permanent internering.»</em>
 <p>De fant deg aldri. Du forsvant rolig inn i den første lyse morgenen på lenge. Ingen vet hvem du er. Det er mer enn nok.</p>`,
     choices:[]
@@ -3045,12 +3213,12 @@ const STORY={
     time:'00:00:00',rad:0,
     title:'HORISONTEN',
     ending:'solo',
-    endingLabel:'SLUTT 3 — DEN ENSOMME OVERLEVEREN',
+    endingLabel:'SLUTT 3 — DEN ENSOMME OVERLEVENDE',
     endingDesc:'Du overlevde. Men til hvilken pris?',
     text:`<p>Du er fri. Frisk luft. Graner og taushet. Ingen solstorm treffer deg. Du hadde rett om alt.</p>
 <p>Men reiseradioen din plukker opp en nyhetssending som aldri slutter: lyder av massive ståldører. Reportere som gråter. Titusenvis forseglet inne for godt.</p>
 <em>Du visste. Du hadde muligheten. Du valgte deg selv.</em>
-<p>Det er ikke straff — det er bare konsekvens. Du lever med frisk luft og den stilleste av alle skrik inni deg. For alltid.</p>`,
+<p>Det er ikke straff — det er bare konsekvens. Du lever med frisk luft og det stilleste av alle skrik inni deg. For alltid.</p>`,
     choices:[]
   },
 
@@ -3074,7 +3242,11 @@ const STORY={
 // ══════════════════════════════════════════════════
 //  RENDER ENGINE
 // ══════════════════════════════════════════════════
+let renderToken=0, busy=false;
 function render(passageId){
+  const token=++renderToken;
+  busy=true;
+  kbChoices=[];
   initAudio();
   playClick();
   playWhoosh();
@@ -3083,8 +3255,13 @@ function render(passageId){
   doVignette();
 
   setTimeout(()=>{
+    if(token!==renderToken) return;
     const p=STORY[passageId];
-    if(!p) return;
+    if(!p){ busy=false; return; }
+
+    // Autosave: the state as it was when entering this scene
+    if(p.ending) lsDel(SAVE_KEY);
+    else saveGame(passageId);
 
     state.visited.add(passageId);
     updatePath(passageId);
@@ -3093,11 +3270,23 @@ function render(passageId){
     if(p.stats) applyStats(p.stats);
     if(p.items) p.items.forEach(id=>addItem(id));
 
+    // Radiation reached 100 with no antidote left
+    if(state.dying&&passageId!=='slutt_rad'){
+      lsDel(SAVE_KEY);
+      setTimeout(()=>render('slutt_rad'),400);
+      return;
+    }
+
     // Geiger ticker — intensity scales with radiation level
     stopGeiger();
-    if(state.rad>=70) startGeiger(3);
-    else if(state.rad>=40) startGeiger(2);
-    else if(state.rad>=15) startGeiger(1);
+    if(!p.ending){
+      if(state.rad>=70) startGeiger(3);
+      else if(state.rad>=40) startGeiger(2);
+      else if(state.rad>=15) startGeiger(1);
+    } else {
+      stopHeartbeat();
+      document.getElementById('game-wrap').classList.remove('hb-fast');
+    }
 
     if(p.intercept) setTimeout(()=>showIntercept(p.intercept),2000);
 
@@ -3133,7 +3322,7 @@ function render(passageId){
       p.choices.forEach((c,i)=>{
         const{locked,reason}=choiceLocked(c);
         const lc=locked?' locked':'';
-        const oc=locked?'':` onclick="handleChoice('${c.target}')"`;
+        const oc=locked?' disabled':` onclick="handleChoice('${c.target}')"`;
         const badge=reason?`<span class="req-badge">🔒 ${reason}</span>`:'';
         const keyNum=locked?'·':`${i+1}`;
         choicesHtml+=`<button class="choice-btn${lc}"${oc} data-choice="${i}"><span class="key-hint">${keyNum}</span><span class="choice-text">${c.text}${badge}</span></button>`;
@@ -3146,9 +3335,21 @@ function render(passageId){
     let endHtml='';
     if(p.ending){
       const col={bad:'#ff1a1a',good:'#ffbe00',solo:'#667788',secret:'#00e5ff',rad:'#00ff88'}[p.ending]||'#fff';
+      const found=lsGet(ENDINGS_KEY,[]);
+      const isNew=!found.includes(passageId);
+      if(isNew){ found.push(passageId); lsSet(ENDINGS_KEY,found); setTimeout(()=>showToast('★ NY SLUTT LÅST OPP','good'),1800); }
+      const list=ENDING_ORDER.map(id=>{
+        const got=found.includes(id);
+        const cls=id===passageId?'now':got?'got':'';
+        return `<li class="${cls}">${got?'◆ '+STORY[id].endingLabel:'◇ ???'}</li>`;
+      }).join('');
       endHtml=`<div class="ending-wrap">
         <div class="ending-title ${p.ending}">${p.endingLabel}</div>
         <div class="ending-sub" style="color:${col};opacity:.55;">${p.endingDesc}</div>
+        <div class="endings-found">
+          <div class="endings-found-label">SLUTTER FUNNET: ${found.filter(id=>ENDING_ORDER.includes(id)).length} / ${ENDING_ORDER.length}</div>
+          <ul>${list}</ul>
+        </div>
       </div>`;
     }
 
@@ -3161,15 +3362,18 @@ function render(passageId){
       <div id="scene-title" data-text="${p.title}">${p.title}</div>
       <div id="story-text">${p.text}</div>
       ${endHtml}
-      <div id="choices" style="opacity:0;transition:opacity .65s ease;">${choicesHtml}</div>
+      <div id="choices" class="waiting" style="opacity:0;transition:opacity .65s ease;">${choicesHtml}</div>
     `;
 
     typewrite(document.getElementById('story-text'),p.text,9,()=>{
+      if(token!==renderToken) return;
       const choicesEl=document.getElementById('choices');
+      if(!choicesEl) return;
       choicesEl.style.opacity='1';
-      // Wire keyboard shortcuts to actual rendered buttons
-      const btns=Array.from(choicesEl.querySelectorAll('.choice-btn:not(.locked)'));
-      setupKeyboard(btns);
+      choicesEl.classList.remove('waiting');
+      busy=false;
+      // Key N presses the button labelled N (locked ones are skipped)
+      setupKeyboard(Array.from(choicesEl.querySelectorAll('.choice-btn')));
     });
     // Every scene transition gets a scan bar sweep + whoosh
     doScanBar();
@@ -3293,8 +3497,57 @@ function render(passageId){
 }
 
 function handleChoice(target){
+  if(busy) return;
+  busy=true;
   window.scrollTo({top:0,behavior:'instant'});
   render(target);
+}
+
+function saveGame(sceneId){
+  lsSet(SAVE_KEY,{
+    scene:sceneId,
+    stats:{frykt:state.frykt,mot:state.mot,kunnskap:state.kunnskap,rad:state.rad},
+    inventory:state.inventory.slice(),
+    path:state.path.slice(),
+    visited:Array.from(state.visited),
+    radMilestones:Array.from(radMilestones),
+  });
+}
+function loadSave(){
+  const sv=lsGet(SAVE_KEY,null);
+  if(!sv||!STORY[sv.scene]||STORY[sv.scene].ending) return null;
+  return sv;
+}
+function resumeGame(){
+  const sv=loadSave();
+  if(!sv){ beginExperience(); return; }
+  const gate=document.getElementById('start-gate');
+  if(gate) gate.remove();
+  initAudio();
+  scheduleDistantBoom();
+  scheduleRadioChatter();
+  document.getElementById('pre-boot').classList.add('gone');
+  const boot=document.getElementById('boot');
+  boot.classList.remove('active'); boot.classList.add('hidden');
+  const gw=document.getElementById('game-wrap');
+  gw.style.display=''; gw.style.opacity='1';
+  resetState();
+  Object.entries(sv.stats||{}).forEach(([k,v])=>{
+    if(!(k in state)) return;
+    state[k]=Math.max(0,Math.min(100,Number(v)||0));
+    const bar=document.getElementById('bar-'+k), val=document.getElementById('val-'+k);
+    if(bar) bar.style.width=state[k]+'%';
+    if(val) val.textContent=state[k];
+  });
+  radBar.style.width=state.rad+'%';
+  state.inventory=(sv.inventory||[]).filter(id=>ITEMS[id]);
+  state.path=(sv.path||[]).filter(id=>STORY[id]);
+  state.visited=new Set(sv.visited||[]);
+  radMilestones=new Set(sv.radMilestones||[]);
+  sceneCount=state.path.length;
+  drawInventory(); drawPath(); updateRadAmbience(); updateThreatLevel();
+  window.scrollTo({top:0,behavior:'instant'});
+  render(sv.scene);
 }
 
 function startOver(){
@@ -3905,9 +4158,34 @@ window.onload=()=>{
   // scheduleDistantBoom started after audio init in beginExperience()
 };
 
+function setupGate(){
+  refreshSettingsUI();
+  const found=lsGet(ENDINGS_KEY,[]).filter(id=>ENDING_ORDER.includes(id));
+  if(found.length){
+    const el=document.getElementById('sg-endings');
+    if(el) el.textContent=`${found.length}/${ENDING_ORDER.length} SLUTTER FUNNET`;
+  }
+  const sv=loadSave();
+  if(sv){
+    document.getElementById('sg-continue-row').style.display='';
+    const n=String((sv.path||[]).length+1).padStart(2,'0');
+    document.getElementById('sg-continue').textContent=`▶ FORTSETT — SONE ${n}: ${STORY[sv.scene].shortName||STORY[sv.scene].title}`;
+  }
+  const gate=document.getElementById('start-gate');
+  if(gate) gate.focus({preventScroll:true});
+}
+document.addEventListener('keydown',e=>{
+  const gate=document.getElementById('start-gate');
+  if(!gate||e.target!==gate) return;
+  if(e.key==='Enter'||e.key===' '){ e.preventDefault(); beginExperience(); }
+});
+setupGate();
+
 function beginExperience(){
   const gate=document.getElementById('start-gate');
   if(!gate) return;
+  if(gate.dataset.started) return;
+  gate.dataset.started='1';
   gate.style.transition='opacity .3s';
   gate.style.opacity='0';
   setTimeout(()=>gate.remove(), 350);
@@ -3986,6 +4264,7 @@ function startPreBoot(){
     setTimeout(doGlitch,55); setTimeout(doGlitch,120);
     setTimeout(doGlitch,195); setTimeout(doGlitch,280); setTimeout(doGlitch,390);
     const pl=document.getElementById('prelude');
+    if(fxOff()) return;
     let f=0; const iv=setInterval(()=>{
       pl.style.opacity=f%2===0?'0.04':'1';
       pl.style.transform=f%2===0?`skewX(${(Math.random()-.5)*8}deg) translateX(${(Math.random()-.5)*36}px) scaleY(${0.93+Math.random()*.14})`:'none';
